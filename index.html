@@ -1974,11 +1974,24 @@ function renderAdminList() {
   `).join('');
 }
 
-$('edPhotoFile').addEventListener('change', e => {
-  const f = e.target.files[0]; if (!f) return;
-  const reader = new FileReader();
-  reader.onload = ev => { $('edPhotoUrl').value = ev.target.result; toast('📷 تم وضع الصورة بنجاح'); };
-  reader.readAsDataURL(f);
+$('edGalleryFiles').addEventListener('change', e => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  const previewBox = $('edGalleryPreview');
+  previewBox.innerHTML = '';
+  const currentGallery = [];
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      currentGallery.push(ev.target.result);
+      if (currentGallery.length === 1) $('edPhotoUrl').value = ev.target.result;
+      previewBox.innerHTML += `<img src="${ev.target.result}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`;
+      $('edGalleryData').value = JSON.stringify(currentGallery);
+    };
+    reader.readAsDataURL(file);
+  });
+  toast(`📷 تم إرفاق ${files.length} صور`);
 });
 
 window.openEditorModal = id => {
