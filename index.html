@@ -9,20 +9,39 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #040911; --surface: #09131f; --card: #0f1c2e; --card-hover: #15263d;
-    --border: rgba(217, 180, 90, 0.25); --border-soft: rgba(255, 255, 255, 0.08);
-    --text: #f8fafc; --muted: #94a3b8; --gold: #D9B45A; --gold-light: #F6E29A;
-    --emerald: #10b981; --teal-glow: #14b8a6; --rose: #f43f5e; --blue: #3b82f6; --violet: #a855f7;
+    --bg: #040911;
+    --surface: #09131f;
+    --card: #0f1c2e;
+    --card-hover: #15263d;
+    --border: rgba(217, 180, 90, 0.25);
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --gold: #D9B45A;
+    --gold-light: #F6E29A;
+    --emerald: #10b981;
+    --teal-glow: #14b8a6;
+    --rose: #f43f5e;
+    --blue: #3b82f6;
+    --violet: #a855f7;
   }
   html.light {
-    --bg: #e2eeec; --surface: #f4f9f8; --card: #ffffff; --card-hover: #f8fafc;
-    --border: rgba(11, 46, 58, 0.18); --border-soft: rgba(11, 46, 58, 0.09);
-    --text: #0B2E3A; --muted: #64748b;
+    --bg: #e2eeec;
+    --surface: #f4f9f8;
+    --card: #ffffff;
+    --card-hover: #f8fafc;
+    --border: rgba(11, 46, 58, 0.18);
+    --border-soft: rgba(11, 46, 58, 0.09);
+    --text: #0B2E3A;
+    --muted: #64748b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body {
-    background-color: var(--bg); color: var(--text);
-    font-family: 'IBM Plex Sans Arabic', Tahoma, sans-serif; line-height: 1.5; overflow-x: hidden;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans Arabic', Tahoma, sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
   }
   .font-display { font-family: 'Reem Kufi', 'IBM Plex Sans Arabic', sans-serif; }
   .hidden { display: none !important; }
@@ -52,7 +71,8 @@
   .main-window {
     max-width: 1240px; margin: 0 auto 30px; background: var(--surface);
     border: 1px solid var(--border); border-radius: 26px;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8); min-height: 86vh; position: relative; overflow: hidden;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8); min-height: 86vh; position: relative;
+    overflow: hidden;
   }
   .window-nav {
     display: flex; align-items: center; justify-content: space-between;
@@ -64,54 +84,133 @@
     background: rgba(15, 28, 46, 0.85); border: 1px solid var(--border); color: var(--gold); font-weight: 700; font-size: 13px;
   }
 
+  /* خلفية Jevi الزمردية المضيئة من العنوان حتى آخر التخصصات */
   .jevi-hero-stage {
     position: relative; padding: 22px 20px 22px; text-align: center;
     border-bottom: 1px solid rgba(45, 212, 191, 0.25);
-    background: radial-gradient(65% 85% at 50% 18%, rgba(20, 184, 166, 0.42) 0%, rgba(13, 148, 136, 0.22) 42%, rgba(6, 24, 34, 0.94) 85%, #06101b 100%);
-    box-shadow: inset 0 -24px 40px -15px rgba(4, 15, 25, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.2); overflow: hidden;
+    background:
+      radial-gradient(65% 85% at 50% 18%, rgba(20, 184, 166, 0.42) 0%, rgba(13, 148, 136, 0.22) 42%, rgba(6, 24, 34, 0.94) 85%, #06101b 100%),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 48px);
+    box-shadow: inset 0 -24px 40px -15px rgba(4, 15, 25, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+  .jevi-spotlight {
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 540px; height: 260px;
+    background: radial-gradient(circle, rgba(94, 234, 212, 0.35) 0%, rgba(217, 180, 90, 0.12) 45%, transparent 72%);
+    filter: blur(22px); pointer-events: none; z-index: 0;
+  }
+  .jevi-3d-emblem {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 240px; height: 240px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(45, 212, 191, 0.18), rgba(6, 78, 59, 0.08) 60%, transparent 75%);
+    border: 1px solid rgba(94, 234, 212, 0.14);
+    box-shadow: inset 0 0 40px rgba(45, 212, 191, 0.15); pointer-events: none; z-index: 0;
   }
   .jevi-hero-content { position: relative; z-index: 2; }
+
   .elegant-slogan {
-    font-size: clamp(26px, 3.8vw, 38px); font-weight: 700; margin-bottom: 14px;
-    display: inline-flex; align-items: center; gap: 10px; text-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+    font-size: clamp(26px, 3.8vw, 38px); font-weight: 700; letter-spacing: 0.4px;
+    margin-bottom: 14px; display: inline-flex; align-items: center; gap: 10px;
+    text-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
   }
   .slogan-white { color: #ffffff; }
   html.light .slogan-white { color: #0B2E3A; text-shadow: none; }
-  .slogan-gold { background: linear-gradient(135deg, #FFF6C2 0%, #D9B45A 55%, #B8860B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .slogan-gold {
+    background: linear-gradient(135deg, #FFF6C2 0%, #D9B45A 55%, #B8860B 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
 
   .ai-search-container { max-width: 780px; margin: 0 auto; position: relative; z-index: 50; }
   .ai-search-box {
     display: flex; align-items: center; gap: 10px; background: rgba(8, 22, 34, 0.82);
     backdrop-filter: blur(12px); border: 1.5px solid rgba(94, 234, 212, 0.35);
     border-radius: 18px; padding: 6px 8px 6px 14px;
+    box-shadow: 0 16px 38px -10px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
   .ai-search-box:focus-within { border-color: var(--gold); box-shadow: 0 0 28px -4px rgba(20, 184, 166, 0.45); }
   .ai-search-input { flex: 1; padding: 9px 6px; font-size: 15px; outline: none; }
+
   .autocomplete-dropdown {
     position: absolute; top: calc(100% + 6px); right: 0; left: 0;
     background: var(--card); border: 1px solid var(--gold); border-radius: 16px;
-    max-height: 290px; overflow-y: auto; text-align: right; z-index: 80; padding: 6px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.88); max-height: 290px; overflow-y: auto;
+    text-align: right; z-index: 80; padding: 6px;
   }
-  .auto-item { padding: 10px 12px; border-radius: 12px; cursor: pointer; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: space-between; }
+  .auto-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border-radius: 12px; cursor: pointer; border-bottom: 1px solid var(--border-soft);
+  }
   .auto-item:hover { background: var(--card-hover); }
 
-  .cats-modern-bar { max-width: 740px; margin: 15px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .cats-modern-bar {
+    max-width: 940px; margin: 15px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+  }
   .cat-orb-pill {
     display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 12px;
-    border-radius: 99px; background: rgba(7, 20, 32, 0.68); border: 1px solid rgba(94, 234, 212, 0.24); transition: all 0.18s ease;
+    border-radius: 99px; background: rgba(7, 20, 32, 0.68);
+    border: 1px solid rgba(94, 234, 212, 0.24); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
+    transition: all 0.18s ease;
   }
   .cat-orb-pill:hover { border-color: var(--gold); transform: translateY(-2px); }
-  .cat-orb-pill.active { background: linear-gradient(135deg, rgba(217,180,90,0.28), rgba(10, 30, 44, 0.92)); border: 1.5px solid var(--gold); }
-  .orb-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .cat-orb-pill.active {
+    background: linear-gradient(135deg, rgba(217,180,90,0.28), rgba(10, 30, 44, 0.92));
+    border: 1.5px solid var(--gold);
+  }
+  .orb-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: #fff;
+  }
 
-  .specs-filter-bar { max-width: 1020px; margin: 13px auto 0; display: flex; gap: 8px; overflow-x: auto; padding: 4px 4px 2px; scrollbar-width: none; justify-content: center; flex-wrap: wrap; }
+  .specs-filter-bar {
+    max-width: 1020px; margin: 13px auto 0; display: flex; gap: 8px;
+    overflow-x: auto; padding: 4px 4px 2px; scrollbar-width: none; justify-content: center; flex-wrap: wrap;
+  }
   .specs-filter-bar::-webkit-scrollbar { display: none; }
   .spec-chip {
     display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: 99px;
-    font-size: 12.5px; font-weight: 700; background: rgba(8, 22, 35, 0.72); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; white-space: nowrap; transition: all 0.15s ease;
+    font-size: 12.5px; font-weight: 700; background: rgba(8, 22, 35, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; white-space: nowrap; transition: all 0.15s ease;
   }
   .spec-chip:hover { border-color: var(--gold); color: #fff; }
   .spec-chip.active { background: var(--gold); color: #050811; border-color: var(--gold); }
+
+  @media (max-width: 640px) {
+    .main-window { border-radius: 24px 24px 0 0; margin-bottom: 0; border-left: none; border-right: none; }
+    .cats-modern-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .cat-orb-pill { flex-direction: column; border-radius: 20px; padding: 10px 4px; gap: 6px; }
+    .orb-icon { width: 46px; height: 46px; border-radius: 15px; }
+    .specs-filter-bar { justify-content: flex-start; flex-wrap: nowrap; }
+  }
+
+  .poster-section { padding: 14px 20px 6px; max-width: 1160px; margin: 0 auto; }
+  .poster-track {
+    display: flex; gap: 14px; overflow-x: auto; scroll-behavior: smooth;
+    scroll-snap-type: x mandatory; padding: 6px 2px 12px; scrollbar-width: none;
+  }
+  .poster-track::-webkit-scrollbar { display: none; }
+  .poster-card {
+    flex: 0 0 340px; scroll-snap-align: start; border-radius: 20px; padding: 12px 15px;
+    background: linear-gradient(155deg, #132238 0%, #0b1322 100%);
+    border: 1px solid var(--border); cursor: pointer; display: flex; flex-direction: column;
+    height: 154px; transition: transform 0.18s ease, border-color 0.18s ease; position: relative;
+  }
+  .poster-card:hover { transform: translateY(-3px); border-color: var(--gold); }
+  .poster-top-quarter {
+    height: 26%; min-height: 34px; display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; border-bottom: 1px solid rgba(217, 180, 90, 0.22); padding-bottom: 7px;
+  }
+  .poster-mini-thumb {
+    width: 26px; height: 26px; border-radius: 7px; object-fit: cover; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff;
+    border: 1px solid var(--gold);
+  }
+  .poster-bio-body {
+    flex: 1; padding-top: 8px; font-size: 12.5px; color: #e2e8f0; line-height: 1.55;
+    overflow-y: auto; scrollbar-width: none;
+  }
+  .poster-bio-body::-webkit-scrollbar { display: none; }
 
   .status-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .status-dot.online { background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 0 10px #10b981; }
@@ -119,45 +218,113 @@
   .status-dot.unknown { background: #94a3b8; box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2); }
 
   .content-body { padding: 12px 20px 45px; max-width: 1160px; margin: 0 auto; }
-  .cards-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); }
+  .cards-grid {
+    display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  }
   @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; } }
-  .entity-card { background: var(--card); border: 1px solid var(--border-soft); border-radius: 22px; padding: 16px; position: relative; overflow: hidden; cursor: pointer; transition: transform 0.16s ease, border-color 0.16s ease; }
-  .entity-card:hover { transform: translateY(-3px); border-color: var(--border); box-shadow: 0 16px 34px -12px rgba(0,0,0,0.7); }
-  .entity-card::before { content: ''; position: absolute; top: 0; right: 0; left: 0; height: 4px; background: var(--cat-accent, var(--gold)); z-index: 3; }
 
-  .id-card-layout { position: relative; z-index: 2; display: grid; grid-template-columns: 32% 1fr; gap: 16px; align-items: stretch; min-height: 152px; }
+  .entity-card {
+    background: var(--card); border: 1px solid var(--border-soft); border-radius: 22px;
+    padding: 16px; position: relative; overflow: hidden; cursor: pointer;
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+  .entity-card:hover {
+    transform: translateY(-3px); border-color: var(--border);
+    box-shadow: 0 16px 34px -12px rgba(0,0,0,0.7);
+  }
+  .entity-card.peds-dignified {
+    background: linear-gradient(145deg, #1f1429 0%, #12172a 65%, #191122 100%);
+    border-color: rgba(244, 114, 182, 0.28);
+  }
+  .entity-card::before {
+    content: ''; position: absolute; top: 0; right: 0; left: 0; height: 4px;
+    background: var(--cat-accent, var(--gold)); z-index: 3;
+  }
+
+  .doctor-watermark {
+    position: absolute; left: 10px; bottom: -8px; width: 135px; height: 135px;
+    opacity: 0.065; pointer-events: none; z-index: 1; color: var(--spec-color, var(--gold));
+  }
+
+  .id-card-layout {
+    position: relative; z-index: 2; display: grid;
+    grid-template-columns: 32% 1fr; gap: 16px; align-items: stretch; min-height: 152px;
+  }
   @media (max-width: 480px) { .id-card-layout { grid-template-columns: 35% 1fr; gap: 12px; } }
-  .id-card-right-photo { border-radius: 16px; overflow: hidden; border: 1.5px solid var(--border); background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.35)); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; min-height: 148px; }
+
+  .id-card-right-photo {
+    border-radius: 16px; overflow: hidden; border: 1.5px solid var(--border);
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.35));
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; min-height: 148px;
+  }
   .id-card-right-photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-  .id-card-left-info { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
-  .top-left-activity { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 99px; font-size: 10.5px; font-weight: 700; background: rgba(255,255,255,0.04); border: 1px solid var(--border-soft); flex-shrink: 0; }
+
+  .id-card-left-info {
+    display: flex; flex-direction: column; justify-content: space-between; min-width: 0;
+  }
+
+  .top-left-activity {
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px;
+    border-radius: 99px; font-size: 10.5px; font-weight: 700;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border-soft); flex-shrink: 0;
+  }
 
   .gold-bg { background: linear-gradient(135deg, #F6E29A 0%, #D9B45A 55%, #9B7119 100%); color: #050811; font-weight: 700; }
   .t-doctor { background: linear-gradient(145deg, #3b82f6, #1d4ed8); }
   .t-pharmacy { background: linear-gradient(145deg, #10b981, #047857); }
   .t-lab { background: linear-gradient(145deg, #a855f7, #6d28d9); }
 
-  .badge-pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700; }
-  .input-box { width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-soft); border-radius: 12px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none; }
-  .input-box:focus { border-color: var(--gold); }
-  .toast-box { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 200; padding: 11px 20px; border-radius: 14px; font-weight: 700; font-size: 13px; max-width: 90vw; text-align: center; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 120; display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .modal-box { width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 22px; }
-
-  .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 90; }
-  .side-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 310px; max-width: 85vw; background: var(--surface); border-left: 1px solid var(--border); z-index: 100; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto; transform: translateX(100%); transition: transform 0.22s ease-out; }
-  .side-drawer.open { transform: translateX(0); }
-  .nav-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 14px; font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; text-align: right; }
-  .nav-btn:hover { background: rgba(255,255,255,0.06); }
-  .nav-btn.active { background: rgba(217, 180, 90, 0.15); color: var(--gold); border: 1px solid var(--border); }
-  
   .noon-page { padding: 20px; max-width: 1100px; margin: 0 auto; }
   .noon-hero-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 14px; }
   @media (min-width: 860px) { .noon-hero-grid { grid-template-columns: 380px 1fr; align-items: start; } }
-  .noon-showcase { background: linear-gradient(145deg, #132238, #0b1322); border: 1px solid var(--border); border-radius: 24px; min-height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-  .noon-table { width: 100%; border-collapse: collapse; margin-top: 14px; background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-soft); }
-  .noon-table th { width: 34%; text-align: right; padding: 11px 14px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-soft); }
-  .noon-table td { padding: 11px 14px; font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--border-soft); }
+  .noon-showcase {
+    background: linear-gradient(145deg, #132238, #0b1322); border: 1px solid var(--border);
+    border-radius: 24px; min-height: 270px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px; text-align: center; position: relative; overflow: hidden;
+  }
+  .noon-table {
+    width: 100%; border-collapse: collapse; margin-top: 14px; background: var(--card);
+    border-radius: 16px; overflow: hidden; border: 1px solid var(--border-soft);
+  }
+  .noon-table tr { border-bottom: 1px solid var(--border-soft); }
+  .noon-table tr:last-child { border-bottom: none; }
+  .noon-table th { width: 34%; text-align: right; padding: 11px 14px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,0.02); }
+  .noon-table td { padding: 11px 14px; font-size: 14px; font-weight: 700; }
+
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 90; }
+  .side-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 310px; max-width: 85vw;
+    background: var(--surface); border-left: 1px solid var(--border); z-index: 100; padding: 20px;
+    display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;
+    transform: translateX(100%); transition: transform 0.22s ease-out;
+  }
+  .side-drawer.open { transform: translateX(0); }
+  .nav-btn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 14px; border-radius: 14px; font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; text-align: right;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.06); }
+  .nav-btn.active { background: rgba(217, 180, 90, 0.15); color: var(--gold); border: 1px solid var(--border); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 120;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-box {
+    width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 22px;
+  }
+  .input-box {
+    width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-soft);
+    border-radius: 12px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none;
+  }
+  .input-box:focus { border-color: var(--gold); }
+  .badge-pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700; }
+  .toast-box {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 200; padding: 11px 20px; border-radius: 14px; font-weight: 700; font-size: 13px; max-width: 90vw; text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -168,6 +335,7 @@
     <span class="brand-text font-display">Cryovion</span>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
+    <button id="bigText" style="padding:6px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border-soft); color:var(--gold); font-weight:700; font-size:13px;">أ+</button>
     <button id="quickThemeBtn" style="padding:6px 10px; border-radius:10px; background:var(--card); border:1px solid var(--border-soft); font-size:13px;">🌗</button>
   </div>
 </div>
@@ -182,30 +350,45 @@
       </div>
       <button id="closeDrawer" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.08);">✕</button>
     </div>
+
     <div onclick="navigateApp('account')" style="margin-top:12px; padding:12px; border-radius:14px; background:rgba(217,180,90,0.1); border:1px solid var(--border); display:flex; align-items:center; gap:10px; cursor:pointer;">
-      <div style="width:38px; height:38px; border-radius:10px; background:rgba(217,180,90,0.2); display:flex; align-items:center; justify-content:center; font-size:16px;">👤</div>
+      <div id="drawerAvatar" style="width:38px; height:38px; border-radius:10px; background:rgba(217,180,90,0.2); display:flex; align-items:center; justify-content:center; font-size:16px;">👤</div>
       <div style="flex:1; min-width:0;">
         <p id="drawerUserName" style="font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">تسجيل الدخول</p>
         <p id="drawerUserRole" style="font-size:11px; color:var(--muted);">إدارة صفحتك / دعوة صديق</p>
       </div>
     </div>
+
     <nav style="margin-top:14px;">
       <button data-nav="home" class="nav-btn active"><span>🏠 الدليل الطبي الذكي</span></button>
-      <button data-nav="myManaged" class="nav-btn"><span>🎛️ إدارة صفحتي</span><span id="managedCountBadge" class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">0</span></button>
+      <button data-nav="myManaged" class="nav-btn">
+        <span>🎛️ إدارة صفحتي</span>
+        <span id="managedCountBadge" class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">0</span>
+      </button>
       <button data-nav="referrals" class="nav-btn"><span>✨ دعوة صديق ومكافأة النشر</span></button>
       <button data-nav="account" class="nav-btn"><span>🔐 تسجيل الدخول والحساب</span></button>
+      <button data-nav="settings" class="nav-btn"><span>⚙️ الإعدادات والمظهر</span></button>
     </nav>
+  </div>
+
+  <div style="padding-top:12px; border-top:1px solid var(--border-soft);">
+    <button data-nav="info" class="nav-btn" style="font-size:12px; color:var(--muted);">
+      <span>ℹ️ التعاون الإعلاني والتواصل</span>
+    </button>
   </div>
 </aside>
 
 <div class="main-window">
+
   <div class="window-nav">
     <button id="openDrawer" class="menu-trigger">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
       <span>القائمة</span>
     </button>
+
     <div style="display:flex; align-items:center; gap:8px;">
       <button onclick="navigateApp('referrals')" class="badge-pill" style="background:rgba(217,180,90,0.14); color:var(--gold); border:1px solid var(--border); padding:5px 12px;">✨ دعوة صديق</button>
+      <button onclick="navigateApp('myManaged')" id="topManageShortcut" class="hidden badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald); border:1px solid var(--emerald); padding:5px 11px;">🎛️ إدارة صفحتي</button>
       <span id="headerUserBadge" onclick="navigateApp('account')" style="font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; background:rgba(217,180,90,0.12); padding:5px 11px; border-radius:10px;">🔐 دخول</span>
     </div>
   </div>
@@ -213,40 +396,69 @@
   <!-- الشاشة الرئيسية -->
   <div id="view-home" class="spa-view">
     <header class="jevi-hero-stage">
+      <div class="jevi-spotlight"></div>
+      <div class="jevi-3d-emblem"></div>
+
       <div class="jevi-hero-content">
-        <h1 class="elegant-slogan font-display"><span class="slogan-white">صحتك أقرب</span> <span class="slogan-gold">مما تظن</span></h1>
+        <h1 class="elegant-slogan font-display">
+          <span class="slogan-white">صحتك أقرب</span>
+          <span class="slogan-gold">مما تظن</span>
+        </h1>
+
         <div class="ai-search-container">
           <div class="ai-search-box">
             <svg width="20" height="20" fill="none" stroke="var(--gold)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
-            <input id="search" type="search" autocomplete="off" placeholder="ابحث عن طبيب، تخصص (أطفال، باطنة)، أو صيدلية..." class="ai-search-input">
+            <input id="search" type="search" autocomplete="off" placeholder="ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب)، أو صيدلية..." class="ai-search-input">
+            <button id="mic" type="button" class="gold-bg" style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px;" title="بحث صوتي">🎤</button>
           </div>
           <div id="searchSuggest" class="autocomplete-dropdown hidden"></div>
         </div>
+
         <div id="cats" class="cats-modern-bar"></div>
         <div id="specsBar" class="specs-filter-bar"></div>
       </div>
     </header>
 
-    <section class="content-body" style="margin-top:20px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+    <section class="poster-section" id="posterSection">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="status-dot online"></span>
+          <h2 class="font-display" style="font-size:16px; color:var(--gold);">حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)</h2>
+        </div>
+        <div style="display:flex; gap:5px;">
+          <button id="slidePrev" style="width:28px; height:28px; border-radius:8px; background:var(--card); border:1px solid var(--border-soft); font-size:12px;">❮</button>
+          <button id="slideNext" style="width:28px; height:28px; border-radius:8px; background:var(--card); border:1px solid var(--border-soft); font-size:12px;">❯</button>
+        </div>
+      </div>
+      <div id="posterTrack" class="poster-track"></div>
+    </section>
+
+    <section class="content-body">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <h2 id="listTitle" class="font-display" style="font-size:20px;">الدليل الطبي الموثق</h2>
           <span id="totalCountBadge" class="badge-pill" style="background:rgba(217,180,90,0.16); color:var(--gold);">0</span>
         </div>
-        <button id="showAll" class="hidden badge-pill" style="background:var(--gold); color:#000; padding:5px 14px;">الكل ✕</button>
+        <button id="showAll" class="hidden badge-pill" style="background:var(--gold); color:#000; padding:5px 14px;">إلغاء الفلتر وعرض الكل ✕</button>
       </div>
+
       <div id="list" class="cards-grid"></div>
       <p id="empty" class="hidden entity-card" style="text-align:center; padding:30px; color:var(--muted);"></p>
     </section>
   </div>
 
   <!-- صفحة الإعلان المستقلة -->
-  <div id="view-placePage" class="spa-view hidden"><div id="placePageContent" class="noon-page"></div></div>
+  <div id="view-placePage" class="spa-view hidden">
+    <div id="placePageContent" class="noon-page"></div>
+  </div>
 
   <!-- إدارة صفحتي -->
   <div id="view-myManaged" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
-      <h2 class="font-display" style="font-size:22px; color:var(--gold);">🎛️ إدارة صفحتي</h2>
+      <div>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🎛️ إدارة صفحتي وحالة الـ 24 ساعة</h2>
+        <p style="font-size:13px; color:var(--muted);">أضف صورتك في المربع الأيمن، نشّط حالة الفتح، وانشر حالتك اليومية</p>
+      </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;">رجوع ←</button>
     </div>
     <div id="managedListBox" style="display:grid; gap:16px;"></div>
@@ -255,15 +467,22 @@
   <!-- دعوة صديق -->
   <div id="view-referrals" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
-      <h2 class="font-display" style="font-size:22px; color:var(--gold);">✨ دعوة صديق</h2>
+      <div>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);">✨ دعوة صديق ومكافأة نشر الإعلانات</h2>
+        <p style="font-size:13px; color:var(--muted);">ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي</p>
+      </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;">رجوع ←</button>
     </div>
     <div id="referralsDashboardBox" style="display:grid; gap:16px; max-width:740px;"></div>
   </div>
+
   <!-- تسجيل الدخول -->
   <div id="view-account" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
-      <h2 class="font-display" style="font-size:22px; color:var(--gold);">🔐 الحساب وتسجيل الدخول</h2>
+      <div>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🔐 الحساب وتسجيل الدخول</h2>
+        <p style="font-size:13px; color:var(--muted);">سجل دخولك عبر Google أو Facebook أو بالبريد الإلكتروني مباشرة</p>
+      </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;">رجوع ←</button>
     </div>
 
@@ -284,25 +503,83 @@
 
     <div id="authFormsWrap" style="max-width:520px; display:grid; gap:14px;">
       <form id="accountForm" class="entity-card" style="display:grid; gap:12px;">
-        <div style="text-align:center; font-size:14px; font-weight:700; color:var(--gold); margin-bottom:10px;">اختر طريقة الدخول السريعة:</div>
-        
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-          <button type="button" id="googleDirectBtn" style="background:#ffffff; color:#0f172a; padding:12px; border-radius:12px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <div style="display:flex; gap:8px; border-bottom:1px solid var(--border-soft); padding-bottom:10px;">
+          <button type="button" id="tabLoginBtn" class="gold-bg" style="flex:1; padding:9px; border-radius:10px; font-size:13px;">تسجيل دخول</button>
+          <button type="button" id="tabRegisterBtn" style="flex:1; padding:9px; border-radius:10px; font-size:13px; background:rgba(255,255,255,0.05); font-weight:700;">إنشاء حساب جديد</button>
+        </div>
+
+        <div id="registerExtraFields" class="hidden" style="display:grid; gap:10px;">
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+            <button type="button" data-role="مستخدم" class="role-btn" style="padding:9px 4px; border-radius:10px; border:1px solid var(--gold); background:rgba(217,180,90,0.15); font-weight:700; font-size:12px;">👤 شخص عادي</button>
+            <button type="button" data-role="طبيب" class="role-btn" style="padding:9px 4px; border-radius:10px; border:1px solid var(--border-soft); font-weight:700; font-size:12px;">🩺 طبيب</button>
+            <button type="button" data-role="صيدلي" class="role-btn" style="padding:9px 4px; border-radius:10px; border:1px solid var(--border-soft); font-weight:700; font-size:12px;">💊 صيدلي</button>
+          </div>
+          <input id="accName" placeholder="الاسم الكامل" class="input-box">
+        </div>
+
+        <input id="accEmail" type="email" required placeholder="البريد الإلكتروني (Gmail) *" class="input-box">
+        <input id="accPass" type="password" required minlength="6" placeholder="كلمة المرور *" class="input-box">
+
+        <button type="submit" id="authSubmitBtn" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">دخول بالبريد الإلكتروني ✔</button>
+
+        <div style="text-align:center; font-size:12px; color:var(--muted); margin:2px 0;">— أو التسجيل السريع المباشر عبر —</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button type="button" id="googleDirectBtn" style="background:#ffffff; color:#0f172a; padding:11px; border-radius:12px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
             <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/><path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/></svg>
             <span>Google</span>
           </button>
-          <button type="button" id="facebookDirectBtn" style="background:#1877F2; color:#ffffff; padding:12px; border-radius:12px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <button type="button" id="facebookDirectBtn" style="background:#1877F2; color:#ffffff; padding:11px; border-radius:12px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
             <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
             <span>Facebook</span>
           </button>
         </div>
-
-        <div style="text-align:center; font-size:12px; color:var(--muted); margin:2px 0;">— أو بالبريد العادي —</div>
-
-        <input id="accName" placeholder="الاسم الكامل" class="input-box">
-        <input id="accEmail" type="email" required placeholder="البريد الإلكتروني *" class="input-box">
-        <button type="submit" id="authSubmitBtn" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">إنشاء الحساب / دخول ✔</button>
       </form>
+    </div>
+  </div>
+
+  <!-- الإعدادات -->
+  <div id="view-settings" class="spa-view hidden content-body">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
+      <h2 class="font-display" style="font-size:22px; color:var(--gold);">⚙️ الإعدادات</h2>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">رجوع ←</button>
+    </div>
+    <div style="display:grid; gap:12px; max-width:600px;">
+      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <p style="font-weight:700;">المظهر الداكن / الفاتح</p>
+          <p style="font-size:12px; color:var(--muted);">تبديل إضاءة المنصة</p>
+        </div>
+        <button id="themeToggleBtn" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">تبديل 🌗</button>
+      </div>
+      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <p style="font-weight:700;">حجم الخط</p>
+          <p style="font-size:12px; color:var(--muted);">تكبير النصوص لوضوح أعلى</p>
+        </div>
+        <button id="settingsBigTextBtn" style="border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:10px; font-size:12px; font-weight:700;">تكبير / تصغير</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- التواصل -->
+  <div id="view-info" class="spa-view hidden content-body">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
+      <h2 class="font-display" style="font-size:22px; color:var(--gold);">ℹ️ التواصل وتفويض الصفحات</h2>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">رجوع ←</button>
+    </div>
+    <div class="entity-card" style="display:grid; gap:12px; max-width:660px; border-color:var(--border);">
+      <h3 style="font-size:17px; color:var(--gold);">إدارة صفحتك الطبية وميزة دعوة صديق</h3>
+      <p style="font-size:14px; color:var(--muted); line-height:1.7;">
+        تُدار الصفحات الطبية عبر منصة <b>Cryovion</b> لضمان الدقة التامة. يمكن لأصحاب العيادات والصيدليات مراسلتنا لتفويض صفحاتهم مجاناً وإضافة أرقام هواتفهم ومواعيدهم وصورهم الخاصة:
+      </p>
+      <div style="background:rgba(255,255,255,0.03); padding:14px; border-radius:14px; border:1px solid var(--border-soft);">
+        <p style="font-size:16px; font-weight:700; color:var(--gold);">goaz7725@gmail.com</p>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <a href="mailto:goaz7725@gmail.com?subject=طلب%20تفعيل%20صفحة%20على%20Cryovion" class="gold-bg" style="padding:9px 16px; border-radius:10px; font-size:12px;">✉️ مراسلة الإدارة</a>
+          <button onclick="navigator.clipboard.writeText('goaz7725@gmail.com'); toast('تم نسخ البريد الإلكتروني')" style="background:rgba(255,255,255,0.1); padding:9px 14px; border-radius:10px; font-size:12px; font-weight:700;">نسخ الإيميل 📋</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -310,13 +587,14 @@
   <div id="view-admin" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🛡️ غرفة التحكم (مزدوجة الأمان)</h2>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🛡️ غرفة تحكم الإدارة</h2>
+        <p style="font-size:12px; color:var(--muted);">نشر الصفحات، تفويض الإيميلات، ومراجعة طلبات دعوة الأصدقاء</p>
       </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">إغلاق ✕</button>
     </div>
 
     <div id="adminLockScreen" class="entity-card" style="text-align:center; padding:28px; max-width:420px; margin:0 auto;">
-      <p id="adminLockHint" style="font-size:16px; font-weight:700; margin-bottom:6px; color:var(--gold);">الطبقة الأولى: أدخل الرمز الأول</p>
+      <p style="font-size:16px; font-weight:700; margin-bottom:6px;">🔒 أدخل الرمز السري للإدارة</p>
       <div style="display:flex; gap:8px; margin-top:12px;">
         <input id="adminPinInput" type="password" inputmode="numeric" placeholder="الرمز السري..." class="input-box" style="text-align:center; letter-spacing:3px; font-size:17px;">
         <button id="unlockAdminBtn" class="gold-bg" style="padding:0 22px; border-radius:12px;">فتح</button>
@@ -327,15 +605,23 @@
       <div class="entity-card" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; border-color:var(--gold);">
         <div>
           <p style="font-weight:700; font-size:14px; color:var(--gold);">إدارة المنصة الحصرية</p>
+          <p style="font-size:12px; color:var(--muted);">إضافة صفحة جديدة أو تفويض إيميل طبيب/صيدلي</p>
         </div>
         <button onclick="openEditorModal(null)" class="gold-bg" style="padding:9px 16px; border-radius:10px; font-size:13px;">+ إضافة صفحة جديدة</button>
       </div>
+
+      <div>
+        <h3 style="font-size:16px; color:var(--gold); margin-bottom:10px;">⏳ طلبات النشر عبر دعوة صديق (<span id="adminRefReqCount">0</span>)</h3>
+        <div id="adminRefRequestsList" style="display:grid; gap:10px;"></div>
+      </div>
+
       <div>
         <h3 style="font-size:16px; color:var(--gold); margin-bottom:10px;">📋 جميع الصفحات المنشورة (<span id="adminTotalPlaces">0</span>)</h3>
         <div id="adminAllPlacesList" style="display:grid; gap:10px;"></div>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- نافذة التعديل مع شارة التوثيق -->
@@ -347,13 +633,14 @@
     </div>
 
     <input type="hidden" id="edId">
+
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
       <div>
         <label style="font-size:11px; color:var(--gold); font-weight:700;">1. نوع المنشأة:</label>
         <select id="edCat" class="input-box" style="background:var(--card);">
-          <option value="doctor">🩺 أطباء وعيادات</option>
-          <option value="pharmacy">💊 صيدليات</option>
-          <option value="lab">🧪 معامل وأشعة</option>
+          <option value="doctor">🩺 عيادة طبيب</option>
+          <option value="pharmacy">💊 صيدلية</option>
+          <option value="lab">🧪 معمل / أشعة</option>
         </select>
       </div>
       <div>
@@ -369,21 +656,29 @@
           <option value="ent">👂 أنف وأذن</option>
           <option value="cardio">🫀 قلب وأوعية</option>
           <option value="physio">🏃 علاج طبيعي</option>
-          <option value="urology">💧 مسالك بولية</option>
           <option value="pharmacy">💊 صيدلية عامة</option>
           <option value="lab">🧪 تحاليل وأشعة</option>
         </select>
       </div>
     </div>
 
-    <input id="edName" required placeholder="الاسم (د. فلان / صيدلية كذا) *" class="input-box">
+    <input id="edName" required placeholder="اسم الطبيب / الصيدلية / المنشأة *" class="input-box">
     <input id="edSpec" required placeholder="المسمى التخصصي الواضح تحت الاسم *" class="input-box">
-    <textarea id="edBio" rows="3" placeholder="اكتب حالتك اليومية أو عرضاً خاصاً..." class="input-box"></textarea>
-    
-    <div style="display:flex; gap:8px; margin-top:4px; align-items:center;">
-      <input id="edPhotoUrl" placeholder="رابط صورة مباشر..." class="input-box" style="flex:1;">
-      <label for="edPhotoFile" class="gold-bg" style="padding:10px 14px; border-radius:10px; font-size:12px; cursor:pointer;">📁 رفع</label>
-      <input id="edPhotoFile" type="file" accept="image/*" class="hidden">
+
+    <div style="background:rgba(217,180,90,0.08); padding:10px; border-radius:12px; border:1px solid var(--border);">
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gold); margin-bottom:4px;">
+        <b>📢 حالتك اليومية على الشريط المتحرك (تُعرض لمدة 24 ساعة):</b>
+      </div>
+      <textarea id="edBio" rows="3" placeholder="اكتب حالتك اليومية أو عرضاً خاصاً..." class="input-box"></textarea>
+    </div>
+
+    <div>
+      <label style="font-size:11px; color:var(--gold); font-weight:700;">📷 صورة المربع الأيمن للكرت:</label>
+      <div style="display:flex; gap:8px; margin-top:4px; align-items:center;">
+        <input id="edPhotoUrl" placeholder="رابط صورة مباشر أو اختر صورة من جهازك ←" class="input-box" style="flex:1;">
+        <label for="edPhotoFile" class="gold-bg" style="padding:10px 14px; border-radius:10px; font-size:12px; cursor:pointer; white-space:nowrap;">📁 ارفع صورة</label>
+        <input id="edPhotoFile" type="file" accept="image/*" class="hidden">
+      </div>
     </div>
 
     <input id="edAddr" required placeholder="العنوان التفصيلي المؤكد *" class="input-box">
@@ -391,16 +686,17 @@
     <!-- شارة التوثيق -->
     <div style="background:rgba(217,180,90,0.08); padding:10px; border-radius:12px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
       <div>
-        <b style="font-size:13px; color:var(--gold);">✔ علامة التوثيق:</b>
-        <p style="font-size:11px; color:var(--muted);">هل البيانات دقيقة 100% ورقم الهاتف مؤكد؟</p>
+        <b style="font-size:13px; color:var(--gold);">✔ علامة التوثيق الرسمية:</b>
+        <p style="font-size:11px; color:var(--muted);">هل تمت مراجعة وتأكيد بيانات هذه العيادة بنسبة 100%؟</p>
       </div>
       <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer;">
         <input type="checkbox" id="edIsVerified" style="width:18px; height:18px;">
-        <span>موثق</span>
+        <span>موثق ورسمي</span>
       </label>
     </div>
 
     <div style="background:rgba(16,185,129,0.07); padding:10px; border-radius:12px; border:1px solid rgba(16,185,129,0.3); display:grid; gap:8px;">
+      <label style="font-size:12px; color:var(--emerald); font-weight:700;">🟢 حالة الدوام والنقطة:</label>
       <select id="edLampMode" class="input-box" style="background:var(--card);">
         <option value="unknown">⚪ غير معروف (افتراضي)</option>
         <option value="open">🟢 مفتوح الآن</option>
@@ -409,89 +705,129 @@
       <input id="edHours" placeholder="مواعيد العمل (مثال: يومياً من 4 عصراً)" class="input-box">
     </div>
 
-    <input id="edPhone" type="tel" placeholder="رقم الهاتف (اتركه فارغاً إن لم يتأكد)" class="input-box">
+    <input id="edPhone" type="tel" placeholder="رقم الهاتف (اتركه فارغاً إن لم يتوفر بعد)" class="input-box">
 
     <div id="ownerAssignWrap" style="background:rgba(217,180,90,0.1); padding:10px; border-radius:12px; border:1px solid var(--border);">
-      <input id="edOwnerEmail" type="email" placeholder="إيميل المالك (للتفويض)..." class="input-box">
+      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">🔑 إيميل المالك المفوض + عدد الدعوات:</label>
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px;">
+        <input id="edOwnerEmail" type="email" placeholder="إيميل الطبيب أو الصيدلي..." class="input-box">
+        <input id="edRefCount" type="number" min="0" placeholder="عدد الدعوات" class="input-box">
+      </div>
     </div>
 
     <button type="submit" class="gold-bg" style="padding:13px; border-radius:14px; font-size:14px;">حفظ ونشر التعديلات فوراً ✔</button>
   </form>
 </div>
 
+<!-- نافذة التقييم -->
+<div id="reviewModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <form id="reviewForm" class="modal-box" onclick="event.stopPropagation()" style="display:grid; gap:12px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 id="revModalTitle" class="font-display" style="font-size:18px; color:var(--gold);">إضافة تقييم وتعليق</h3>
+      <button type="button" onclick="closeReviewModal()" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.1);">✕</button>
+    </div>
+    <div id="starPick" style="display:flex; justify-content:center; gap:10px; background:rgba(255,255,255,0.03); padding:10px; border-radius:12px;"></div>
+    <textarea id="revBody" required rows="3" placeholder="اكتب تجربتك أو معلومة مفيدة بكل احترام..." class="input-box"></textarea>
+    <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">نشر التقييم ✔</button>
+  </form>
+</div>
+
 <div id="toast" class="toast-box gold-bg hidden"></div>
 
 <script>
-// إعدادات لوحة التحكم
-const ADMIN_PIN_1 = '360720';
-const ADMIN_PIN_2 = '473318';
-let adminUnlockStage = 0; // 0 = مقفل, 1 = اجتاز 7 ضغطات, 2 = اجتاز الرمز الأول, 3 = مفكوك كلياً
-let adminUnlocked = false;
+const SUPABASE_URL = 'https://zthcfuxdidfosdidiahz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_4Qdm2dAJWiSdraP2sOaYeQ_ICCHukSG';
+const ADMIN_PIN = '360720';
+
+const adminHeaderTitle = document.querySelector('#view-admin h2');
+if (adminHeaderTitle) adminHeaderTitle.textContent = '🛡️ غرفة تحكم الإدارة';
 
 const SPECS_META = {
   all:      { label: 'كل التخصصات', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
-  peds:     { label: 'طب الأطفال وحديثي الولادة', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)' },
-  gastro:   { label: 'باطنة ومعدة', icon: '🩺', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)' },
-  neuro:    { label: 'مخ وأعصاب', icon: '🧠', color: '#c084fc', bg: 'rgba(192,132,252,0.16)' },
-  ortho:    { label: 'عظام ومفاصل', icon: '🦴', color: '#fbbf24', bg: 'rgba(251,191,36,0.16)' },
-  obgyn:    { label: 'نساء وتوليد', icon: '🤰', color: '#fb7185', bg: 'rgba(251,113,133,0.16)' },
-  dental:   { label: 'فم وأسنان', icon: '🦷', color: '#2dd4bf', bg: 'rgba(45,212,191,0.16)' },
-  eye:      { label: 'عيون ورمد', icon: '👁️', color: '#60a5fa', bg: 'rgba(96,165,250,0.16)' },
-  ent:      { label: 'أنف وأذن', icon: '👂', color: '#a3e635', bg: 'rgba(163,230,53,0.16)' },
-  cardio:   { label: 'قلب وأوعية', icon: '🫀', color: '#f87171', bg: 'rgba(248,113,113,0.16)' },
-  physio:   { label: 'علاج طبيعي', icon: '🏃', color: '#34d399', bg: 'rgba(52,211,153,0.16)' },
-  urology:  { label: 'مسالك بولية', icon: '💧', color: '#3b82f6', bg: 'rgba(59,130,246,0.16)' },
+  peds:     { label: 'طب الأطفال وحديثي الولادة', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
+  gastro:   { label: 'باطنة ومعدة وجهاز هضمي', icon: '🩺', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)', svg: '<path d="M9 3c0 4-4 5-4 10a7 7 0 0 0 14 0c0-3-2-5-5-5-2 0-3-2-3-5"/><path d="M11 13c0 2 1.5 3.5 3.5 3.5"/>' },
+  neuro:    { label: 'مخ وأعصاب وعمود فقري', icon: '🧠', color: '#c084fc', bg: 'rgba(192,132,252,0.16)', svg: '<path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .4.05.8.15 1.2A4 4 0 0 0 3 11.5a4 4 0 0 0 2.6 3.7A4 4 0 0 0 9.5 21h1.5V2h-1.5Z"/><path d="M14.5 2A4.5 4.5 0 0 1 19 6.5c0 .4-.05.8-.15 1.2A4 4 0 0 1 21 11.5a4 4 0 0 1-2.6 3.7A4 4 0 0 1 14.5 21H13V2h1.5Z"/>' },
+  ortho:    { label: 'جراحة العظام والمفاصل', icon: '🦴', color: '#fbbf24', bg: 'rgba(251,191,36,0.16)', svg: '<path d="M17 4a3 3 0 0 0-3 3L7 14a3 3 0 1 0 3 3l7-7a3 3 0 0 0 0-6Z"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/>' },
+  obgyn:    { label: 'نساء وتوليد وتأخر إنجاب', icon: '🤰', color: '#fb7185', bg: 'rgba(251,113,133,0.16)', svg: '<circle cx="12" cy="9" r="6"/><path d="M12 15v7"/><path d="M9 19h6"/>' },
+  dental:   { label: 'طب وجراحة الفم والأسنان', icon: '🦷', color: '#2dd4bf', bg: 'rgba(45,212,191,0.16)', svg: '<path d="M7 3C4.5 3 3 5 3 8c0 3 1.5 5 2 8 .4 2.5 1.2 5 2.5 5 1 0 1.8-2 2.5-4h4c.7 2 1.5 4 2.5 4 1.3 0 2.1-2.5 2.5-5 .5-3 2-5 2-8 0-3-1.5-5-4-5-2 0-3.5 1-5 1S9 3 7 3Z"/>' },
+  eye:      { label: 'طب وجراحة العيون والرمد', icon: '👁️', color: '#60a5fa', bg: 'rgba(96,165,250,0.16)', svg: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3.5"/>' },
+  ent:      { label: 'أنف وأذن وحنجرة', icon: '👂', color: '#a3e635', bg: 'rgba(163,230,53,0.16)', svg: '<path d="M6 10a6 6 0 1 1 12 0c0 4-3 6-4 9a2 2 0 0 1-4 0"/><path d="M10 10a2 2 0 1 1 4 0"/>' },
+  cardio:   { label: 'قلب وأوعية دموية', icon: '🫀', color: '#f87171', bg: 'rgba(248,113,113,0.16)', svg: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>' },
+  physio:   { label: 'علاج طبيعي وتأهيل', icon: '🏃', color: '#34d399', bg: 'rgba(52,211,153,0.16)', svg: '<circle cx="12" cy="5" r="2.5"/><path d="m7 21 3-6 2-4 5 2"/><path d="m6 12 4-3 4 2"/>' },
   pharmacy: { label: 'صيدلية ودواء', icon: '💊', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
   lab:      { label: 'تحاليل وأشعة', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
 
-/* حذفنا المستشفيات وأبقينا الثلاثة ليتوسطوا الشاشة */
+const nowTs = Date.now();
+/* البيانات مع إضافة عيادة د. كوثر ومستشفى زمزم المأخوذة من إعلانك[span_1](start_span)[span_1](end_span) */
+const DEFAULT_DIRECTORY = [
+  {
+    id: 'v-zamzam-1',
+    cat: 'hospital',
+    spec_key: 'hospital',
+    name: 'مستشفى زمزم التخصصي',
+    spec: 'طوارئ وعيادات تخصصية وجلسات دعم نفسي',
+    bio: 'جلستك الأولى هي أول خطوة لراحتك. استشارات نفسية وعلاج الاضطرابات وإدمان وتقلبات المزاج.',
+    bio_ts: nowTs,
+    hours: 'غير معروف',
+    lamp_mode: 'unknown',
+    addr: '20 شارع أحمد عرابي، أم بيومي، شبرا الخيمة (أول مسجد التوحيد)',
+    phone: '0246062611',
+    is_verified: true,
+    photo_url: '',
+    ref_count: 0,
+    updated_date: '2026-11-07'
+  },
+  {
+    id: 'v-kaouthar-1',
+    cat: 'doctor',
+    spec_key: 'neuro',
+    name: 'د. كوثر ناصر',
+    spec: 'أخصائية نفسية إكلينيكية (اضطرابات وعصبية)',
+    bio: 'علاج الاضطرابات النفسية والانفعالية، مشاكل التركيز والذاكرة، علاج الوسواس القهري والقلق والتوغّل النفسي.',
+    bio_ts: nowTs,
+    hours: 'غير معروف',
+    lamp_mode: 'unknown',
+    addr: 'مستشفى زمزم التخصصي - شبرا الخيمة',
+    phone: '01555083804',
+    is_verified: true,
+    photo_url: '',
+    ref_count: 0,
+    updated_date: '2026-11-07'
+  },
+  { id: 'v-hosp-1', cat: 'hospital', spec_key: 'hospital', name: 'المستشفى المركزي العام', spec: 'طوارئ وعيادات خارجية تخصصية', bio: 'استقبال الطوارئ والعيادات الخارجية الصباحية لخدمة الأهالي.', bio_ts: nowTs, hours: 'غير معروف', lamp_mode: 'unknown', addr: '10 شارع الخليفة المأمون - بجوار الرعاية', phone: null, is_verified: true, ref_count: 0, updated_date: '2026-11-07' },
+  { id: 'v-ph-1', cat: 'pharmacy', spec_key: 'pharmacy', name: 'صيدلية الأمل', spec: 'صيدلية عامة وتركيبات دوائية', bio: 'صرف الأدوية والمستلزمات الطبية.', bio_ts: nowTs, hours: 'غير معروف', lamp_mode: 'unknown', addr: 'أمام المستشفى العام مباشرة', phone: null, is_verified: false, ref_count: 0, updated_date: '2026-11-07' }
+];
+
+const BAD_WORDS = ['نصاب', 'حرامي', 'فاشل', 'غبي', 'زباله', 'قذر', 'وسخ', 'كلب', 'حمار', 'كذاب', 'شرموط', 'عرص', 'خول'];
+const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim().toLowerCase();
+const containsDefamation = txt => BAD_WORDS.some(w => norm(txt).includes(norm(w)));
+
 const CATS = {
   doctor:   { label: 'أطباء وعيادات', color: '#60a5fa', accent: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
   pharmacy: { label: 'صيدليات',       color: '#34d399', accent: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'معامل وأشعة',   color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
+  lab:      { label: 'معامل وأشعة',   color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' },
+  hospital: { label: 'مستشفيات',      color: '#fb7185', accent: '#f43f5e', bg: 'rgba(244,63,94,0.15)' }
 };
 
-const DEFAULT_DIRECTORY = [
-  {
-    id: 'd-samir-1', cat: 'doctor', spec_key: 'peds',
-    name: 'د. سمير محمد البهنسي', spec: 'أخصائي الأطفال وحديثي الولادة',
-    bio: 'تطعيمات إضافية وجهاز قياس الصفراء عن طريق الجلد (بدون ألم).',
-    hours: 'يومياً من 11 صباحاً حتى 6 مساءً', lamp_mode: 'unknown',
-    addr: 'الكوم الأحمر: شارع البوسطة - أمام صيدلية د/ علياء',
-    phone: '01107204057', is_verified: true, updated_date: '2026-11-07'
-  },
-  {
-    id: 'd-kawthar-1', cat: 'doctor', spec_key: 'neuro',
-    name: 'د. كوثر ناصر', spec: 'أخصائية نفسية إكلينيكية (عصبية)',
-    bio: 'علاج الاضطرابات النفسية والانفعالية، ومشاكل التركيز.',
-    hours: 'غير معروف', lamp_mode: 'unknown',
-    addr: 'مستشفى زمزم التخصصي - شبرا الخيمة',
-    phone: '01555083804', is_verified: true, updated_date: '2026-11-07'
-  },
-  {
-    id: 'd-rehab-1', cat: 'doctor', spec_key: 'urology',
-    name: 'د. رحاب حلمي مراد', spec: 'جراحة المسالك البولية للسيدات',
-    bio: 'طبيبة متخصصة لرفع الحرج عن صاحبات الحياء.',
-    hours: 'المهندسين، طنطا، الإسكندرية', lamp_mode: 'unknown',
-    addr: 'المهندسين: ميدان لبنان 41 شارع 26 يوليو',
-    phone: '01552203154', is_verified: true, updated_date: '2026-11-07'
-  },
-  {
-    id: 'ph-amal-1', cat: 'pharmacy', spec_key: 'pharmacy',
-    name: 'صيدلية الأمل', spec: 'صيدلية عامة',
-    bio: 'صرف الأدوية والمستلزمات الطبية.',
-    hours: 'غير معروف', lamp_mode: 'unknown', addr: 'أمام المستشفى العام',
-    phone: null, is_verified: false, updated_date: '2026-11-07'
-  }
-];
+const ICON = {
+  doctor:'<path fill="currentColor" fill-opacity=".3" stroke="none" d="M6 3v6a5 5 0 0 0 10 0V3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-1"/><circle cx="19" cy="12" r="2" fill="currentColor"/>',
+  pharmacy:'<g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="currentColor" fill-opacity=".4" stroke="none"/><path d="M12 8v8"/></g>',
+  lab:'<path fill="currentColor" fill-opacity=".4" stroke="none" d="M7.5 15h9l2.6 4.2A1.5 1.5 0 0 1 17.8 21H6.2a1.5 1.5 0 0 1-1.3-1.8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M10 3v6l-5.2 9.2A2 2 0 0 0 6.6 21h10.8a2 2 0 0 0 1.8-2.8L14 9V3"/>',
+  hospital:'<path fill="currentColor" fill-opacity=".3" stroke="none" d="M4 21V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v15z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v15M15 10h4a1 1 0 0 1 1 1v10M2 21h20"/><path stroke-linecap="round" d="M9.5 9v5M7 11.5h5"/>'
+};
 
-const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g,'').trim().toLowerCase();
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ico = (p, sz = 20) => `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${p}</svg>`;
+const orb = (k, sz = 38) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz*0.55))}</span>`;
+const star = on => `<span style="color:${on ? '#D9B45A' : '#475569'}; font-size:15px;">★</span>`;
+const stars = r => [1,2,3,4,5].map(i => star(i <= Math.round(r))).join('');
 
-let places = [], activeCat = null, activeSpec = 'all', query = '';
-let currentViewName = 'home', savedHomeScrollY = 0;
+let db = null, places = [], activeCat = null, activeSpec = 'all', query = '';
+let adminUnlocked = false, isRegisterMode = false, selectedRole = 'مستخدم';
+let activeReviewPlaceId = null, newRate = 5;
+let savedHomeScrollY = 0, currentViewName = 'home';
 
 function toast(m) {
   const t = $('toast'); t.textContent = m; t.classList.remove('hidden');
@@ -504,69 +840,99 @@ function getAvailabilityStatus(d) {
   return { state: 'unknown', label: 'المواعيد: غير معروف', color: 'var(--muted)' };
 }
 
-function getCustomOverrides() { try { return JSON.parse(localStorage.getItem('cryovion_overrides_v8') || '{}'); } catch { return {}; } }
-function saveCustomOverride(item) { const map = getCustomOverrides(); map[item.id] = item; localStorage.setItem('cryovion_overrides_v8', JSON.stringify(map)); }
+function getCustomOverrides() { try { return JSON.parse(localStorage.getItem('cryovion_overrides_v7') || '{}'); } catch { return {}; } }
+function saveCustomOverride(item) { const map = getCustomOverrides(); map[item.id] = item; localStorage.setItem('cryovion_overrides_v7', JSON.stringify(map)); }
+function getLocalReviews() { try { return JSON.parse(localStorage.getItem('cryovion_reviews_v7') || '[]'); } catch { return []; } }
+function saveLocalReview(rv) { const arr = getLocalReviews(); arr.unshift(rv); localStorage.setItem('cryovion_reviews_v7', JSON.stringify(arr)); }
+function getRefRequests() { try { return JSON.parse(localStorage.getItem('cryovion_ref_reqs_v7') || '[]'); } catch { return []; } }
+function saveRefRequest(rq) { const arr = getRefRequests(); arr.unshift(rq); localStorage.setItem('cryovion_ref_reqs_v7', JSON.stringify(arr)); }
+
+function checkIncomingReferral() {
+  const params = new URLSearchParams(window.location.search);
+  const refId = params.get('ref');
+  if (!refId) return;
+  const visitedKey = 'cryovion_visited_' + refId;
+  if (!localStorage.getItem(visitedKey)) {
+    localStorage.setItem(visitedKey, 'true');
+    if (refId.startsWith('u-')) {
+      const uMap = JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}');
+      uMap[refId] = (uMap[refId] || 0) + 1;
+      localStorage.setItem('cryovion_user_refs', JSON.stringify(uMap));
+    } else {
+      const overrides = getCustomOverrides();
+      const base = DEFAULT_DIRECTORY.find(x => x.id === refId) || {};
+      const current = overrides[refId] || base;
+      saveCustomOverride({ ...current, id: refId, ref_count: (current.ref_count || 0) + 1 });
+    }
+    toast('👋 أهلاً بك في منصة Cryovion الطبية!');
+  }
+  if (!refId.startsWith('u-')) setTimeout(() => openPlacePage(refId), 300);
+}
 
 function switchViewDOM(viewName, restoreScroll = false) {
-  if (currentViewName === 'home' && viewName !== 'home') savedHomeScrollY = window.scrollY;
+  if (currentViewName === 'home' && viewName !== 'home') {
+    savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  }
   currentViewName = viewName;
   document.querySelectorAll('.spa-view').forEach(v => v.classList.add('hidden'));
   const target = $('view-' + viewName);
   if (target) target.classList.remove('hidden');
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === viewName));
-  $('searchSuggest').classList.add('hidden');
-  closeSideDrawer();
-  
+  closeSideDrawer(); $('searchSuggest').classList.add('hidden');
+
   if (viewName === 'myManaged') renderManagedAds();
+  if (viewName === 'referrals') renderReferralsHub();
   if (viewName === 'admin' && adminUnlocked) renderAdminList();
-  
-  if (viewName === 'home' && restoreScroll) window.scrollTo({ top: savedHomeScrollY, behavior: 'instant' });
-  else window.scrollTo({ top: 0, behavior: 'instant' });
+
+  if (viewName === 'home' && restoreScroll) {
+    requestAnimationFrame(() => window.scrollTo({ top: savedHomeScrollY, behavior: 'instant' }));
+  } else {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
 }
 
-window.navigateApp = (viewName) => { history.pushState({ view: viewName }, '', ''); switchViewDOM(viewName, viewName === 'home'); };
-window.goBackSmart = () => { if (history.state && history.state.view !== 'home') history.back(); else switchViewDOM('home', true); };
-window.addEventListener('popstate', e => { const st = e.state; if (!st || st.view === 'home') switchViewDOM('home', true); else if (st.view === 'placePage') { renderPlacePageDOM(st.placeId); switchViewDOM('placePage', false); } else switchViewDOM(st.view, false); });
+window.navigateApp = (viewName) => {
+  if (currentViewName === 'home' && viewName !== 'home') {
+    savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  }
+  history.pushState({ view: viewName }, '', '');
+  switchViewDOM(viewName, viewName === 'home');
+};
 
-let logoClicks = 0, logoTimer = null;
-function goHomeLogo() { activeCat = null; activeSpec = 'all'; query = ''; $('search').value = ''; switchViewDOM('home', false); render(); }
+window.goBackSmart = () => {
+  if (history.state && history.state.view && history.state.view !== 'home') {
+    history.back();
+  } else {
+    switchViewDOM('home', true);
+  }
+};
 
-// برمجة الضغط 7 مرات لغرفة التحكم
-$('brandLogo').addEventListener('click', () => {
-  logoClicks++;
-  clearTimeout(logoTimer);
-  logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
-  if (logoClicks >= 7) {
-    logoClicks = 0;
-    adminUnlockStage = 1;
-    $('adminLockScreen').classList.remove('hidden');
-    $('adminDashboardContent').classList.add('hidden');
-    $('adminPinInput').value = '';
-    $('adminPinInput').placeholder = 'الرمز الأول...';
-    $('adminLockHint').textContent = 'الطبقة الأولى: أدخل الرمز الأول';
-    navigateApp('admin');
-  } else if (currentViewName !== 'home') {
-    goHomeLogo();
+window.addEventListener('popstate', e => {
+  const st = e.state;
+  if (!st || st.view === 'home') {
+    switchViewDOM('home', true);
+  } else if (st.view === 'placePage' && st.placeId) {
+    renderPlacePageDOM(st.placeId);
+    switchViewDOM('placePage', false);
+  } else {
+    switchViewDOM(st.view, false);
   }
 });
 
-// برمجة الرمز المزدوج للإدارة
-$('unlockAdminBtn').addEventListener('click', () => {
-  const pin = $('adminPinInput').value.trim();
-  if (adminUnlockStage === 1 && pin === ADMIN_PIN_1) {
-    adminUnlockStage = 2;
-    $('adminPinInput').value = '';
-    $('adminPinInput').placeholder = 'الرمز الثاني...';
-    $('adminLockHint').textContent = 'الطبقة الثانية: أدخل الرمز الثاني';
-    toast('نجاح الطبقة الأولى');
-  } else if (adminUnlockStage === 2 && pin === ADMIN_PIN_2) {
-    adminUnlocked = true;
-    $('adminLockScreen').classList.add('hidden');
-    $('adminDashboardContent').classList.remove('hidden');
-    renderAdminList();
-    toast('تم فتح غرفة التحكم بالكامل');
-  } else {
-    toast('الرمز غير صحيح!');
+let logoClicks = 0, logoTimer = null;
+function goHomeLogo() {
+  activeCat = null; activeSpec = 'all'; query = ''; $('search').value = '';
+  $('searchSuggest').classList.add('hidden'); savedHomeScrollY = 0;
+  switchViewDOM('home', false); render();
+}
+$('brandLogo').addEventListener('click', () => {
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
+  if (logoClicks >= 7) {
+    logoClicks = 0; navigateApp('admin');
+  } else if (currentViewName !== 'home') {
+    goHomeLogo();
   }
 });
 
@@ -575,132 +941,326 @@ function closeSideDrawer() { $('drawerBackdrop').classList.add('hidden'); $('sid
 $('openDrawer').addEventListener('click', openSideDrawer);
 $('closeDrawer').addEventListener('click', closeSideDrawer);
 $('drawerBackdrop').addEventListener('click', closeSideDrawer);
-document.querySelectorAll('[data-nav]').forEach(btn => { btn.addEventListener('click', () => navigateApp(btn.dataset.nav)); });
+
+document.querySelectorAll('[data-nav]').forEach(btn => {
+  btn.addEventListener('click', () => navigateApp(btn.dataset.nav));
+});
+
+$('editorModal').addEventListener('click', e => { if (e.target === $('editorModal')) closeEditorModal(); });
+$('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
+document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden'); });
 
 function getCurrentUser() { try { return JSON.parse(localStorage.getItem('cryovion_user') || 'null'); } catch { return null; } }
-function setCurrentUser(u) { localStorage.setItem('cryovion_user', JSON.stringify(u)); refreshUserUI(); }
+function setCurrentUser(u) {
+  if (u) {
+    if (!u.ref_code) u.ref_code = 'u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10);
+    localStorage.setItem('cryovion_user', JSON.stringify(u));
+  } else localStorage.removeItem('cryovion_user');
+  refreshUserUI();
+}
 function refreshUserUI() {
   const u = getCurrentUser();
   const myAds = u ? places.filter(p => norm(p.owner_email) === norm(u.email)) : [];
   $('managedCountBadge').textContent = myAds.length;
-  
+  $('topManageShortcut').classList.toggle('hidden', myAds.length === 0);
+
   if (u) {
     $('drawerUserName').textContent = u.name || u.email.split('@')[0];
-    $('drawerUserRole').textContent = `${u.email}`;
+    $('drawerUserRole').textContent = `${u.email} (${u.role || 'عضو'})`;
     $('headerUserBadge').textContent = `👤 ${u.name || u.email.split('@')[0]}`;
     $('profileActiveBox').classList.remove('hidden');
     $('authFormsWrap').classList.add('hidden');
+    $('profRoleTag').textContent = `حساب ${u.role || 'مفعل'}`;
     $('profNameDisp').textContent = u.name || u.email.split('@')[0];
     $('profEmailDisp').textContent = u.email;
   } else {
     $('drawerUserName').textContent = 'تسجيل الدخول';
-    $('drawerUserRole').textContent = 'إدارة صفحتك';
+    $('drawerUserRole').textContent = 'إدارة صفحتك / دعوة صديق';
     $('headerUserBadge').textContent = '🔐 دخول';
     $('profileActiveBox').classList.add('hidden');
     $('authFormsWrap').classList.remove('hidden');
   }
 }
 
-// نظام تسجيل الدخول المنبثق السريع (يحل مشكلة Supabase)
-$('googleDirectBtn').addEventListener('click', () => {
-  const email = prompt('تسجيل دخول سريع بواسطة جوجل\nأدخل بريدك الإلكتروني (Gmail):');
-  if (email && email.includes('@')) {
-    const name = email.split('@')[0];
-    setCurrentUser({ name, email: email.trim().toLowerCase(), provider: 'google' });
-    toast('✔ تم تسجيل الدخول بحساب جوجل بنجاح');
-  } else if(email) toast('صيغة البريد غير صحيحة');
+$('tabLoginBtn').addEventListener('click', () => {
+  isRegisterMode = false; $('registerExtraFields').classList.add('hidden');
+  $('tabLoginBtn').className = 'gold-bg'; $('tabRegisterBtn').className = '';
+  $('tabRegisterBtn').style.background = 'rgba(255,255,255,0.05)';
+  $('authSubmitBtn').textContent = 'دخول بالبريد الإلكتروني ✔';
+});
+$('tabRegisterBtn').addEventListener('click', () => {
+  isRegisterMode = true; $('registerExtraFields').classList.remove('hidden');
+  $('tabRegisterBtn').className = 'gold-bg'; $('tabLoginBtn').className = '';
+  $('tabLoginBtn').style.background = 'rgba(255,255,255,0.05)';
+  $('authSubmitBtn').textContent = 'إنشاء الحساب وتفعيله ✔';
+});
+document.querySelectorAll('.role-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    selectedRole = b.dataset.role;
+    document.querySelectorAll('.role-btn').forEach(x => {
+      const on = x.dataset.role === selectedRole;
+      x.style.borderColor = on ? 'var(--gold)' : 'var(--border-soft)';
+      x.style.background = on ? 'rgba(217,180,90,0.15)' : 'transparent';
+    });
+  });
 });
 
-$('facebookDirectBtn').addEventListener('click', () => {
-  const name = prompt('تسجيل دخول سريع بواسطة فيسبوك\nأدخل اسم حسابك أو بريدك:');
-  if (name && name.trim()) {
-    const email = name.includes('@') ? name : `${name.replace(/\s+/g,'.')}@facebook.com`;
-    setCurrentUser({ name: name.trim().split('@')[0], email: email.trim().toLowerCase(), provider: 'facebook' });
-    toast('✔ تم الدخول بحساب فيسبوك بنجاح');
+$('accountForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = $('accEmail').value.trim().toLowerCase();
+  const password = $('accPass').value;
+  const name = ($('accName').value || '').trim() || email.split('@')[0];
+  if (db) {
+    try {
+      if (isRegisterMode) await db.auth.signUp({ email, password, options: { data: { name, role: selectedRole } } });
+      else await db.auth.signInWithPassword({ email, password });
+    } catch {}
+  }
+  setCurrentUser({ name, email, role: selectedRole });
+  toast(`مرحباً بك ${name}! تم تسجيل الدخول`);
+});
+
+$('googleDirectBtn').addEventListener('click', async () => {
+  const gEmail = prompt('أدخل بريدك الإلكتروني على Google (Gmail) لتسجيل الدخول:');
+  if (gEmail && gEmail.includes('@')) {
+    const clean = gEmail.trim().toLowerCase();
+    setCurrentUser({ name: clean.split('@')[0], email: clean, role: selectedRole, provider: 'google' });
+    toast('✔ تم تسجيل الدخول عبر Google بنجاح');
   }
 });
 
-$('accountForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const email = $('accEmail').value.trim().toLowerCase();
-  const name = $('accName').value.trim() || email.split('@')[0];
-  setCurrentUser({ name, email, provider: 'email' });
-  toast(`مرحباً بك ${name}! تم الدخول`);
+$('facebookDirectBtn').addEventListener('click', async () => {
+  const fbInput = prompt('أدخل البريد أو اسم الحساب المرتبط بـ Facebook:');
+  if (fbInput && fbInput.trim()) {
+    const clean = fbInput.trim().toLowerCase();
+    const emailFmt = clean.includes('@') ? clean : `${clean.replace(/\s+/g,'.')}@facebook.user`;
+    setCurrentUser({ name: fbInput.trim().split('@')[0], email: emailFmt, role: selectedRole, provider: 'facebook' });
+    toast('✔ تم تسجيل الدخول عبر Facebook بنجاح');
+  }
 });
 
-$('logoutBtn').addEventListener('click', () => { setCurrentUser(null); toast('تم تسجيل الخروج'); });
+$('logoutBtn').addEventListener('click', async () => {
+  if (db) { try { await db.auth.signOut(); } catch {} }
+  setCurrentUser(null); toast('تم تسجيل الخروج');
+});
 
 async function load() {
+  let dbPlaces = [], dbReviews = [];
+  if (db) {
+    const [p, r] = await Promise.all([
+      db.from('places').select('*').eq('status','approved').order('created_at',{ascending:false}),
+      db.from('reviews').select('*').eq('status','approved').order('created_at',{ascending:false})
+    ]);
+    if (!p.error && p.data) dbPlaces = p.data;
+    if (!r.error && r.data) dbReviews = r.data;
+  }
+
   const overrides = getCustomOverrides();
+  const localRevs = getLocalReviews();
+  const allRevs = [...localRevs, ...dbReviews];
+
   const baseMap = new Map();
   DEFAULT_DIRECTORY.forEach(item => baseMap.set(item.id, { ...item }));
-  
+  dbPlaces.forEach(item => {
+    if (!baseMap.has(item.id)) {
+      baseMap.set(item.id, {
+        id: item.id, cat: item.cat || 'doctor', spec_key: item.spec_key || item.cat || 'gastro',
+        name: item.name, spec: item.spec || '', bio: item.bio || item.spec || '', bio_ts: nowTs,
+        hours: item.hours || 'غير معروف', lamp_mode: 'unknown',
+        addr: item.addr || 'غير معروف', phone: item.phone || null,
+        photo_url: item.photo_url || '', is_verified: !!item.is_verified, ref_count: 0, updated_date: '2026-11-07'
+      });
+    }
+  });
   Object.values(overrides).forEach(item => {
     if (item.deleted) baseMap.delete(item.id);
     else baseMap.set(item.id, { ...(baseMap.get(item.id) || {}), ...item });
   });
 
   places = Array.from(baseMap.values()).map(d => {
+    const rv = allRevs.filter(x => x.place_id === d.id);
+    const rated = rv.filter(x => x.stars > 0);
     const avail = getAvailabilityStatus(d);
-    return { ...d, avail_state: avail.state, avail_label: avail.label, avail_color: avail.color };
+    return {
+      ...d,
+      avail_state: avail.state,
+      avail_label: avail.label,
+      avail_color: avail.color,
+      reviews: rv,
+      n: rated.length,
+      rate: rated.length ? Math.round(rated.reduce((a,x)=>a+x.stars,0)/rated.length*10)/10 : 5
+    };
   });
 
-  refreshUserUI(); render();
+  refreshUserUI();
+  render();
+  renderPostersCarousel();
 }
 
 $('search').addEventListener('input', e => {
-  query = e.target.value; const q = norm(query);
+  query = e.target.value;
+  const raw = query.trim();
+  const q = norm(raw);
   const box = $('searchSuggest');
   if (!q) { box.classList.add('hidden'); }
   else {
     const matches = places.filter(d => norm(`${d.name} ${d.spec} ${d.addr}`).includes(q)).slice(0, 6);
     if (matches.length) {
-      box.innerHTML = matches.map(m => `<div class="auto-item" onclick="openPlacePage('${m.id}')"><p style="font-weight:700;">${esc(m.name)} <span style="font-size:11px; color:var(--gold);">(${esc(m.spec)})</span></p></div>`).join('');
+      box.innerHTML = matches.map(m => {
+        const sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
+        return `<div class="auto-item" data-suggest-id="${m.id}">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+            ${orb(m.cat, 32)}
+            <div style="min-width:0;">
+              <p style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;">
+                <span>${esc(m.name)}</span>
+                <span class="status-dot ${m.avail_state}"></span>
+              </p>
+              <p style="font-size:11px; color:${sp.color};">${esc(m.spec)} • 📍 ${esc(m.addr)}</p>
+            </div>
+          </div>
+          <span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.label}</span>
+        </div>`;
+      }).join('');
       box.classList.remove('hidden');
     } else {
-      box.innerHTML = `<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق</div>`;
+      box.innerHTML = `<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق لـ "${esc(raw)}"</div>`;
       box.classList.remove('hidden');
     }
   }
+  if (currentViewName !== 'home') switchViewDOM('home', false);
+  render();
+});
+
+$('searchSuggest').addEventListener('click', e => {
+  const item = e.target.closest('[data-suggest-id]');
+  if (!item) return;
+  $('searchSuggest').classList.add('hidden');
+  openPlacePage(item.dataset.suggestId);
 });
 
 function renderCats() {
   $('cats').innerHTML = Object.entries(CATS).map(([k,c]) => {
     const n = places.filter(d => d.cat === k).length, on = activeCat === k;
     return `<button data-cat="${k}" class="cat-orb-pill ${on ? 'active' : ''}">
-      <span style="font-size:20px;">${c.icon||'📍'}</span>
-      <div style="text-align:right;"><span style="font-size:14px; font-weight:700; display:block;">${c.label}</span><span style="font-size:11px; color:var(--gold);">${n} صفحة</span></div>
+      ${orb(k, 36)}
+      <div style="text-align:right;">
+        <span style="font-size:14px; font-weight:700; display:block; line-height:1.2;">${c.label}</span>
+        <span style="font-size:11px; color:var(--gold);">${n} صفحة</span>
+      </div>
     </button>`;
   }).join('');
 }
+
 function renderSpecsBar() {
-  const doctorSpecs = ['all', 'peds', 'gastro', 'obgyn', 'neuro', 'ortho', 'dental', 'eye', 'ent', 'urology', 'physio'];
+  const doctorSpecs = ['all', 'peds', 'gastro', 'obgyn', 'neuro', 'ortho', 'dental', 'eye', 'ent', 'physio'];
   $('specsBar').innerHTML = doctorSpecs.map(k => {
-    const s = SPECS_META[k], on = activeSpec === k;
-    return `<button data-spec="${k}" class="spec-chip ${on ? 'active' : ''}"><span>${s.icon}</span><span>${s.label}</span></button>`;
+    const s = SPECS_META[k];
+    const on = activeSpec === k;
+    return `<button data-spec="${k}" class="spec-chip ${on ? 'active' : ''}">
+      <span>${s.icon}</span><span>${s.label}</span>
+    </button>`;
   }).join('');
 }
 
+let posterTimer = null;
+function renderPostersCarousel() {
+  const track = $('posterTrack');
+  const dayMs = 24 * 60 * 60 * 1000;
+  const activeStatuses = places.filter(d => d.bio && (!d.bio_ts || (Date.now() - d.bio_ts) <= dayMs));
+
+  track.innerHTML = activeStatuses.map(d => {
+    const sp = SPECS_META[d.spec_key] || SPECS_META.gastro;
+    const thumbHtml = d.photo_url
+      ? `<img src="${esc(d.photo_url)}" class="poster-mini-thumb" alt="${esc(d.name)}">`
+      : `<span class="poster-mini-thumb t-${d.cat}">${sp.icon}</span>`;
+
+    return `<div data-act="openPage" data-id="${d.id}" class="poster-card">
+      <div class="poster-top-quarter">
+        <div style="display:flex; align-items:center; gap:7px; min-width:0;">
+          ${thumbHtml}
+          <span style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(d.name)}</span>
+        </div>
+        <span style="display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; color:${d.avail_color}; flex-shrink:0;">
+          <span class="status-dot ${d.avail_state}"></span>
+          <span>${esc(d.avail_label)}</span>
+        </span>
+      </div>
+      <div class="poster-bio-body">${esc(d.bio)}</div>
+    </div>`;
+  }).join('');
+
+  clearInterval(posterTimer);
+  posterTimer = setInterval(() => {
+    if (!track) return;
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    if (Math.abs(track.scrollLeft) >= maxScroll - 20) track.scrollTo({ left: 0, behavior: 'smooth' });
+    else track.scrollBy({ left: -354, behavior: 'smooth' });
+  }, 4200);
+}
+$('slidePrev').addEventListener('click', () => $('posterTrack').scrollBy({ left: 354, behavior: 'smooth' }));
+$('slideNext').addEventListener('click', () => $('posterTrack').scrollBy({ left: -354, behavior: 'smooth' }));
+
 function card(d) {
   const c = CATS[d.cat] || CATS.doctor;
-  const spMeta = SPECS_META[d.spec_key] || SPECS_META.gastro;
-  const verificationBadge = d.is_verified 
-    ? `<span style="color:var(--gold); font-size:12px; font-weight:700;">✔ موثق ورسمي</span>`
-    : `<span style="color:var(--muted); font-size:11px;">⏳ جاري مراجعة وتدقيق البيانات</span>`;
-  const phoneDisplay = d.phone && d.is_verified ? esc(d.phone) : '<span style="color:var(--muted); font-size:11px;">الرقم غير مؤكد بعد</span>';
-  
-  const imgHtml = d.photo_url ? `<img src="${esc(d.photo_url)}">` : `<div style="text-align:center; padding:8px;"><div style="font-size:34px;">${spMeta.icon}</div></div>`;
+  const spMeta = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro;
+  const isPedsDoctor = d.cat === 'doctor' && d.spec_key === 'peds';
 
-  return `<article onclick="openPlacePage('${d.id}')" class="entity-card" style="--cat-accent:${c.accent};">
+  const doctorWatermarkHtml = (d.cat === 'doctor' && spMeta.svg)
+    ? `<svg class="doctor-watermark" style="--spec-color:${spMeta.color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">${spMeta.svg}</svg>`
+    : '';
+
+  const phoneDisplay = d.phone
+    ? esc(d.phone)
+    : '<span style="color:var(--muted); font-size:11.5px;">لا تتوفر أرقام هواتف بعد من قبل مدير الصفحة</span>';
+
+  /* شارة التوثيق أو جاري جمع البيانات */
+  const verificationBadge = d.is_verified
+    ? `<span style="color:var(--gold); font-size:12px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>`
+    : `<span style="color:var(--muted); font-size:11px;" title="جاري جمع وتدقيق البيانات">⏳ جاري جمع البيانات وتدقيقها</span>`;
+
+  const rightPhotoHtml = d.photo_url
+    ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" loading="lazy">`
+    : `<div style="text-align:center; padding:8px;">
+        <div style="font-size:34px; margin-bottom:4px;">${spMeta.icon}</div>
+        <span style="font-size:10.5px; color:var(--muted); font-weight:700; display:block;">${c.label}</span>
+      </div>`;
+
+  return `<article data-act="openPage" data-id="${d.id}" class="entity-card ${isPedsDoctor ? 'peds-dignified' : ''}" style="--cat-accent:${isPedsDoctor ? '#f472b6' : c.accent};">
+    ${doctorWatermarkHtml}
     <div class="id-card-layout">
-      <div class="id-card-right-photo">${imgHtml}</div>
+      <div class="id-card-right-photo">${rightPhotoHtml}</div>
       <div class="id-card-left-info">
         <div>
-          <div style="display:flex; justify-content:space-between;"><h3 style="font-size:17.5px; font-weight:700;">${esc(d.name)}</h3><span class="top-left-activity"><span class="status-dot ${d.avail_state}"></span><span style="color:${d.avail_color};">${esc(d.avail_label)}</span></span></div>
-          <div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;"><span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color};">${spMeta.icon} ${esc(d.spec)}</span>${verificationBadge}</div>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+            <h3 style="font-size:17.5px; font-weight:700; line-height:1.3;">
+              <span>${esc(d.name)}</span>
+            </h3>
+            <span class="top-left-activity">
+              <span class="status-dot ${d.avail_state}"></span>
+              <span style="color:${d.avail_color};">${esc(d.avail_label)}</span>
+            </span>
+          </div>
+
+          <div style="margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color}; border:1px solid ${spMeta.color}44;">
+              ${spMeta.icon} ${esc(d.spec)}
+            </span>
+            ${verificationBadge}
+          </div>
+
           <div style="margin-top:9px; font-size:12.5px; color:var(--muted); display:grid; gap:3px;">
             <p>📍 <b style="color:var(--text);">العنوان:</b> ${esc(d.addr)}</p>
+            <p>🕒 <b style="color:var(--text);">مواعيد الفتح:</b> ${esc(d.hours || 'غير معروف')}</p>
             <p>📞 <b style="color:var(--text);">الهاتف:</b> ${phoneDisplay}</p>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-size:11.5px; color:var(--gold); font-weight:700;">عرض بطاقة المكان الكاملة ←</span>
+          <div style="display:flex; gap:6px;">
+            ${d.phone ? `<a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()" style="background:var(--emerald); color:#fff; padding:5px 12px; border-radius:9px; font-size:11.5px; font-weight:700;">📞 اتصل</a>` : ''}
+            <button data-act="speak" data-id="${d.id}" style="background:rgba(255,255,255,0.07); color:var(--gold); padding:5px 9px; border-radius:9px; font-size:11.5px;">🔊</button>
           </div>
         </div>
       </div>
@@ -719,126 +1279,403 @@ function render() {
 
   $('list').innerHTML = res.map(card).join('');
   $('totalCountBadge').textContent = res.length;
-  $('empty').textContent = 'لا توجد نتائج.';
+  $('empty').textContent = 'لا توجد نتائج مطابقة لهذا الفلتر.';
   $('empty').classList.toggle('hidden', res.length > 0);
   $('listTitle').textContent = activeSpec !== 'all' ? SPECS_META[activeSpec].label : (activeCat ? CATS[activeCat].label : 'الدليل الطبي الموثق');
   $('showAll').classList.toggle('hidden', !activeCat && activeSpec === 'all');
-  renderCats(); renderSpecsBar();
+  renderCats();
+  renderSpecsBar();
 }
 
 function renderPlacePageDOM(id) {
-  const d = places.find(x => x.id === id); if (!d) return;
+  const d = places.find(x => x.id === id);
+  if (!d) return;
+  const c = CATS[d.cat] || CATS.doctor;
   const spMeta = SPECS_META[d.spec_key] || SPECS_META.gastro;
-  const verificationBadgePage = d.is_verified ? `<span style="color:var(--gold); font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>` : `<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>`;
-  const phoneRowText = d.phone && d.is_verified ? `📞 ${esc(d.phone)}` : `<span style="color:var(--muted);">لا تتوفر أرقام هواتف بعد من قبل مدير الصفحة</span>`;
   const u = getCurrentUser();
-  const canManage = adminUnlocked || (u && norm(u.email) === norm(d.owner_email));
+  const canManage = adminUnlocked || (u && norm(u.email) === norm(d.owner_email) && d.owner_email);
+
+  const phoneRowText = d.phone
+    ? `📞 ${esc(d.phone)}`
+    : `<span style="color:var(--muted);">لا تتوفر أرقام هواتف بعد من قبل مدير الصفحة</span>`;
+
+  const verificationBadgePage = d.is_verified
+    ? `<span style="color:var(--gold); font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>`
+    : `<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>`;
 
   $('placePageContent').innerHTML = `
-    <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
-      <div style="font-size:13px; color:var(--muted);"><span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة للدليل</span> / ${esc(d.name)}</div>
-      ${canManage ? `<button onclick="openEditorModal('${d.id}')" class="gold-bg" style="padding:6px 12px; border-radius:10px; font-size:12px;">✏️ تعديل الصفحة</button>` : ''}
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
+      <div style="font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px;">
+        <span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة لنفس مكانك في الدليل</span>
+        <span>/</span><span>${c.label}</span><span>/</span>
+        <span style="color:var(--text); font-weight:700;">${esc(d.name)}</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        ${canManage ? `<button onclick="openEditorModal('${d.id}')" class="gold-bg" style="padding:8px 14px; border-radius:10px; font-size:12px;">✏️ تعديل بيانات الصفحة</button>` : ''}
+        <button onclick="goBackSmart()" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">← رجوع للمكان السابق</button>
+      </div>
     </div>
+
     <div class="noon-hero-grid">
       <div class="noon-showcase">
-        ${d.photo_url ? `<img src="${esc(d.photo_url)}" style="width:100%; height:230px; object-fit:cover; border-radius:16px;">` : `<div style="font-size:54px;">${spMeta.icon}</div>`}
+        ${d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" style="width:100%; height:230px; object-fit:cover; border-radius:16px; margin-bottom:10px;">` : `<div style="font-size:54px; margin-bottom:10px;">${spMeta.icon}</div>`}
+        <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color};">${spMeta.icon} ${esc(d.spec)}</span>
         <h2 class="font-display" style="font-size:22px; margin-top:8px; color:#fff;">${esc(d.name)}</h2>
-        <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px;">"${esc(d.bio || '')}"</p>
+        <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">"${esc(d.bio || '')}"</p>
       </div>
+
       <div>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+          <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color}; font-size:13px;">${spMeta.icon} ${esc(d.spec)}</span>
+          <span class="top-left-activity">
+            <span class="status-dot ${d.avail_state}"></span>
+            <span style="color:${d.avail_color};">${esc(d.avail_label)}</span>
+          </span>
+        </div>
+
+        <h1 class="font-display" style="font-size:26px; margin-top:8px;">${esc(d.name)}</h1>
+        <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+          <span>${stars(d.rate || 5)}</span>
+          <span style="font-size:12px; color:var(--muted);">(${d.n} تقييم)</span>
+        </div>
+
         <table class="noon-table">
           <tr><th>حالة التوثيق</th><td>${verificationBadgePage}</td></tr>
           <tr><th>التخصص الدقيق</th><td style="color:${spMeta.color};">${esc(d.spec)}</td></tr>
           <tr><th>العنوان المؤكد</th><td>📍 ${esc(d.addr)}</td></tr>
           <tr><th>مواعيد الفتح</th><td>🕒 ${esc(d.hours || 'غير معروف')}</td></tr>
           <tr><th>رقم الهاتف</th><td>${phoneRowText}</td></tr>
+          <tr><th>آخر تحديث</th><td>📅 ${esc(d.updated_date || '2026-11-07')}</td></tr>
         </table>
-        <div style="margin-top:16px; display:grid; gap:10px;">
-          ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:13px; border-radius:14px; text-align:center; font-weight:700;">📞 اتصال مباشر</a>` : ''}
+
+        <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:10px; font-weight:700; font-size:13px;">
+          ${d.phone ? `<a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:13px; border-radius:14px; text-align:center;">📞 اتصال مباشر</a>` : `<span style="background:rgba(255,255,255,0.05); color:var(--muted); padding:13px; border-radius:14px; text-align:center; font-size:11.5px;">لا يتوفر رقم هاتف بعد</span>`}
+          <button data-act="speak" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border); color:var(--gold); padding:13px; border-radius:14px;">🔊 قراءة صوتية</button>
+          <button data-act="share" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border-soft); padding:13px; border-radius:14px;">✨ دعوة صديق للمكان</button>
         </div>
       </div>
     </div>
   `;
 }
 
-function openPlacePage(id) { renderPlacePageDOM(id); history.pushState({ view: 'placePage', placeId: id }, '', ''); switchViewDOM('placePage', false); }
+function openPlacePage(id) {
+  if (currentViewName === 'home') {
+    savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  }
+  renderPlacePageDOM(id);
+  history.pushState({ view: 'placePage', placeId: id }, '', '');
+  switchViewDOM('placePage', false);
+}
 
 function renderManagedAds() {
-  const u = getCurrentUser(); const box = $('managedListBox');
-  if (!u) { box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px;"><p style="color:var(--muted);">سجل دخولك لعرض الصفحات المفوضة.</p><button onclick="navigateApp('account')" class="gold-bg" style="padding:10px 20px; border-radius:12px; margin-top:10px;">دخول</button></div>`; return; }
+  const u = getCurrentUser();
+  const box = $('managedListBox');
+  if (!u) {
+    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px;">
+      <p style="color:var(--muted); margin-bottom:12px;">سجل دخولك ببريدك الإلكتروني لعرض الصفحات المفوضة لك.</p>
+      <button onclick="navigateApp('account')" class="gold-bg" style="padding:10px 20px; border-radius:12px;">تسجيل الدخول</button>
+    </div>`;
+    return;
+  }
   const myAds = places.filter(p => norm(p.owner_email) === norm(u.email));
-  if (!myAds.length) { box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px; color:var(--muted);">لا توجد صفحة مرتبطة ببريدك حالياً.</div>`; return; }
-  
-  box.innerHTML = myAds.map(p => `
-    <div class="entity-card" style="border-color:var(--gold); display:flex; justify-content:space-between; align-items:center;">
-      <div><span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔ صفحتك</span><h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}</h3></div>
-      <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px;">✏️ تعديل بياناتي</button>
-    </div>
-  `).join('');
+  if (!myAds.length) {
+    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px; color:var(--muted);">
+      لا توجد صفحة مرتبطة ببريدك (<b style="color:var(--gold);">${esc(u.email)}</b>) حالياً.<br>
+      يمكنك استخدام ميزة <button onclick="navigateApp('referrals')" style="color:var(--gold); text-decoration:underline; font-weight:700;">✨ دعوة صديق</button> لنشر إعلانك مجاناً!
+    </div>`;
+    return;
+  }
+
+  const baseUrl = window.location.href.split('?')[0];
+  box.innerHTML = myAds.map(p => {
+    const refLink = `${baseUrl}?ref=${p.id}`;
+    const count = p.ref_count || 0;
+    const pct = Math.min(100, count);
+    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔ صفحة مفوضة لحسابك</span>
+          <h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}</h3>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button onclick="quickToggleLamp('${p.id}')" style="background:rgba(255,255,255,0.06); border:1px solid var(--emerald); color:var(--emerald); padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700;">
+            <span class="status-dot ${p.avail_state}"></span>
+            تبديل حالة الدوام (${esc(p.avail_label)})
+          </button>
+          <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">📷 رفع صورة / تعديل البيانات</button>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:14px; border:1px solid var(--border-soft);">
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; margin-bottom:6px;">
+          <span style="color:var(--gold);">✨ عداد دعوة صديق الخاص بصفحتك:</span>
+          <span style="color:var(--emerald);">${count} / 100 صديق</span>
+        </div>
+        <div style="height:9px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:10px;">
+          <div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input readonly value="${esc(refLink)}" class="input-box" style="font-size:12px; padding:8px 10px;">
+          <button onclick="navigator.clipboard.writeText('${esc(refLink)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 14px; border-radius:10px; font-size:12px; white-space:nowrap;">نسخ الرابط</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
+
+window.quickToggleLamp = async id => {
+  const p = places.find(x => x.id === id);
+  if (!p) return;
+  const order = ['unknown', 'open', 'closed'];
+  const nextMode = order[(order.indexOf(p.lamp_mode || 'unknown') + 1) % order.length];
+  saveCustomOverride({ ...p, lamp_mode: nextMode });
+  await load();
+  renderManagedAds();
+  toast(nextMode === 'open' ? '🟢 تم التفعيل: مفتوح الآن' : (nextMode === 'closed' ? '🔴 تم التعديل: مغلق الآن' : '⚪ تم الضبط: غير معروف'));
+};
+
+function renderReferralsHub() {
+  const u = getCurrentUser();
+  const box = $('referralsDashboardBox');
+  const baseUrl = window.location.href.split('?')[0];
+
+  if (!u) {
+    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:28px;">
+      <h3 style="font-size:18px; color:var(--gold); margin-bottom:8px;">✨ شارك المنصة عبر ميزة دعوة صديق</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">سجل دخولك بحساب مجاني للحصول على رابط دعوة الأصدقاء الخاص بك.</p>
+      <button onclick="navigateApp('account')" class="gold-bg" style="padding:11px 22px; border-radius:12px;">تسجيل الدخول الآن ←</button>
+    </div>`;
+    return;
+  }
+
+  const uMap = JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}');
+  const myCode = u.ref_code || ('u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10));
+  const myAds = places.filter(p => norm(p.owner_email) === norm(u.email));
+  const adRefCount = myAds.reduce((acc, item) => acc + (item.ref_count || 0), 0);
+  const totalRefs = (uMap[myCode] || 0) + adRefCount;
+  const pct = Math.min(100, totalRefs);
+  const myRefUrl = myAds.length ? `${baseUrl}?ref=${myAds[0].id}` : `${baseUrl}?ref=${myCode}`;
+
+  box.innerHTML = `
+    <div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span class="badge-pill" style="background:rgba(217,180,90,0.2); color:var(--gold);">✨ دعوة صديق</span>
+          <h3 style="font-size:19px; margin-top:4px;">مرحباً ${esc(u.name)}</h3>
+        </div>
+        <div style="text-align:center; background:rgba(16,185,129,0.12); border:1px solid var(--emerald); padding:8px 16px; border-radius:14px;">
+          <span style="font-size:22px; font-weight:700; color:var(--emerald); display:block; line-height:1.1;">${totalRefs}</span>
+          <span style="font-size:11px; color:var(--muted);">صديق مدعو</span>
+        </div>
+      </div>
+
+      <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+        قم بدعوة أصدقائك عبر الرابط التالي؛ وعند دعوة 100 شخص حقيقي يمكنك طلب وضع إعلان لنشاطك الطبي أو التجميلي مجاناً:
+      </p>
+
+      <div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;">
+          <span>التقدم نحو مكافأة الـ 100 صديق:</span>
+          <b style="color:var(--gold);">${totalRefs} / 100</b>
+        </div>
+        <div style="height:10px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden;">
+          <div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <input readonly value="${esc(myRefUrl)}" class="input-box" style="font-size:12.5px;">
+        <button onclick="navigator.clipboard.writeText('${esc(myRefUrl)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 18px; border-radius:12px; font-size:13px; white-space:nowrap;">✨ دعوة صديق 📋</button>
+      </div>
+    </div>
+
+    <form id="refAdRequestForm" class="entity-card" style="display:grid; gap:10px;">
+      <h4 style="font-size:16px; color:var(--gold);">📢 طلب نشر إعلان لنشاطك المسموح به</h4>
+      <input id="rqTitle" required placeholder="اسم النشاط أو العيادة *" class="input-box">
+      <input id="rqType" required placeholder="نوع النشاط *" class="input-box">
+      <input id="rqPhone" required placeholder="رقم الهاتف أو الواتساب *" class="input-box">
+      <textarea id="rqDesc" required rows="2" placeholder="تفاصيل الإعلان والعنوان..." class="input-box"></textarea>
+      <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">إرسال الطلب للإدارة (${totalRefs} صديق) ✔</button>
+    </form>
+  `;
+
+  $('refAdRequestForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const desc = $('rqDesc').value.trim();
+    if (containsDefamation(desc)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
+    saveRefRequest({
+      id: crypto.randomUUID(),
+      user_name: u.name, user_email: u.email, refs: totalRefs,
+      title: $('rqTitle').value.trim(), type: $('rqType').value.trim(), phone: $('rqPhone').value.trim(), desc
+    });
+    e.target.reset();
+    toast('✔ تم إرسال طلبك إلى الإدارة بنجاح!');
+  });
+}
+
+$('unlockAdminBtn').addEventListener('click', () => {
+  if ($('adminPinInput').value.trim() === ADMIN_PIN) {
+    adminUnlocked = true;
+    $('adminPinInput').value = '';
+    $('adminLockScreen').classList.add('hidden');
+    $('adminDashboardContent').classList.remove('hidden');
+    renderAdminList();
+  } else toast('الرمز غير صحيح!');
+});
 
 function renderAdminList() {
+  const reqs = getRefRequests();
+  $('adminRefReqCount').textContent = reqs.length;
+  $('adminRefRequestsList').innerHTML = reqs.length ? reqs.map(r => `
+    <div class="entity-card" style="border-color:var(--emerald); padding:12px 16px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gold);">
+        <span>المرسل: ${esc(r.user_name)} (${esc(r.user_email)})</span>
+        <b style="color:var(--emerald);">الدعوات: ${r.refs}</b>
+      </div>
+      <h4 style="font-size:16px; margin-top:4px;">${esc(r.title)} — <span style="font-size:13px; color:var(--gold);">${esc(r.type)}</span></h4>
+      <p style="font-size:13px; color:var(--muted); margin-top:4px;">${esc(r.desc)} | هاتف: ${esc(r.phone)}</p>
+    </div>
+  `).join('') : `<div class="entity-card" style="text-align:center; padding:16px; color:var(--muted);">لا توجد طلبات جديدة.</div>`;
+
   $('adminTotalPlaces').textContent = places.length;
   $('adminAllPlacesList').innerHTML = places.map(p => `
-    <div class="entity-card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+    <div class="entity-card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div>
-        <strong style="font-size:15px;">${esc(p.name)}</strong>
-        <p style="font-size:12px; color:var(--muted);">موثق: <b style="color:${p.is_verified?'var(--gold)':'var(--muted)'};">${p.is_verified?'نعم':'قيد التدقيق'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'لا يوجد')}</b></p>
+        <span style="font-size:11px; color:var(--gold); font-weight:700;">[${(SPECS_META[p.spec_key]||SPECS_META.gastro).label}]</span>
+        <strong style="font-size:15px; margin-right:6px;">${esc(p.name)}</strong>
+        <p style="font-size:12px; color:var(--muted); margin-top:2px;">
+          موثق: <b style="color:${p.is_verified ? 'var(--gold)' : 'var(--muted)'};">${p.is_verified ? 'نعم' : 'قيد التدقيق'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b>
+        </p>
       </div>
-      <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:7px 14px; border-radius:9px; font-size:12px;">✏️ تعديل</button>
+      <div style="display:flex; gap:6px;">
+        <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:7px 14px; border-radius:9px; font-size:12px;">✏️ تعديل / تفويض</button>
+        <button onclick="deleteAd('${p.id}')" style="background:rgba(244,63,94,0.2); color:var(--rose); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">🗑 حذف</button>
+      </div>
     </div>
   `).join('');
 }
 
+$('edCat').addEventListener('change', () => {});
+$('edPhotoFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => { $('edPhotoUrl').value = ev.target.result; toast('📷 تم وضع الصورة بنجاح'); };
+  reader.readAsDataURL(f);
+});
+
 window.openEditorModal = id => {
-  const ex = id ? places.find(x => x.id === id) : null;
-  $('edId').value = ex ? ex.id : '';
-  $('edCat').value = ex ? ex.cat : 'doctor';
-  $('edSpecKey').value = ex ? (ex.spec_key || 'gastro') : 'gastro';
-  $('edName').value = ex ? ex.name : '';
-  $('edSpec').value = ex ? ex.spec : '';
-  $('edBio').value = ex ? (ex.bio || '') : '';
-  $('edPhotoUrl').value = ex ? (ex.photo_url || '') : '';
-  $('edAddr').value = ex ? ex.addr : '';
-  $('edIsVerified').checked = ex ? !!ex.is_verified : false;
-  $('edLampMode').value = ex ? (ex.lamp_mode || 'unknown') : 'unknown';
-  $('edHours').value = ex && ex.hours !== 'غير معروف' ? ex.hours : '';
-  $('edPhone').value = ex && ex.phone ? ex.phone : '';
-  $('edOwnerEmail').value = ex && ex.owner_email ? ex.owner_email : '';
+  const existing = id ? places.find(x => x.id === id) : null;
+  $('edId').value = existing ? existing.id : '';
+  $('edCat').value = existing ? existing.cat : 'doctor';
+  $('edSpecKey').value = existing ? (existing.spec_key || 'gastro') : 'gastro';
+  $('edName').value = existing ? existing.name : '';
+  $('edSpec').value = existing ? existing.spec : '';
+  $('edBio').value = existing ? (existing.bio || '') : '';
+  $('edPhotoUrl').value = existing ? (existing.photo_url || '') : '';
+  $('edAddr').value = existing ? existing.addr : '';
+  $('edIsVerified').checked = existing ? !!existing.is_verified : false;
+  $('edLampMode').value = existing ? (existing.lamp_mode || 'unknown') : 'unknown';
+  $('edHours').value = existing && existing.hours !== 'غير معروف' ? existing.hours : '';
+  $('edPhone').value = existing && existing.phone ? existing.phone : '';
+  $('edOwnerEmail').value = existing && existing.owner_email ? existing.owner_email : '';
+  $('edRefCount').value = existing ? (existing.ref_count || 0) : 0;
+
   $('ownerAssignWrap').classList.toggle('hidden', !adminUnlocked);
-  $('editorTitle').textContent = ex ? `تحديث بيانات: ${ex.name}` : 'إضافة صفحة جديدة';
+  $('editorTitle').textContent = existing ? `تحديث بيانات: ${existing.name}` : 'إضافة صفحة جديدة';
   $('editorModal').classList.remove('hidden');
 };
 window.closeEditorModal = () => $('editorModal').classList.add('hidden');
 
 $('editorForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const bioVal = $('edBio').value.trim();
+  const nameVal = $('edName').value.trim();
+  if (containsDefamation(bioVal) || containsDefamation(nameVal)) {
+    return toast('🚫 النص يحتوي على عبارات مسيئة.');
+  }
+
   const id = $('edId').value || ('c-' + crypto.randomUUID().slice(0, 8));
-  const ex = places.find(x => x.id === id);
+  const cat = $('edCat').value;
+  const today = new Date().toISOString().split('T')[0];
+  const existing = places.find(x => x.id === id);
+
   const item = {
-    id, cat: $('edCat').value, spec_key: $('edSpecKey').value,
-    name: $('edName').value.trim(), spec: $('edSpec').value.trim(),
-    bio: $('edBio').value.trim(), photo_url: $('edPhotoUrl').value.trim(),
-    addr: $('edAddr').value.trim() || 'غير معروف', is_verified: $('edIsVerified').checked,
-    lamp_mode: $('edLampMode').value, hours: $('edHours').value.trim() || 'غير معروف',
+    id, cat,
+    spec_key: $('edSpecKey').value,
+    name: nameVal,
+    spec: $('edSpec').value.trim(),
+    bio: bioVal,
+    bio_ts: Date.now(),
+    photo_url: $('edPhotoUrl').value.trim(),
+    addr: $('edAddr').value.trim() || 'غير معروف',
+    is_verified: $('edIsVerified').checked,
+    lamp_mode: $('edLampMode').value,
+    hours: $('edHours').value.trim() || 'غير معروف',
     phone: $('edPhone').value.trim() || null,
-    owner_email: adminUnlocked ? $('edOwnerEmail').value.trim().toLowerCase() : (ex ? ex.owner_email : ''),
-    updated_date: new Date().toISOString().split('T')[0]
+    owner_email: adminUnlocked ? $('edOwnerEmail').value.trim().toLowerCase() : (existing ? existing.owner_email : ''),
+    ref_count: adminUnlocked ? (parseInt($('edRefCount').value, 10) || 0) : (existing ? (existing.ref_count || 0) : 0),
+    status: 'approved', updated_date: today
   };
-  saveCustomOverride(item); closeEditorModal(); await load();
+
+  saveCustomOverride(item);
+  closeEditorModal();
+  await load();
   if (currentViewName === 'placePage') renderPlacePageDOM(id);
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'myManaged') renderManagedAds();
   toast('✔ تم حفظ التعديلات بنجاح!');
 });
 
-$('cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if(b) { activeCat = activeCat===b.dataset.cat ? null : b.dataset.cat; render(); } });
-$('specsBar').addEventListener('click', e => { const b = e.target.closest('[data-spec]'); if(b) { activeSpec = activeSpec===b.dataset.spec ? 'all' : b.dataset.spec; if(activeSpec!=='all' && !['pharmacy','lab'].includes(activeSpec)) activeCat = 'doctor'; render(); } });
-$('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'all'; render(); });
-$('quickThemeBtn').addEventListener('click', () => document.documentElement.classList.toggle('light'));
+window.deleteAd = async id => {
+  if (!confirm('حذف هذه الصفحة نهائياً؟')) return;
+  saveCustomOverride({ id, deleted: true });
+  await load(); renderAdminList(); toast('تم الحذف');
+};
 
+async function share(id) {
+  const d = places.find(x => x.id === id); if (!d) return;
+  const shareUrl = `${window.location.href.split('?')[0]}?ref=${d.id}`;
+  const text = `✨ دعوة صديق لزيارة صفحة: ${d.name} (${d.spec})\n📍 العنوان: ${d.addr}\n${shareUrl}`;
+  try {
+    if (navigator.share) await navigator.share({ title: d.name, text, url: shareUrl });
+    else { await navigator.clipboard.writeText(text); toast('تم نسخ رابط دعوة صديق 📋'); }
+  } catch {}
+}
+
+let big = false;
+const toggleBig = () => { big = !big; document.documentElement.style.fontSize = big ? '18px' : '16px'; toast(big ? 'تم تكبير الخط' : 'الحجم الطبيعي'); };
+$('bigText').addEventListener('click', toggleBig);
+$('settingsBigTextBtn').addEventListener('click', toggleBig);
+
+const toggleTheme = () => { document.documentElement.classList.toggle('light'); toast('تم تبديل المظهر'); };
+$('themeToggleBtn').addEventListener('click', toggleTheme);
+$('quickThemeBtn').addEventListener('click', toggleTheme);
+
+$('cats').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]'); if (!b) return;
+  activeCat = activeCat === b.dataset.cat ? null : b.dataset.cat; render();
+});
+$('specsBar').addEventListener('click', e => {
+  const b = e.target.closest('[data-spec]'); if (!b) return;
+  activeSpec = activeSpec === b.dataset.spec ? 'all' : b.dataset.spec;
+  if (activeSpec !== 'all' && !['pharmacy','lab'].includes(activeSpec)) activeCat = 'doctor';
+  render();
+});
+$('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'all'; render(); });
+
+document.addEventListener('click', e => {
+  if (e.target.closest('a')) return;
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = b.dataset.id, a = b.dataset.act;
+  if (a === 'share') { e.stopPropagation(); share(id); }
+  else if (a === 'openPage') openPlacePage(id);
+});
+
+if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 history.replaceState({ view: 'home' }, '', '');
-load();
+load().then(() => checkIncomingReferral());
 </script>
 </body>
 </html>
