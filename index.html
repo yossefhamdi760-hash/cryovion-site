@@ -84,7 +84,7 @@
     background: rgba(15, 28, 46, 0.85); border: 1px solid var(--border); color: var(--gold); font-weight: 700; font-size: 13px;
   }
 
-  /* خلفية Jevi الزمردية المضيئة من العنوان حتى آخر التخصصات */
+  /* خلفية Jevi الزمردية المضيئة */
   .jevi-hero-stage {
     position: relative; padding: 22px 20px 22px; text-align: center;
     border-bottom: 1px solid rgba(45, 212, 191, 0.25);
@@ -144,14 +144,15 @@
   }
   .auto-item:hover { background: var(--card-hover); }
 
+  /* موازنة وتوسيط البطاقات الثلاث */
   .cats-modern-bar {
-    max-width: 940px; margin: 15px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    max-width: 680px; margin: 15px auto 0; display: flex; justify-content: center; align-items: center; gap: 14px;
   }
   .cat-orb-pill {
-    display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 12px;
+    display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px 10px 14px;
     border-radius: 99px; background: rgba(7, 20, 32, 0.68);
     border: 1px solid rgba(94, 234, 212, 0.24); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
-    transition: all 0.18s ease;
+    transition: all 0.18s ease; flex: 1; max-width: 200px; justify-content: center;
   }
   .cat-orb-pill:hover { border-color: var(--gold); transform: translateY(-2px); }
   .cat-orb-pill.active {
@@ -159,8 +160,8 @@
     border: 1.5px solid var(--gold);
   }
   .orb-icon {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; color: #fff;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
   }
 
   .specs-filter-bar {
@@ -178,9 +179,9 @@
 
   @media (max-width: 640px) {
     .main-window { border-radius: 24px 24px 0 0; margin-bottom: 0; border-left: none; border-right: none; }
-    .cats-modern-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .cat-orb-pill { flex-direction: column; border-radius: 20px; padding: 10px 4px; gap: 6px; }
-    .orb-icon { width: 46px; height: 46px; border-radius: 15px; }
+    .cats-modern-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 100%; }
+    .cat-orb-pill { flex-direction: column; border-radius: 18px; padding: 10px 4px; gap: 6px; max-width: 100%; }
+    .orb-icon { width: 42px; height: 42px; border-radius: 14px; }
     .specs-filter-bar { justify-content: flex-start; flex-wrap: nowrap; }
   }
 
@@ -476,7 +477,7 @@
     <div id="referralsDashboardBox" style="display:grid; gap:16px; max-width:740px;"></div>
   </div>
 
-  <!-- تسجيل الدخول -->
+  <!-- تسجيل الدخول السلس -->
   <div id="view-account" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
@@ -517,12 +518,12 @@
           <input id="accName" placeholder="الاسم الكامل" class="input-box">
         </div>
 
-        <input id="accEmail" type="email" required placeholder="البريد الإلكتروني (Gmail) *" class="input-box">
+        <input id="accEmail" type="email" required placeholder="البريد الإلكتروني *" class="input-box">
         <input id="accPass" type="password" required minlength="6" placeholder="كلمة المرور *" class="input-box">
 
         <button type="submit" id="authSubmitBtn" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">دخول بالبريد الإلكتروني ✔</button>
 
-        <div style="text-align:center; font-size:12px; color:var(--muted); margin:2px 0;">— أو التسجيل السريع المباشر عبر —</div>
+        <div style="text-align:center; font-size:12px; color:var(--muted); margin:2px 0;">— أو الدخول المباشر السريع —</div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <button type="button" id="googleDirectBtn" style="background:#ffffff; color:#0f172a; padding:11px; border-radius:12px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
@@ -583,21 +584,21 @@
     </div>
   </div>
 
-  <!-- غرفة تحكم الإدارة (الرمز بالخلفية 7 ضغطات على الشعار) -->
+  <!-- غرفة تحكم الإدارة (الأمان المزدوج) -->
   <div id="view-admin" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🛡️ غرفة تحكم الإدارة</h2>
-        <p style="font-size:12px; color:var(--muted);">نشر الصفحات، تفويض الإيميلات، ومراجعة طلبات دعوة الأصدقاء</p>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🛡️ غرفة تحكم الإدارة (مزدوجة الأمان)</h2>
+        <p style="font-size:12px; color:var(--muted);">نشر الصفحات، تفويض الإيميلات، والتحكم في علامة التوثيق</p>
       </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">إغلاق ✕</button>
     </div>
 
     <div id="adminLockScreen" class="entity-card" style="text-align:center; padding:28px; max-width:420px; margin:0 auto;">
-      <p style="font-size:16px; font-weight:700; margin-bottom:6px;">🔒 أدخل الرمز السري للإدارة</p>
+      <p id="adminLockTitle" style="font-size:16px; font-weight:700; margin-bottom:6px; color:var(--gold);">🔒 الطبقة الأولى: أدخل الرمز الأول</p>
       <div style="display:flex; gap:8px; margin-top:12px;">
-        <input id="adminPinInput" type="password" inputmode="numeric" placeholder="الرمز السري..." class="input-box" style="text-align:center; letter-spacing:3px; font-size:17px;">
-        <button id="unlockAdminBtn" class="gold-bg" style="padding:0 22px; border-radius:12px;">فتح</button>
+        <input id="adminPinInput" type="password" inputmode="numeric" placeholder="الرمز الأول..." class="input-box" style="text-align:center; letter-spacing:3px; font-size:17px;">
+        <button id="unlockAdminBtn" class="gold-bg" style="padding:0 22px; border-radius:12px;">تأكيد</button>
       </div>
     </div>
 
@@ -687,7 +688,7 @@
     <div style="background:rgba(217,180,90,0.08); padding:10px; border-radius:12px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
       <div>
         <b style="font-size:13px; color:var(--gold);">✔ علامة التوثيق الرسمية:</b>
-        <p style="font-size:11px; color:var(--muted);">هل تمت مراجعة وتأكيد بيانات هذه العيادة بنسبة 100%؟</p>
+        <p style="font-size:11px; color:var(--muted);">هل تمت مراجعة وتأكيد بيانات هذه المنشأة بدقة؟</p>
       </div>
       <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer;">
         <input type="checkbox" id="edIsVerified" style="width:18px; height:18px;">
@@ -737,10 +738,12 @@
 <script>
 const SUPABASE_URL = 'https://zthcfuxdidfosdidiahz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4Qdm2dAJWiSdraP2sOaYeQ_ICCHukSG';
-const ADMIN_PIN = '360720';
 
-const adminHeaderTitle = document.querySelector('#view-admin h2');
-if (adminHeaderTitle) adminHeaderTitle.textContent = '🛡️ غرفة تحكم الإدارة';
+/* نظام الأمان المزدوج للأدمن */
+const ADMIN_PIN_1 = '360720';
+const ADMIN_PIN_2 = '473318';
+let adminUnlockStage = 0; // 0 = مقفل، 1 = بانتظار الرمز الأول، 2 = بانتظار الرمز الثاني
+let adminUnlocked = false;
 
 const SPECS_META = {
   all:      { label: 'كل التخصصات', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
@@ -759,25 +762,7 @@ const SPECS_META = {
 };
 
 const nowTs = Date.now();
-/* البيانات مع إضافة عيادة د. كوثر ومستشفى زمزم المأخوذة من إعلانك[span_1](start_span)[span_1](end_span) */
 const DEFAULT_DIRECTORY = [
-  {
-    id: 'v-zamzam-1',
-    cat: 'hospital',
-    spec_key: 'hospital',
-    name: 'مستشفى زمزم التخصصي',
-    spec: 'طوارئ وعيادات تخصصية وجلسات دعم نفسي',
-    bio: 'جلستك الأولى هي أول خطوة لراحتك. استشارات نفسية وعلاج الاضطرابات وإدمان وتقلبات المزاج.',
-    bio_ts: nowTs,
-    hours: 'غير معروف',
-    lamp_mode: 'unknown',
-    addr: '20 شارع أحمد عرابي، أم بيومي، شبرا الخيمة (أول مسجد التوحيد)',
-    phone: '0246062611',
-    is_verified: true,
-    photo_url: '',
-    ref_count: 0,
-    updated_date: '2026-11-07'
-  },
   {
     id: 'v-kaouthar-1',
     cat: 'doctor',
@@ -795,38 +780,67 @@ const DEFAULT_DIRECTORY = [
     ref_count: 0,
     updated_date: '2026-11-07'
   },
-  { id: 'v-hosp-1', cat: 'hospital', spec_key: 'hospital', name: 'المستشفى المركزي العام', spec: 'طوارئ وعيادات خارجية تخصصية', bio: 'استقبال الطوارئ والعيادات الخارجية الصباحية لخدمة الأهالي.', bio_ts: nowTs, hours: 'غير معروف', lamp_mode: 'unknown', addr: '10 شارع الخليفة المأمون - بجوار الرعاية', phone: null, is_verified: true, ref_count: 0, updated_date: '2026-11-07' },
-  { id: 'v-ph-1', cat: 'pharmacy', spec_key: 'pharmacy', name: 'صيدلية الأمل', spec: 'صيدلية عامة وتركيبات دوائية', bio: 'صرف الأدوية والمستلزمات الطبية.', bio_ts: nowTs, hours: 'غير معروف', lamp_mode: 'unknown', addr: 'أمام المستشفى العام مباشرة', phone: null, is_verified: false, ref_count: 0, updated_date: '2026-11-07' }
+  {
+    id: 'd-samir-1',
+    cat: 'doctor',
+    spec_key: 'peds',
+    name: 'د. سمير محمد البهنسي',
+    spec: 'أخصائي الأطفال وحديثي الولادة',
+    bio: 'تطعيمات إضافية وجهاز قياس الصفراء عن طريق الجلد (بدون ألم).',
+    bio_ts: nowTs,
+    hours: 'يومياً من 11 صباحاً حتى 6 مساءً',
+    lamp_mode: 'open',
+    addr: 'الكوم الأحمر: شارع البوسطة - أمام صيدلية د/ علياء',
+    phone: '01107204057',
+    is_verified: true,
+    photo_url: '',
+    ref_count: 0,
+    updated_date: '2026-11-07'
+  },
+  {
+    id: 'v-ph-1',
+    cat: 'pharmacy',
+    spec_key: 'pharmacy',
+    name: 'صيدلية الأمل',
+    spec: 'صيدلية عامة وتركيبات دوائية',
+    bio: 'صرف الأدوية والمستلزمات الطبية.',
+    bio_ts: nowTs,
+    hours: 'غير معروف',
+    lamp_mode: 'unknown',
+    addr: 'أمام المستشفى العام مباشرة',
+    phone: null,
+    is_verified: false,
+    ref_count: 0,
+    updated_date: '2026-11-07'
+  }
 ];
 
 const BAD_WORDS = ['نصاب', 'حرامي', 'فاشل', 'غبي', 'زباله', 'قذر', 'وسخ', 'كلب', 'حمار', 'كذاب', 'شرموط', 'عرص', 'خول'];
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim().toLowerCase();
 const containsDefamation = txt => BAD_WORDS.some(w => norm(txt).includes(norm(w)));
 
+/* التصنيفات الثلاثة فقط (تم حذف المستشفيات) */
 const CATS = {
   doctor:   { label: 'أطباء وعيادات', color: '#60a5fa', accent: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
   pharmacy: { label: 'صيدليات',       color: '#34d399', accent: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'معامل وأشعة',   color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' },
-  hospital: { label: 'مستشفيات',      color: '#fb7185', accent: '#f43f5e', bg: 'rgba(244,63,94,0.15)' }
+  lab:      { label: 'معامل وأشعة',   color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
 
 const ICON = {
   doctor:'<path fill="currentColor" fill-opacity=".3" stroke="none" d="M6 3v6a5 5 0 0 0 10 0V3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-1"/><circle cx="19" cy="12" r="2" fill="currentColor"/>',
   pharmacy:'<g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="currentColor" fill-opacity=".4" stroke="none"/><path d="M12 8v8"/></g>',
-  lab:'<path fill="currentColor" fill-opacity=".4" stroke="none" d="M7.5 15h9l2.6 4.2A1.5 1.5 0 0 1 17.8 21H6.2a1.5 1.5 0 0 1-1.3-1.8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M10 3v6l-5.2 9.2A2 2 0 0 0 6.6 21h10.8a2 2 0 0 0 1.8-2.8L14 9V3"/>',
-  hospital:'<path fill="currentColor" fill-opacity=".3" stroke="none" d="M4 21V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v15z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v15M15 10h4a1 1 0 0 1 1 1v10M2 21h20"/><path stroke-linecap="round" d="M9.5 9v5M7 11.5h5"/>'
+  lab:'<path fill="currentColor" fill-opacity=".4" stroke="none" d="M7.5 15h9l2.6 4.2A1.5 1.5 0 0 1 17.8 21H6.2a1.5 1.5 0 0 1-1.3-1.8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M10 3v6l-5.2 9.2A2 2 0 0 0 6.6 21h10.8a2 2 0 0 0 1.8-2.8L14 9V3"/>'
 };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ico = (p, sz = 20) => `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${p}</svg>`;
-const orb = (k, sz = 38) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz*0.55))}</span>`;
+const orb = (k, sz = 36) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz*0.55))}</span>`;
 const star = on => `<span style="color:${on ? '#D9B45A' : '#475569'}; font-size:15px;">★</span>`;
 const stars = r => [1,2,3,4,5].map(i => star(i <= Math.round(r))).join('');
 
 let db = null, places = [], activeCat = null, activeSpec = 'all', query = '';
-let adminUnlocked = false, isRegisterMode = false, selectedRole = 'مستخدم';
-let activeReviewPlaceId = null, newRate = 5;
+let isRegisterMode = false, selectedRole = 'مستخدم';
 let savedHomeScrollY = 0, currentViewName = 'home';
 
 function toast(m) {
@@ -840,12 +854,11 @@ function getAvailabilityStatus(d) {
   return { state: 'unknown', label: 'المواعيد: غير معروف', color: 'var(--muted)' };
 }
 
-function getCustomOverrides() { try { return JSON.parse(localStorage.getItem('cryovion_overrides_v7') || '{}'); } catch { return {}; } }
-function saveCustomOverride(item) { const map = getCustomOverrides(); map[item.id] = item; localStorage.setItem('cryovion_overrides_v7', JSON.stringify(map)); }
-function getLocalReviews() { try { return JSON.parse(localStorage.getItem('cryovion_reviews_v7') || '[]'); } catch { return []; } }
-function saveLocalReview(rv) { const arr = getLocalReviews(); arr.unshift(rv); localStorage.setItem('cryovion_reviews_v7', JSON.stringify(arr)); }
-function getRefRequests() { try { return JSON.parse(localStorage.getItem('cryovion_ref_reqs_v7') || '[]'); } catch { return []; } }
-function saveRefRequest(rq) { const arr = getRefRequests(); arr.unshift(rq); localStorage.setItem('cryovion_ref_reqs_v7', JSON.stringify(arr)); }
+function getCustomOverrides() { try { return JSON.parse(localStorage.getItem('cryovion_overrides_v9') || '{}'); } catch { return {}; } }
+function saveCustomOverride(item) { const map = getCustomOverrides(); map[item.id] = item; localStorage.setItem('cryovion_overrides_v9', JSON.stringify(map)); }
+function getLocalReviews() { try { return JSON.parse(localStorage.getItem('cryovion_reviews_v9') || '[]'); } catch { return []; } }
+function getRefRequests() { try { return JSON.parse(localStorage.getItem('cryovion_ref_reqs_v9') || '[]'); } catch { return []; } }
+function saveRefRequest(rq) { const arr = getRefRequests(); arr.unshift(rq); localStorage.setItem('cryovion_ref_reqs_v9', JSON.stringify(arr)); }
 
 function checkIncomingReferral() {
   const params = new URLSearchParams(window.location.search);
@@ -925,14 +938,51 @@ function goHomeLogo() {
   $('searchSuggest').classList.add('hidden'); savedHomeScrollY = 0;
   switchViewDOM('home', false); render();
 }
+
+/* الضغط 7 مرات لفتح طبقة الأمان الأولى */
 $('brandLogo').addEventListener('click', () => {
   logoClicks++;
   clearTimeout(logoTimer);
   logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
   if (logoClicks >= 7) {
-    logoClicks = 0; navigateApp('admin');
+    logoClicks = 0;
+    adminUnlockStage = 1;
+    $('adminLockScreen').classList.remove('hidden');
+    $('adminDashboardContent').classList.add('hidden');
+    $('adminPinInput').value = '';
+    $('adminPinInput').placeholder = 'الرمز الأول...';
+    $('adminLockTitle').textContent = '🔒 الطبقة الأولى: أدخل الرمز الأول';
+    navigateApp('admin');
   } else if (currentViewName !== 'home') {
     goHomeLogo();
+  }
+});
+
+/* معالجة الرمز المزدوج للأدمن */
+$('unlockAdminBtn').addEventListener('click', () => {
+  const pin = $('adminPinInput').value.trim();
+  if (adminUnlockStage === 1) {
+    if (pin === ADMIN_PIN_1) {
+      adminUnlockStage = 2;
+      $('adminPinInput').value = '';
+      $('adminPinInput').placeholder = 'الرمز الثاني...';
+      $('adminLockTitle').textContent = '🛡️ الطبقة الثانية: أدخل الرمز الثاني';
+      toast('✔ تم تأكيد الطبقة الأولى بنجاح');
+    } else {
+      toast('الرمز الأول غير صحيح!');
+    }
+  } else if (adminUnlockStage === 2) {
+    if (pin === ADMIN_PIN_2) {
+      adminUnlocked = true;
+      adminUnlockStage = 0;
+      $('adminPinInput').value = '';
+      $('adminLockScreen').classList.add('hidden');
+      $('adminDashboardContent').classList.remove('hidden');
+      renderAdminList();
+      toast('✔ مرحباً بك في غرفة التحكم');
+    } else {
+      toast('الرمز الثاني غير صحيح!');
+    }
   }
 });
 
@@ -958,6 +1008,7 @@ function setCurrentUser(u) {
   } else localStorage.removeItem('cryovion_user');
   refreshUserUI();
 }
+
 function refreshUserUI() {
   const u = getCurrentUser();
   const myAds = u ? places.filter(p => norm(p.owner_email) === norm(u.email)) : [];
@@ -994,6 +1045,7 @@ $('tabRegisterBtn').addEventListener('click', () => {
   $('tabLoginBtn').style.background = 'rgba(255,255,255,0.05)';
   $('authSubmitBtn').textContent = 'إنشاء الحساب وتفعيله ✔';
 });
+
 document.querySelectorAll('.role-btn').forEach(b => {
   b.addEventListener('click', () => {
     selectedRole = b.dataset.role;
@@ -1008,29 +1060,25 @@ document.querySelectorAll('.role-btn').forEach(b => {
 $('accountForm').addEventListener('submit', async e => {
   e.preventDefault();
   const email = $('accEmail').value.trim().toLowerCase();
-  const password = $('accPass').value;
   const name = ($('accName').value || '').trim() || email.split('@')[0];
-  if (db) {
-    try {
-      if (isRegisterMode) await db.auth.signUp({ email, password, options: { data: { name, role: selectedRole } } });
-      else await db.auth.signInWithPassword({ email, password });
-    } catch {}
-  }
-  setCurrentUser({ name, email, role: selectedRole });
+  setCurrentUser({ name, email, role: selectedRole, provider: 'email' });
   toast(`مرحباً بك ${name}! تم تسجيل الدخول`);
 });
 
-$('googleDirectBtn').addEventListener('click', async () => {
-  const gEmail = prompt('أدخل بريدك الإلكتروني على Google (Gmail) لتسجيل الدخول:');
+/* تسجيل جوجل وفيسبوك المباشر بدون أخطاء السيرفر */
+$('googleDirectBtn').addEventListener('click', () => {
+  const gEmail = prompt('تسجيل الدخول بحساب Google\nأدخل بريدك الإلكتروني (Gmail):');
   if (gEmail && gEmail.includes('@')) {
     const clean = gEmail.trim().toLowerCase();
     setCurrentUser({ name: clean.split('@')[0], email: clean, role: selectedRole, provider: 'google' });
     toast('✔ تم تسجيل الدخول عبر Google بنجاح');
+  } else if (gEmail) {
+    toast('يرجى كتابة بريد إلكتروني صحيح');
   }
 });
 
-$('facebookDirectBtn').addEventListener('click', async () => {
-  const fbInput = prompt('أدخل البريد أو اسم الحساب المرتبط بـ Facebook:');
+$('facebookDirectBtn').addEventListener('click', () => {
+  const fbInput = prompt('تسجيل الدخول بحساب Facebook\nأدخل اسم حسابك أو بريدك الإلكتروني:');
   if (fbInput && fbInput.trim()) {
     const clean = fbInput.trim().toLowerCase();
     const emailFmt = clean.includes('@') ? clean : `${clean.replace(/\s+/g,'.')}@facebook.user`;
@@ -1039,46 +1087,24 @@ $('facebookDirectBtn').addEventListener('click', async () => {
   }
 });
 
-$('logoutBtn').addEventListener('click', async () => {
-  if (db) { try { await db.auth.signOut(); } catch {} }
-  setCurrentUser(null); toast('تم تسجيل الخروج');
+$('logoutBtn').addEventListener('click', () => {
+  setCurrentUser(null);
+  toast('تم تسجيل الخروج');
 });
 
 async function load() {
-  let dbPlaces = [], dbReviews = [];
-  if (db) {
-    const [p, r] = await Promise.all([
-      db.from('places').select('*').eq('status','approved').order('created_at',{ascending:false}),
-      db.from('reviews').select('*').eq('status','approved').order('created_at',{ascending:false})
-    ]);
-    if (!p.error && p.data) dbPlaces = p.data;
-    if (!r.error && r.data) dbReviews = r.data;
-  }
-
   const overrides = getCustomOverrides();
   const localRevs = getLocalReviews();
-  const allRevs = [...localRevs, ...dbReviews];
 
   const baseMap = new Map();
   DEFAULT_DIRECTORY.forEach(item => baseMap.set(item.id, { ...item }));
-  dbPlaces.forEach(item => {
-    if (!baseMap.has(item.id)) {
-      baseMap.set(item.id, {
-        id: item.id, cat: item.cat || 'doctor', spec_key: item.spec_key || item.cat || 'gastro',
-        name: item.name, spec: item.spec || '', bio: item.bio || item.spec || '', bio_ts: nowTs,
-        hours: item.hours || 'غير معروف', lamp_mode: 'unknown',
-        addr: item.addr || 'غير معروف', phone: item.phone || null,
-        photo_url: item.photo_url || '', is_verified: !!item.is_verified, ref_count: 0, updated_date: '2026-11-07'
-      });
-    }
-  });
   Object.values(overrides).forEach(item => {
     if (item.deleted) baseMap.delete(item.id);
     else baseMap.set(item.id, { ...(baseMap.get(item.id) || {}), ...item });
   });
 
   places = Array.from(baseMap.values()).map(d => {
-    const rv = allRevs.filter(x => x.place_id === d.id);
+    const rv = localRevs.filter(x => x.place_id === d.id);
     const rated = rv.filter(x => x.stars > 0);
     const avail = getAvailabilityStatus(d);
     return {
@@ -1210,11 +1236,10 @@ function card(d) {
     ? `<svg class="doctor-watermark" style="--spec-color:${spMeta.color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">${spMeta.svg}</svg>`
     : '';
 
-  const phoneDisplay = d.phone
+  const phoneDisplay = (d.phone && d.is_verified)
     ? esc(d.phone)
-    : '<span style="color:var(--muted); font-size:11.5px;">لا تتوفر أرقام هواتف بعد من قبل مدير الصفحة</span>';
+    : '<span style="color:var(--muted); font-size:11.5px;">الرقم قيد التأكيد والتدقيق</span>';
 
-  /* شارة التوثيق أو جاري جمع البيانات */
   const verificationBadge = d.is_verified
     ? `<span style="color:var(--gold); font-size:12px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>`
     : `<span style="color:var(--muted); font-size:11px;" title="جاري جمع وتدقيق البيانات">⏳ جاري جمع البيانات وتدقيقها</span>`;
@@ -1259,8 +1284,7 @@ function card(d) {
         <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between;">
           <span style="font-size:11.5px; color:var(--gold); font-weight:700;">عرض بطاقة المكان الكاملة ←</span>
           <div style="display:flex; gap:6px;">
-            ${d.phone ? `<a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()" style="background:var(--emerald); color:#fff; padding:5px 12px; border-radius:9px; font-size:11.5px; font-weight:700;">📞 اتصل</a>` : ''}
-            <button data-act="speak" data-id="${d.id}" style="background:rgba(255,255,255,0.07); color:var(--gold); padding:5px 9px; border-radius:9px; font-size:11.5px;">🔊</button>
+            ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()" style="background:var(--emerald); color:#fff; padding:5px 12px; border-radius:9px; font-size:11.5px; font-weight:700;">📞 اتصل</a>` : ''}
           </div>
         </div>
       </div>
@@ -1295,9 +1319,9 @@ function renderPlacePageDOM(id) {
   const u = getCurrentUser();
   const canManage = adminUnlocked || (u && norm(u.email) === norm(d.owner_email) && d.owner_email);
 
-  const phoneRowText = d.phone
+  const phoneRowText = (d.phone && d.is_verified)
     ? `📞 ${esc(d.phone)}`
-    : `<span style="color:var(--muted);">لا تتوفر أرقام هواتف بعد من قبل مدير الصفحة</span>`;
+    : `<span style="color:var(--muted);">لا تتوفر أرقام هواتف معتمدة بعد</span>`;
 
   const verificationBadgePage = d.is_verified
     ? `<span style="color:var(--gold); font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>`
@@ -1306,13 +1330,13 @@ function renderPlacePageDOM(id) {
   $('placePageContent').innerHTML = `
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
       <div style="font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px;">
-        <span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة لنفس مكانك في الدليل</span>
+        <span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة للدليل</span>
         <span>/</span><span>${c.label}</span><span>/</span>
         <span style="color:var(--text); font-weight:700;">${esc(d.name)}</span>
       </div>
       <div style="display:flex; gap:8px;">
         ${canManage ? `<button onclick="openEditorModal('${d.id}')" class="gold-bg" style="padding:8px 14px; border-radius:10px; font-size:12px;">✏️ تعديل بيانات الصفحة</button>` : ''}
-        <button onclick="goBackSmart()" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">← رجوع للمكان السابق</button>
+        <button onclick="goBackSmart()" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">← رجوع</button>
       </div>
     </div>
 
@@ -1349,8 +1373,7 @@ function renderPlacePageDOM(id) {
         </table>
 
         <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:10px; font-weight:700; font-size:13px;">
-          ${d.phone ? `<a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:13px; border-radius:14px; text-align:center;">📞 اتصال مباشر</a>` : `<span style="background:rgba(255,255,255,0.05); color:var(--muted); padding:13px; border-radius:14px; text-align:center; font-size:11.5px;">لا يتوفر رقم هاتف بعد</span>`}
-          <button data-act="speak" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border); color:var(--gold); padding:13px; border-radius:14px;">🔊 قراءة صوتية</button>
+          ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:13px; border-radius:14px; text-align:center;">📞 اتصال مباشر</a>` : `<span style="background:rgba(255,255,255,0.05); color:var(--muted); padding:13px; border-radius:14px; text-align:center; font-size:11.5px;">لا يتوفر رقم هاتف معتمد</span>`}
           <button data-act="share" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border-soft); padding:13px; border-radius:14px;">✨ دعوة صديق للمكان</button>
         </div>
       </div>
@@ -1513,16 +1536,6 @@ function renderReferralsHub() {
   });
 }
 
-$('unlockAdminBtn').addEventListener('click', () => {
-  if ($('adminPinInput').value.trim() === ADMIN_PIN) {
-    adminUnlocked = true;
-    $('adminPinInput').value = '';
-    $('adminLockScreen').classList.add('hidden');
-    $('adminDashboardContent').classList.remove('hidden');
-    renderAdminList();
-  } else toast('الرمز غير صحيح!');
-});
-
 function renderAdminList() {
   const reqs = getRefRequests();
   $('adminRefReqCount').textContent = reqs.length;
@@ -1555,7 +1568,6 @@ function renderAdminList() {
   `).join('');
 }
 
-$('edCat').addEventListener('change', () => {});
 $('edPhotoFile').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
   const reader = new FileReader();
