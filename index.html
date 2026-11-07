@@ -739,12 +739,6 @@
 const SUPABASE_URL = 'https://zthcfuxdidfosdidiahz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4Qdm2dAJWiSdraP2sOaYeQ_ICCHukSG';
 
-/* نظام الأمان المزدوج للأدمن */
-const ADMIN_PIN_1 = '360720';
-const ADMIN_PIN_2 = '473318';
-let adminUnlockStage = 0; // 0 = مقفل، 1 = بانتظار الرمز الأول، 2 = بانتظار الرمز الثاني
-let adminUnlocked = false;
-
 const SPECS_META = {
   all:      { label: 'كل التخصصات', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
   peds:     { label: 'طب الأطفال وحديثي الولادة', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
@@ -1689,5 +1683,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
 history.replaceState({ view: 'home' }, '', '');
 load().then(() => checkIncomingReferral());
 </script>
+<script src="cryovion-backend.js"></script>
 </body>
 </html>
