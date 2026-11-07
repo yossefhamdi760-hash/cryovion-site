@@ -6,30 +6,35 @@
 <meta name="theme-color" content="#041b21">
 <title>Cryovion | صحتك أقرب مما تظن</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #040911;
     --surface: #09131f;
+    --surface-glass: rgba(9, 19, 31, 0.88);
     --card: #0f1c2e;
     --card-hover: #15263d;
-    --border: rgba(217, 180, 90, 0.25);
+    --border: rgba(217, 180, 90, 0.26);
     --border-soft: rgba(255, 255, 255, 0.08);
     --text: #f8fafc;
     --muted: #94a3b8;
     --gold: #D9B45A;
     --gold-light: #F6E29A;
     --emerald: #10b981;
+    --whatsapp: #25D366;
     --teal-glow: #14b8a6;
     --rose: #f43f5e;
     --blue: #3b82f6;
     --violet: #a855f7;
+    --radius-lg: 24px;
+    --radius-md: 16px;
   }
   html.light {
     --bg: #e2eeec;
     --surface: #f4f9f8;
+    --surface-glass: rgba(244, 249, 248, 0.92);
     --card: #ffffff;
-    --card-hover: #f8fafc;
+    --card-hover: #f1f5f9;
     --border: rgba(11, 46, 58, 0.18);
     --border-soft: rgba(11, 46, 58, 0.09);
     --text: #0B2E3A;
@@ -39,27 +44,33 @@
   html, body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: 'IBM Plex Sans Arabic', Tahoma, sans-serif;
-    line-height: 1.5;
+    font-family: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', Tahoma, sans-serif;
+    line-height: 1.55;
     overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+  html[dir="ltr"] body {
+    font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', sans-serif;
   }
   .font-display { font-family: 'Reem Kufi', 'IBM Plex Sans Arabic', sans-serif; }
   .hidden { display: none !important; }
   button, input, select, textarea { font-family: inherit; color: inherit; border: none; background: none; }
-  button { cursor: pointer; }
+  button { cursor: pointer; transition: all 0.18s ease; }
   a { text-decoration: none; color: inherit; }
 
+  /* الشريط العلوي المحيطي */
   .top-ambient-bar {
-    max-width: 1240px; margin: 0 auto; padding: 10px 18px 6px;
+    max-width: 1260px; margin: 0 auto; padding: 12px 20px 8px;
     display: flex; align-items: center; justify-content: space-between;
   }
-  .brand-backdrop { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+  .brand-backdrop { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
   .brand-mark {
-    width: 34px; height: 34px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px;
+    width: 36px; height: 36px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 19px;
+    box-shadow: 0 4px 15px rgba(217, 180, 90, 0.35);
   }
   .brand-text {
-    font-size: 23px; font-weight: 700; letter-spacing: 0.8px;
+    font-size: 24px; font-weight: 700; letter-spacing: 0.8px;
     background: linear-gradient(135deg, #fff 0%, #D9B45A 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
@@ -68,25 +79,120 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
 
+  .top-ctrl-btn {
+    padding: 6px 12px; border-radius: 10px; background: var(--card);
+    border: 1px solid var(--border-soft); color: var(--gold); font-weight: 700; font-size: 12.5px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .top-ctrl-btn:hover { border-color: var(--gold); transform: translateY(-1px); }
+
+  /* شريط الأيقونات الأيمن العائم (Quick Navigation Dock) */
+  .right-icon-dock {
+    position: fixed;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    z-index: 85;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--surface-glass);
+    backdrop-filter: blur(16px);
+    padding: 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.65);
+  }
+  html[dir="ltr"] .right-icon-dock {
+    right: auto;
+    left: 12px;
+  }
+  .dock-item {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+  }
+  .dock-item:hover {
+    color: var(--gold);
+    background: rgba(217, 180, 90, 0.12);
+    border-color: var(--border);
+    transform: scale(1.06);
+  }
+  .dock-item.active {
+    background: linear-gradient(135deg, #F6E29A 0%, #D9B45A 55%, #9B7119 100%);
+    color: #050811;
+    box-shadow: 0 4px 14px rgba(217, 180, 90, 0.35);
+  }
+  .dock-tooltip {
+    position: absolute;
+    right: calc(100% + 10px);
+    background: var(--card);
+    color: var(--gold);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(6px);
+    transition: all 0.18s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  }
+  html[dir="ltr"] .dock-tooltip {
+    right: auto;
+    left: calc(100% + 10px);
+    transform: translateX(-6px);
+  }
+  .dock-item:hover .dock-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  @media (max-width: 1024px) {
+    .right-icon-dock {
+      top: auto;
+      bottom: 14px;
+      right: 50%;
+      left: auto !important;
+      transform: translateX(50%);
+      flex-direction: row;
+      padding: 6px 12px;
+      border-radius: 99px;
+    }
+    .dock-tooltip { display: none; }
+  }
+
+  /* النافذة الرئيسية */
   .main-window {
-    max-width: 1240px; margin: 0 auto 30px; background: var(--surface);
+    max-width: 1200px; margin: 0 auto 80px; background: var(--surface);
     border: 1px solid var(--border); border-radius: 26px;
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8); min-height: 86vh; position: relative;
     overflow: hidden;
   }
   .window-nav {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(4, 24, 30, 0.75); position: relative; z-index: 10;
+    padding: 12px 20px; border-bottom: 1px solid var(--border-soft);
+    background: rgba(4, 24, 30, 0.78); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 40;
   }
+  html.light .window-nav { background: rgba(255, 255, 255, 0.88); }
   .menu-trigger {
     display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px;
     background: rgba(15, 28, 46, 0.85); border: 1px solid var(--border); color: var(--gold); font-weight: 700; font-size: 13px;
   }
+  html.light .menu-trigger { background: var(--card); }
+  .menu-trigger:hover { border-color: var(--gold-light); transform: translateY(-1px); }
 
   /* خلفية Jevi الزمردية المضيئة */
   .jevi-hero-stage {
-    position: relative; padding: 22px 20px 22px; text-align: center;
+    position: relative; padding: 26px 20px 24px; text-align: center;
     border-bottom: 1px solid rgba(45, 212, 191, 0.25);
     background:
       radial-gradient(65% 85% at 50% 18%, rgba(20, 184, 166, 0.42) 0%, rgba(13, 148, 136, 0.22) 42%, rgba(6, 24, 34, 0.94) 85%, #06101b 100%),
@@ -112,31 +218,32 @@
 
   .elegant-slogan {
     font-size: clamp(26px, 3.8vw, 38px); font-weight: 700; letter-spacing: 0.4px;
-    margin-bottom: 14px; display: inline-flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; display: inline-flex; align-items: center; gap: 10px;
     text-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
   }
   .slogan-white { color: #ffffff; }
-  html.light .slogan-white { color: #0B2E3A; text-shadow: none; }
   .slogan-gold {
     background: linear-gradient(135deg, #FFF6C2 0%, #D9B45A 55%, #B8860B 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
 
+  /* صندوق البحث الذكي */
   .ai-search-container { max-width: 780px; margin: 0 auto; position: relative; z-index: 50; }
   .ai-search-box {
-    display: flex; align-items: center; gap: 10px; background: rgba(8, 22, 34, 0.82);
+    display: flex; align-items: center; gap: 10px; background: rgba(8, 22, 34, 0.86);
     backdrop-filter: blur(12px); border: 1.5px solid rgba(94, 234, 212, 0.35);
     border-radius: 18px; padding: 6px 8px 6px 14px;
     box-shadow: 0 16px 38px -10px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
   .ai-search-box:focus-within { border-color: var(--gold); box-shadow: 0 0 28px -4px rgba(20, 184, 166, 0.45); }
-  .ai-search-input { flex: 1; padding: 9px 6px; font-size: 15px; outline: none; }
+  .ai-search-input { flex: 1; padding: 9px 6px; font-size: 15px; color: #fff; outline: none; }
+  .ai-search-input::placeholder { color: #94a3b8; }
 
   .autocomplete-dropdown {
     position: absolute; top: calc(100% + 6px); right: 0; left: 0;
     background: var(--card); border: 1px solid var(--gold); border-radius: 16px;
     box-shadow: 0 20px 45px rgba(0,0,0,0.88); max-height: 290px; overflow-y: auto;
-    text-align: right; z-index: 80; padding: 6px;
+    text-align: start; z-index: 80; padding: 6px;
   }
   .auto-item {
     display: flex; align-items: center; justify-content: space-between;
@@ -144,48 +251,52 @@
   }
   .auto-item:hover { background: var(--card-hover); }
 
-  /* موازنة وتوسيط البطاقات الثلاث */
+  /* البطاقات الثلاث للأقسام (أطباء، صيدليات، معامل) */
   .cats-modern-bar {
-    max-width: 680px; margin: 15px auto 0; display: flex; justify-content: center; align-items: center; gap: 14px;
+    max-width: 720px; margin: 18px auto 0; display: flex; justify-content: center; align-items: center; gap: 14px;
   }
   .cat-orb-pill {
-    display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px 10px 14px;
-    border-radius: 99px; background: rgba(7, 20, 32, 0.68);
-    border: 1px solid rgba(94, 234, 212, 0.24); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
-    transition: all 0.18s ease; flex: 1; max-width: 200px; justify-content: center;
+    display: inline-flex; align-items: center; gap: 12px; padding: 10px 20px 10px 14px;
+    border-radius: 99px; background: rgba(7, 20, 32, 0.75);
+    border: 1px solid rgba(94, 234, 212, 0.28); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
+    transition: all 0.2s ease; flex: 1; max-width: 220px; justify-content: center; color: #fff;
   }
   .cat-orb-pill:hover { border-color: var(--gold); transform: translateY(-2px); }
   .cat-orb-pill.active {
-    background: linear-gradient(135deg, rgba(217,180,90,0.28), rgba(10, 30, 44, 0.92));
+    background: linear-gradient(135deg, rgba(217,180,90,0.32), rgba(10, 30, 44, 0.95));
     border: 1.5px solid var(--gold);
+    box-shadow: 0 0 25px rgba(217, 180, 90, 0.25);
   }
   .orb-icon {
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 40px; height: 40px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
   }
 
+  /* شريط التخصصات الطبية */
   .specs-filter-bar {
-    max-width: 1020px; margin: 13px auto 0; display: flex; gap: 8px;
+    max-width: 1040px; margin: 14px auto 0; display: flex; gap: 8px;
     overflow-x: auto; padding: 4px 4px 2px; scrollbar-width: none; justify-content: center; flex-wrap: wrap;
   }
   .specs-filter-bar::-webkit-scrollbar { display: none; }
   .spec-chip {
-    display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: 99px;
-    font-size: 12.5px; font-weight: 700; background: rgba(8, 22, 35, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; white-space: nowrap; transition: all 0.15s ease;
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 99px;
+    font-size: 12.5px; font-weight: 700; background: rgba(8, 22, 35, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.14); color: #e2e8f0; white-space: nowrap; transition: all 0.15s ease;
   }
-  .spec-chip:hover { border-color: var(--gold); color: #fff; }
-  .spec-chip.active { background: var(--gold); color: #050811; border-color: var(--gold); }
+  .spec-chip:hover { border-color: var(--gold); color: #fff; transform: translateY(-1px); }
+  .spec-chip.active { background: var(--gold); color: #050811; border-color: var(--gold); box-shadow: 0 4px 12px rgba(217,180,90,0.3); }
 
   @media (max-width: 640px) {
-    .main-window { border-radius: 24px 24px 0 0; margin-bottom: 0; border-left: none; border-right: none; }
+    .main-window { border-radius: 24px 24px 0 0; margin-bottom: 70px; border-left: none; border-right: none; }
     .cats-modern-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 100%; }
-    .cat-orb-pill { flex-direction: column; border-radius: 18px; padding: 10px 4px; gap: 6px; max-width: 100%; }
+    .cat-orb-pill { flex-direction: column; border-radius: 18px; padding: 10px 4px; gap: 6px; max-width: 100%; text-align: center; }
     .orb-icon { width: 42px; height: 42px; border-radius: 14px; }
     .specs-filter-bar { justify-content: flex-start; flex-wrap: nowrap; }
   }
 
-  .poster-section { padding: 14px 20px 6px; max-width: 1160px; margin: 0 auto; }
+  /* شريط الحالات اليومية (24 ساعة) */
+  .poster-section { padding: 16px 20px 6px; max-width: 1160px; margin: 0 auto; }
   .poster-track {
     display: flex; gap: 14px; overflow-x: auto; scroll-behavior: smooth;
     scroll-snap-type: x mandatory; padding: 6px 2px 12px; scrollbar-width: none;
@@ -199,12 +310,12 @@
   }
   .poster-card:hover { transform: translateY(-3px); border-color: var(--gold); }
   .poster-top-quarter {
-    height: 26%; min-height: 34px; display: flex; align-items: center; justify-content: space-between;
+    height: 28%; min-height: 34px; display: flex; align-items: center; justify-content: space-between;
     gap: 8px; border-bottom: 1px solid rgba(217, 180, 90, 0.22); padding-bottom: 7px;
   }
   .poster-mini-thumb {
-    width: 26px; height: 26px; border-radius: 7px; object-fit: cover; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff;
+    width: 28px; height: 28px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff;
     border: 1px solid var(--gold);
   }
   .poster-bio-body {
@@ -213,12 +324,14 @@
   }
   .poster-bio-body::-webkit-scrollbar { display: none; }
 
+  /* النقطة المضيئة لحالة الدوام */
   .status-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .status-dot.online { background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 0 10px #10b981; }
   .status-dot.offline { background: #f43f5e; box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2); }
   .status-dot.unknown { background: #94a3b8; box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2); }
 
-  .content-body { padding: 12px 20px 45px; max-width: 1160px; margin: 0 auto; }
+  /* شبكة البطاقات */
+  .content-body { padding: 14px 20px 45px; max-width: 1160px; margin: 0 auto; }
   .cards-grid {
     display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
   }
@@ -237,6 +350,9 @@
     background: linear-gradient(145deg, #1f1429 0%, #12172a 65%, #191122 100%);
     border-color: rgba(244, 114, 182, 0.28);
   }
+  html.light .entity-card.peds-dignified {
+    background: linear-gradient(145deg, #fdf2f8 0%, #ffffff 100%);
+  }
   .entity-card::before {
     content: ''; position: absolute; top: 0; right: 0; left: 0; height: 4px;
     background: var(--cat-accent, var(--gold)); z-index: 3;
@@ -249,15 +365,15 @@
 
   .id-card-layout {
     position: relative; z-index: 2; display: grid;
-    grid-template-columns: 32% 1fr; gap: 16px; align-items: stretch; min-height: 152px;
+    grid-template-columns: 32% 1fr; gap: 16px; align-items: stretch; min-height: 158px;
   }
-  @media (max-width: 480px) { .id-card-layout { grid-template-columns: 35% 1fr; gap: 12px; } }
+  @media (max-width: 480px) { .id-card-layout { grid-template-columns: 34% 1fr; gap: 12px; } }
 
   .id-card-right-photo {
     border-radius: 16px; overflow: hidden; border: 1.5px solid var(--border);
     background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.35));
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    position: relative; min-height: 148px;
+    position: relative; min-height: 152px;
   }
   .id-card-right-photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
 
@@ -276,6 +392,7 @@
   .t-pharmacy { background: linear-gradient(145deg, #10b981, #047857); }
   .t-lab { background: linear-gradient(145deg, #a855f7, #6d28d9); }
 
+  /* صفحة المكان المستقلة */
   .noon-page { padding: 20px; max-width: 1100px; margin: 0 auto; }
   .noon-hero-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 14px; }
   @media (min-width: 860px) { .noon-hero-grid { grid-template-columns: 380px 1fr; align-items: start; } }
@@ -290,57 +407,102 @@
   }
   .noon-table tr { border-bottom: 1px solid var(--border-soft); }
   .noon-table tr:last-child { border-bottom: none; }
-  .noon-table th { width: 34%; text-align: right; padding: 11px 14px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,0.02); }
+  .noon-table th { width: 34%; text-align: start; padding: 11px 14px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,0.02); }
   .noon-table td { padding: 11px 14px; font-size: 14px; font-weight: 700; }
 
-  .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 90; }
+  /* القائمة الجانبية المنزلقة */
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); z-index: 90; }
   .side-drawer {
-    position: fixed; top: 0; right: 0; bottom: 0; width: 310px; max-width: 85vw;
+    position: fixed; top: 0; right: 0; bottom: 0; width: 320px; max-width: 86vw;
     background: var(--surface); border-left: 1px solid var(--border); z-index: 100; padding: 20px;
     display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;
-    transform: translateX(100%); transition: transform 0.22s ease-out;
+    transform: translateX(100%); transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .side-drawer.open { transform: translateX(0); }
+  html[dir="ltr"] .side-drawer {
+    right: auto; left: 0; border-left: none; border-right: 1px solid var(--border);
+    transform: translateX(-100%);
+  }
+  .side-drawer.open { transform: translateX(0) !important; }
   .nav-btn {
     width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: 11px 14px; border-radius: 14px; font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; text-align: right;
+    padding: 11px 14px; border-radius: 14px; font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; text-align: start;
+  }
+  .nav-btn-left { display: flex; align-items: center; gap: 10px; }
+  .nav-icon-box {
+    width: 32px; height: 32px; border-radius: 9px; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: center; color: var(--gold);
   }
   .nav-btn:hover { background: rgba(255,255,255,0.06); }
   .nav-btn.active { background: rgba(217, 180, 90, 0.15); color: var(--gold); border: 1px solid var(--border); }
+  .nav-btn.active .nav-icon-box { background: var(--gold); color: #050811; border-color: var(--gold); }
 
+  /* النوافذ المنبثقة */
   .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 120;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(5px); z-index: 120;
     display: flex; align-items: center; justify-content: center; padding: 16px;
   }
   .modal-box {
-    width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto;
+    width: 100%; max-width: 620px; max-height: 92vh; overflow-y: auto;
     background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 22px;
   }
   .input-box {
     width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-soft);
     border-radius: 12px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none;
   }
+  html.light .input-box { background: rgba(0, 0, 0, 0.03); }
   .input-box:focus { border-color: var(--gold); }
-  .badge-pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700; }
+  .badge-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 99px; font-size: 11.5px; font-weight: 700; }
   .toast-box {
     position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
     z-index: 200; padding: 11px 20px; border-radius: 14px; font-weight: 700; font-size: 13px; max-width: 90vw; text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
   }
 </style>
 </head>
 <body>
 
+<!-- الشريط العلوي المحيطي -->
 <div class="top-ambient-bar">
-  <div id="brandLogo" class="brand-backdrop" title="العودة للرئيسية">
+  <div id="brandLogo" class="brand-backdrop" title="Cryovion">
     <span class="brand-mark gold-bg">C</span>
     <span class="brand-text font-display">Cryovion</span>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
-    <button id="bigText" style="padding:6px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border-soft); color:var(--gold); font-weight:700; font-size:13px;">أ+</button>
-    <button id="quickThemeBtn" style="padding:6px 10px; border-radius:10px; background:var(--card); border:1px solid var(--border-soft); font-size:13px;">🌗</button>
+    <button id="langSwitchBtn" class="top-ctrl-btn" title="Switch Language / تغيير اللغة">🌐 <span id="langLabel">EN</span></button>
+    <button id="bigText" class="top-ctrl-btn" title="تكبير الخط">أ+</button>
+    <button id="quickThemeBtn" class="top-ctrl-btn" title="تبديل المظهر">🌗</button>
   </div>
 </div>
 
+<!-- شريط الأيقونات الأيمن العائم للتنقل السريع (Right Quick Icon Dock) -->
+<nav class="right-icon-dock" aria-label="Quick Navigation">
+  <button data-nav="home" class="dock-item active">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="dock-tooltip" data-i18n="nav_home">الدليل الطبي</span>
+  </button>
+  <button data-nav="myManaged" class="dock-item">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    <span class="dock-tooltip" data-i18n="nav_managed">إدارة صفحتي</span>
+  </button>
+  <button data-nav="referrals" class="dock-item">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+    <span class="dock-tooltip" data-i18n="nav_referrals">دعوة صديق</span>
+  </button>
+  <button data-nav="account" class="dock-item">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="dock-tooltip" data-i18n="nav_account">حسابي والدخول</span>
+  </button>
+  <button data-nav="settings" class="dock-item">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="dock-tooltip" data-i18n="nav_settings">الإعدادات</span>
+  </button>
+  <button id="dockAdminBtn" data-nav="admin" class="dock-item hidden" style="border-color:var(--gold); color:var(--gold);">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span class="dock-tooltip">غرفة الإدارة</span>
+  </button>
+</nav>
+
+<!-- القائمة الجانبية الكاملة -->
 <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
 <aside id="sideDrawer" class="side-drawer">
   <div>
@@ -353,44 +515,57 @@
     </div>
 
     <div onclick="navigateApp('account')" style="margin-top:12px; padding:12px; border-radius:14px; background:rgba(217,180,90,0.1); border:1px solid var(--border); display:flex; align-items:center; gap:10px; cursor:pointer;">
-      <div id="drawerAvatar" style="width:38px; height:38px; border-radius:10px; background:rgba(217,180,90,0.2); display:flex; align-items:center; justify-content:center; font-size:16px;">👤</div>
+      <div id="drawerAvatar" style="width:40px; height:40px; border-radius:11px; background:rgba(217,180,90,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">👤</div>
       <div style="flex:1; min-width:0;">
-        <p id="drawerUserName" style="font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">تسجيل الدخول</p>
-        <p id="drawerUserRole" style="font-size:11px; color:var(--muted);">إدارة صفحتك / دعوة صديق</p>
+        <p id="drawerUserName" data-i18n="login_title" style="font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">تسجيل الدخول</p>
+        <p id="drawerUserRole" data-i18n="login_sub" style="font-size:11px; color:var(--muted);">إدارة صفحتك / دعوة صديق</p>
       </div>
     </div>
 
     <nav style="margin-top:14px;">
-      <button data-nav="home" class="nav-btn active"><span>🏠 الدليل الطبي الذكي</span></button>
+      <button data-nav="home" class="nav-btn active">
+        <span class="nav-btn-left"><span class="nav-icon-box">🏠</span><span data-i18n="nav_home">الدليل الطبي الذكي</span></span>
+      </button>
       <button data-nav="myManaged" class="nav-btn">
-        <span>🎛️ إدارة صفحتي</span>
+        <span class="nav-btn-left"><span class="nav-icon-box">🎛️</span><span data-i18n="nav_managed">إدارة صفحتي</span></span>
         <span id="managedCountBadge" class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">0</span>
       </button>
-      <button data-nav="referrals" class="nav-btn"><span>✨ دعوة صديق ومكافأة النشر</span></button>
-      <button data-nav="account" class="nav-btn"><span>🔐 تسجيل الدخول والحساب</span></button>
-      <button data-nav="settings" class="nav-btn"><span>⚙️ الإعدادات والمظهر</span></button>
+      <button data-nav="referrals" class="nav-btn">
+        <span class="nav-btn-left"><span class="nav-icon-box">✨</span><span data-i18n="nav_referrals">دعوة صديق ومكافأة النشر</span></span>
+      </button>
+      <button data-nav="account" class="nav-btn">
+        <span class="nav-btn-left"><span class="nav-icon-box">🔐</span><span data-i18n="nav_account">تسجيل الدخول والحساب</span></span>
+      </button>
+      <button data-nav="settings" class="nav-btn">
+        <span class="nav-btn-left"><span class="nav-icon-box">⚙️</span><span data-i18n="nav_settings">الإعدادات واللغة</span></span>
+      </button>
+      <button id="drawerAdminBtn" data-nav="admin" class="nav-btn hidden" style="border:1px solid var(--gold); background:rgba(217,180,90,0.12);">
+        <span class="nav-btn-left"><span class="nav-icon-box">🛡️</span><span>غرفة تحكم المشرف (Admin)</span></span>
+      </button>
     </nav>
   </div>
 
   <div style="padding-top:12px; border-top:1px solid var(--border-soft);">
     <button data-nav="info" class="nav-btn" style="font-size:12px; color:var(--muted);">
-      <span>ℹ️ التعاون الإعلاني والتواصل</span>
+      <span class="nav-btn-left"><span class="nav-icon-box">ℹ️</span><span data-i18n="nav_info">التعاون الإعلاني والتواصل</span></span>
     </button>
   </div>
 </aside>
 
+<!-- النافذة الرئيسية للمنصة -->
 <div class="main-window">
 
   <div class="window-nav">
     <button id="openDrawer" class="menu-trigger">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
-      <span>القائمة</span>
+      <span data-i18n="menu_btn">القائمة</span>
     </button>
 
-    <div style="display:flex; align-items:center; gap:8px;">
-      <button onclick="navigateApp('referrals')" class="badge-pill" style="background:rgba(217,180,90,0.14); color:var(--gold); border:1px solid var(--border); padding:5px 12px;">✨ دعوة صديق</button>
-      <button onclick="navigateApp('myManaged')" id="topManageShortcut" class="hidden badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald); border:1px solid var(--emerald); padding:5px 11px;">🎛️ إدارة صفحتي</button>
-      <span id="headerUserBadge" onclick="navigateApp('account')" style="font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; background:rgba(217,180,90,0.12); padding:5px 11px; border-radius:10px;">🔐 دخول</span>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <button id="topAdminShortcut" onclick="navigateApp('admin')" class="hidden badge-pill gold-bg" style="padding:5px 12px;">🛡️ لوحة الأدمن</button>
+      <button onclick="navigateApp('referrals')" class="badge-pill" style="background:rgba(217,180,90,0.14); color:var(--gold); border:1px solid var(--border); padding:5px 12px;" data-i18n="nav_referrals_short">✨ دعوة صديق</button>
+      <button onclick="navigateApp('myManaged')" id="topManageShortcut" class="hidden badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald); border:1px solid var(--emerald); padding:5px 11px;" data-i18n="nav_managed">🎛️ إدارة صفحتي</button>
+      <span id="headerUserBadge" onclick="navigateApp('account')" style="font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; background:rgba(217,180,90,0.12); padding:5px 11px; border-radius:10px;" data-i18n="login_short">🔐 دخول</span>
     </div>
   </div>
 
@@ -402,8 +577,8 @@
 
       <div class="jevi-hero-content">
         <h1 class="elegant-slogan font-display">
-          <span class="slogan-white">صحتك أقرب</span>
-          <span class="slogan-gold">مما تظن</span>
+          <span class="slogan-white" data-i18n="slogan_1">صحتك أقرب</span>
+          <span class="slogan-gold" data-i18n="slogan_2">مما تظن</span>
         </h1>
 
         <div class="ai-search-container">
@@ -415,7 +590,9 @@
           <div id="searchSuggest" class="autocomplete-dropdown hidden"></div>
         </div>
 
+        <!-- شريط الأقسام الثلاثة (أطباء، صيدليات، معامل) -->
         <div id="cats" class="cats-modern-bar"></div>
+        <!-- شريط التخصصات الدقيقة -->
         <div id="specsBar" class="specs-filter-bar"></div>
       </div>
     </header>
@@ -424,7 +601,7 @@
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <span class="status-dot online"></span>
-          <h2 class="font-display" style="font-size:16px; color:var(--gold);">حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)</h2>
+          <h2 class="font-display" style="font-size:16px; color:var(--gold);" data-i18n="stories_title">حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)</h2>
         </div>
         <div style="display:flex; gap:5px;">
           <button id="slidePrev" style="width:28px; height:28px; border-radius:8px; background:var(--card); border:1px solid var(--border-soft); font-size:12px;">❮</button>
@@ -437,10 +614,10 @@
     <section class="content-body">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <h2 id="listTitle" class="font-display" style="font-size:20px;">الدليل الطبي الموثق</h2>
+          <h2 id="listTitle" class="font-display" style="font-size:20px;" data-i18n="dir_title">الدليل الطبي الموثق</h2>
           <span id="totalCountBadge" class="badge-pill" style="background:rgba(217,180,90,0.16); color:var(--gold);">0</span>
         </div>
-        <button id="showAll" class="hidden badge-pill" style="background:var(--gold); color:#000; padding:5px 14px;">إلغاء الفلتر وعرض الكل ✕</button>
+        <button id="showAll" class="hidden badge-pill" style="background:var(--gold); color:#000; padding:5px 14px;" data-i18n="reset_filter">إلغاء الفلتر وعرض الكل ✕</button>
       </div>
 
       <div id="list" class="cards-grid"></div>
@@ -448,7 +625,7 @@
     </section>
   </div>
 
-  <!-- صفحة الإعلان المستقلة -->
+  <!-- صفحة المكان المستقلة -->
   <div id="view-placePage" class="spa-view hidden">
     <div id="placePageContent" class="noon-page"></div>
   </div>
@@ -457,10 +634,10 @@
   <div id="view-myManaged" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🎛️ إدارة صفحتي وحالة الـ 24 ساعة</h2>
-        <p style="font-size:13px; color:var(--muted);">أضف صورتك في المربع الأيمن، نشّط حالة الفتح، وانشر حالتك اليومية</p>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="managed_header">🎛️ إدارة صفحتي وحالة الـ 24 ساعة</h2>
+        <p style="font-size:13px; color:var(--muted);" data-i18n="managed_sub">أضف صورتك في المربع الأيمن، نشّط حالة الفتح، سعر الكشف، وانشر حالتك اليومية</p>
       </div>
-      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;">رجوع ←</button>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;" data-i18n="back_btn">رجوع ←</button>
     </div>
     <div id="managedListBox" style="display:grid; gap:16px;"></div>
   </div>
@@ -469,22 +646,21 @@
   <div id="view-referrals" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);">✨ دعوة صديق ومكافأة نشر الإعلانات</h2>
-        <p style="font-size:13px; color:var(--muted);">ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي</p>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="ref_header">✨ دعوة صديق ومكافأة نشر الإعلانات</h2>
+        <p style="font-size:13px; color:var(--muted);" data-i18n="ref_sub">ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي</p>
       </div>
-      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;">رجوع ←</button>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;" data-i18n="back_btn">رجوع ←</button>
     </div>
     <div id="referralsDashboardBox" style="display:grid; gap:16px; max-width:740px;"></div>
   </div>
-
-  <!-- تسجيل الدخول السلس -->
+  <!-- تسجيل الدخول والحساب (مع ربط Google OAuth المباشر و Supabase) -->
   <div id="view-account" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🔐 الحساب وتسجيل الدخول</h2>
-        <p style="font-size:13px; color:var(--muted);">سجل دخولك عبر Google أو Facebook أو بالبريد الإلكتروني مباشرة</p>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="acc_header">🔐 الحساب وتسجيل الدخول</h2>
+        <p style="font-size:13px; color:var(--muted);" data-i18n="acc_sub">سجل دخولك عبر Google أو Facebook أو بالبريد الإلكتروني مباشرة</p>
       </div>
-      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;">رجوع ←</button>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;" data-i18n="back_btn">رجوع ←</button>
     </div>
 
     <div id="profileActiveBox" class="entity-card hidden" style="margin-bottom:18px; border-color:var(--gold); max-width:580px;">
@@ -494,19 +670,20 @@
           <h3 id="profNameDisp" style="font-size:20px; margin-top:6px;"></h3>
           <p id="profEmailDisp" style="font-size:13px; color:var(--gold);"></p>
         </div>
-        <button id="logoutBtn" style="background:rgba(244,63,94,0.18); color:var(--rose); padding:8px 14px; border-radius:10px; font-weight:700; font-size:12px;">تسجيل الخروج</button>
+        <button id="logoutBtn" style="background:rgba(244,63,94,0.18); color:var(--rose); padding:8px 14px; border-radius:10px; font-weight:700; font-size:12px;" data-i18n="logout_btn">تسجيل الخروج</button>
       </div>
       <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-soft); display:flex; gap:10px; flex-wrap:wrap;">
-        <button onclick="navigateApp('myManaged')" class="gold-bg" style="padding:10px 18px; border-radius:12px; font-size:13px;">🎛️ إدارة صفحتي</button>
-        <button onclick="navigateApp('referrals')" style="background:rgba(255,255,255,0.08); padding:10px 18px; border-radius:12px; font-size:13px; font-weight:700;">✨ دعوة صديق</button>
+        <button onclick="navigateApp('myManaged')" class="gold-bg" style="padding:10px 18px; border-radius:12px; font-size:13px;" data-i18n="nav_managed">🎛️ إدارة صفحتي</button>
+        <button onclick="navigateApp('referrals')" style="background:rgba(255,255,255,0.08); padding:10px 18px; border-radius:12px; font-size:13px; font-weight:700;" data-i18n="nav_referrals_short">✨ دعوة صديق</button>
+        <button id="accAdminShortcut" onclick="navigateApp('admin')" class="hidden gold-bg" style="padding:10px 18px; border-radius:12px; font-size:13px;">🛡️ دخول غرفة الإدارة</button>
       </div>
     </div>
 
     <div id="authFormsWrap" style="max-width:520px; display:grid; gap:14px;">
       <form id="accountForm" class="entity-card" style="display:grid; gap:12px;">
         <div style="display:flex; gap:8px; border-bottom:1px solid var(--border-soft); padding-bottom:10px;">
-          <button type="button" id="tabLoginBtn" class="gold-bg" style="flex:1; padding:9px; border-radius:10px; font-size:13px;">تسجيل دخول</button>
-          <button type="button" id="tabRegisterBtn" style="flex:1; padding:9px; border-radius:10px; font-size:13px; background:rgba(255,255,255,0.05); font-weight:700;">إنشاء حساب جديد</button>
+          <button type="button" id="tabLoginBtn" class="gold-bg" style="flex:1; padding:9px; border-radius:10px; font-size:13px;" data-i18n="tab_login">تسجيل دخول</button>
+          <button type="button" id="tabRegisterBtn" style="flex:1; padding:9px; border-radius:10px; font-size:13px; background:rgba(255,255,255,0.05); font-weight:700;" data-i18n="tab_register">إنشاء حساب جديد</button>
         </div>
 
         <div id="registerExtraFields" class="hidden" style="display:grid; gap:10px;">
@@ -521,9 +698,9 @@
         <input id="accEmail" type="email" required placeholder="البريد الإلكتروني *" class="input-box">
         <input id="accPass" type="password" required minlength="6" placeholder="كلمة المرور *" class="input-box">
 
-        <button type="submit" id="authSubmitBtn" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">دخول بالبريد الإلكتروني ✔</button>
+        <button type="submit" id="authSubmitBtn" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;" data-i18n="email_submit">دخول بالبريد الإلكتروني ✔</button>
 
-        <div style="text-align:center; font-size:12px; color:var(--muted); margin:2px 0;">— أو الدخول المباشر السريع —</div>
+        <div style="text-align:center; font-size:12px; color:var(--muted); margin:2px 0;" data-i18n="or_oauth">— أو الدخول المباشر السريع —</div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <button type="button" id="googleDirectBtn" style="background:#ffffff; color:#0f172a; padding:11px; border-radius:12px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
@@ -539,68 +716,75 @@
     </div>
   </div>
 
-  <!-- الإعدادات -->
+  <!-- الإعدادات واللغة والمظهر -->
   <div id="view-settings" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
-      <h2 class="font-display" style="font-size:22px; color:var(--gold);">⚙️ الإعدادات</h2>
-      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">رجوع ←</button>
+      <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="settings_header">⚙️ الإعدادات واللغة والمظهر</h2>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;" data-i18n="back_btn">رجوع ←</button>
     </div>
-    <div style="display:grid; gap:12px; max-width:600px;">
-      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:grid; gap:12px; max-width:620px;">
+      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
         <div>
-          <p style="font-weight:700;">المظهر الداكن / الفاتح</p>
-          <p style="font-size:12px; color:var(--muted);">تبديل إضاءة المنصة</p>
+          <p style="font-weight:700;" data-i18n="set_lang_title">🌐 لغة المنصة (Language)</p>
+          <p style="font-size:12px; color:var(--muted);" data-i18n="set_lang_sub">التبديل الفوري بين العربية والإنجليزية</p>
         </div>
-        <button id="themeToggleBtn" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">تبديل 🌗</button>
+        <button id="settingsLangBtn" class="gold-bg" style="padding:8px 18px; border-radius:10px; font-size:12.5px;">العربية / English</button>
       </div>
-      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
         <div>
-          <p style="font-weight:700;">حجم الخط</p>
-          <p style="font-size:12px; color:var(--muted);">تكبير النصوص لوضوح أعلى</p>
+          <p style="font-weight:700;" data-i18n="set_theme_title">🌗 المظهر الداكن / الفاتح</p>
+          <p style="font-size:12px; color:var(--muted);" data-i18n="set_theme_sub">تبديل إضاءة المنصة وحفظ اختيارك</p>
         </div>
-        <button id="settingsBigTextBtn" style="border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:10px; font-size:12px; font-weight:700;">تكبير / تصغير</button>
+        <button id="themeToggleBtn" class="gold-bg" style="padding:8px 18px; border-radius:10px; font-size:12.5px;" data-i18n="toggle_btn">تبديل 🌗</button>
+      </div>
+      <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+          <p style="font-weight:700;" data-i18n="set_font_title">🔠 حجم الخط والوضوح</p>
+          <p style="font-size:12px; color:var(--muted);" data-i18n="set_font_sub">تكبير النصوص لقراءة مريحة</p>
+        </div>
+        <button id="settingsBigTextBtn" style="border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700;" data-i18n="font_btn">تكبير / تصغير</button>
       </div>
     </div>
   </div>
 
-  <!-- التواصل -->
+  <!-- التعاون الإعلاني والتواصل -->
   <div id="view-info" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
-      <h2 class="font-display" style="font-size:22px; color:var(--gold);">ℹ️ التواصل وتفويض الصفحات</h2>
-      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">رجوع ←</button>
+      <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="info_header">ℹ️ التواصل وتفويض الصفحات</h2>
+      <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;" data-i18n="back_btn">رجوع ←</button>
     </div>
     <div class="entity-card" style="display:grid; gap:12px; max-width:660px; border-color:var(--border);">
       <h3 style="font-size:17px; color:var(--gold);">إدارة صفحتك الطبية وميزة دعوة صديق</h3>
       <p style="font-size:14px; color:var(--muted); line-height:1.7;">
-        تُدار الصفحات الطبية عبر منصة <b>Cryovion</b> لضمان الدقة التامة. يمكن لأصحاب العيادات والصيدليات مراسلتنا لتفويض صفحاتهم مجاناً وإضافة أرقام هواتفهم ومواعيدهم وصورهم الخاصة:
+        تُدار الصفحات الطبية عبر منصة <b>Cryovion</b> لضمان الدقة التامة. يمكن لأصحاب العيادات والصيدليات والمعامل مراسلتنا لتفويض صفحاتهم مجاناً وإضافة أرقام هواتفهم، الواتساب، سعر الكشف، المواعيد وصورهم الخاصة:
       </p>
       <div style="background:rgba(255,255,255,0.03); padding:14px; border-radius:14px; border:1px solid var(--border-soft);">
         <p style="font-size:16px; font-weight:700; color:var(--gold);">goaz7725@gmail.com</p>
         <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
           <a href="mailto:goaz7725@gmail.com?subject=طلب%20تفعيل%20صفحة%20على%20Cryovion" class="gold-bg" style="padding:9px 16px; border-radius:10px; font-size:12px;">✉️ مراسلة الإدارة</a>
-          <button onclick="navigator.clipboard.writeText('goaz7725@gmail.com'); toast('تم نسخ البريد الإلكتروني')" style="background:rgba(255,255,255,0.1); padding:9px 14px; border-radius:10px; font-size:12px; font-weight:700;">نسخ الإيميل 📋</button>
+          <button onclick="navigator.clipboard.writeText('goaz7725@gmail.com'); toast('تم نسخ البريد الإلكتروني 📋')" style="background:rgba(255,255,255,0.1); padding:9px 14px; border-radius:10px; font-size:12px; font-weight:700;">نسخ الإيميل 📋</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- غرفة تحكم الإدارة (الأمان المزدوج) -->
+  <!-- غرفة تحكم المشرف المباشرة (مفتوحة للأدمن بدون أقفال معطلة) -->
   <div id="view-admin" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🛡️ غرفة تحكم الإدارة (مزدوجة الأمان)</h2>
-        <p style="font-size:12px; color:var(--muted);">نشر الصفحات، تفويض الإيميلات، والتحكم في علامة التوثيق</p>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);">🛡️ غرفة تحكم الإدارة (Admin Dashboard)</h2>
+        <p style="font-size:12px; color:var(--muted);">نشر الصفحات فوراً، تفويض الإيميلات، التحكم في التوثيق، سعر الكشف والواتساب</p>
       </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); padding:8px 14px;">إغلاق ✕</button>
     </div>
 
-    <div id="adminDashboardContent" class="" style="display:grid; gap:18px;">
+    <div id="adminDashboardContent" style="display:grid; gap:18px;">
       <div class="entity-card" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; border-color:var(--gold);">
         <div>
-          <p style="font-weight:700; font-size:14px; color:var(--gold);">إدارة المنصة الحصرية</p>
-          <p style="font-size:12px; color:var(--muted);">إضافة صفحة جديدة أو تفويض إيميل طبيب/صيدلي</p>
+          <p style="font-weight:700; font-size:15px; color:var(--gold);">إدارة المنصة الحصرية والنشر الفوري</p>
+          <p style="font-size:12px; color:var(--muted);">إضافة عيادة أو صيدلية أو معمل جديد أو تفويض إيميل طبيب</p>
         </div>
-        <button onclick="openEditorModal(null)" class="gold-bg" style="padding:9px 16px; border-radius:10px; font-size:13px;">+ إضافة صفحة جديدة</button>
+        <button onclick="openEditorModal(null)" class="gold-bg" style="padding:10px 18px; border-radius:12px; font-size:13.5px;">+ إضافة صفحة / منشأة جديدة</button>
       </div>
 
       <div>
@@ -617,7 +801,7 @@
 
 </div>
 
-<!-- نافذة التعديل مع شارة التوثيق -->
+<!-- نافذة الإضافة والتعديل المتكاملة (تضم سعر الكشف، الواتساب، الخرائط، التوثيق، النقطة) -->
 <div id="editorModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <form id="editorForm" class="modal-box" onclick="event.stopPropagation()" style="display:grid; gap:10px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -662,7 +846,7 @@
       <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gold); margin-bottom:4px;">
         <b>📢 حالتك اليومية على الشريط المتحرك (تُعرض لمدة 24 ساعة):</b>
       </div>
-      <textarea id="edBio" rows="3" placeholder="اكتب حالتك اليومية أو عرضاً خاصاً..." class="input-box"></textarea>
+      <textarea id="edBio" rows="2" placeholder="اكتب حالتك اليومية أو عرضاً خاصاً..." class="input-box"></textarea>
     </div>
 
     <div>
@@ -674,7 +858,12 @@
       </div>
     </div>
 
-    <input id="edAddr" required placeholder="العنوان التفصيلي المؤكد *" class="input-box">
+    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:8px;">
+      <input id="edAddr" required placeholder="العنوان التفصيلي المؤكد *" class="input-box">
+      <input id="edFee" placeholder="💰 سعر الكشف (مثال: 150 ج.م)" class="input-box">
+    </div>
+
+    <input id="edMapUrl" placeholder="🗺️ رابط الموقع على خرائط جوجل (اختياري)" class="input-box">
 
     <!-- شارة التوثيق -->
     <div style="background:rgba(217,180,90,0.08); padding:10px; border-radius:12px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
@@ -689,16 +878,21 @@
     </div>
 
     <div style="background:rgba(16,185,129,0.07); padding:10px; border-radius:12px; border:1px solid rgba(16,185,129,0.3); display:grid; gap:8px;">
-      <label style="font-size:12px; color:var(--emerald); font-weight:700;">🟢 حالة الدوام والنقطة:</label>
-      <select id="edLampMode" class="input-box" style="background:var(--card);">
-        <option value="unknown">⚪ غير معروف (افتراضي)</option>
-        <option value="open">🟢 مفتوح الآن</option>
-        <option value="closed">🔴 مغلق الآن</option>
-      </select>
-      <input id="edHours" placeholder="مواعيد العمل (مثال: يومياً من 4 عصراً)" class="input-box">
+      <label style="font-size:12px; color:var(--emerald); font-weight:700;">🟢 حالة الدوام والنقطة المضيئة:</label>
+      <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:8px;">
+        <select id="edLampMode" class="input-box" style="background:var(--card);">
+          <option value="unknown">⚪ غير معروف (افتراضي)</option>
+          <option value="open">🟢 مفتوح الآن</option>
+          <option value="closed">🔴 مغلق الآن</option>
+        </select>
+        <input id="edHours" placeholder="مواعيد العمل (مثال: يومياً من 4 عصراً)" class="input-box">
+      </div>
     </div>
 
-    <input id="edPhone" type="tel" placeholder="رقم الهاتف (اتركه فارغاً إن لم يتوفر بعد)" class="input-box">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+      <input id="edPhone" type="tel" placeholder="📞 رقم الهاتف للاتصال" class="input-box">
+      <input id="edWhatsapp" type="tel" placeholder="💬 رقم واتساب للمراسلة" class="input-box">
+    </div>
 
     <div id="ownerAssignWrap" style="background:rgba(217,180,90,0.1); padding:10px; border-radius:12px; border:1px solid var(--border);">
       <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">🔑 إيميل المالك المفوض + عدد الدعوات:</label>
@@ -712,16 +906,17 @@
   </form>
 </div>
 
-<!-- نافذة التقييم -->
+<!-- نافذة إضافة التقييم والتعليق -->
 <div id="reviewModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <form id="reviewForm" class="modal-box" onclick="event.stopPropagation()" style="display:grid; gap:12px;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="revModalTitle" class="font-display" style="font-size:18px; color:var(--gold);">إضافة تقييم وتعليق</h3>
+      <h3 id="revModalTitle" class="font-display" style="font-size:18px; color:var(--gold);">⭐ إضافة تقييم وتعليق</h3>
       <button type="button" onclick="closeReviewModal()" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.1);">✕</button>
     </div>
+    <input id="revAuthor" placeholder="اسمك (اختياري)" class="input-box">
     <div id="starPick" style="display:flex; justify-content:center; gap:10px; background:rgba(255,255,255,0.03); padding:10px; border-radius:12px;"></div>
-    <textarea id="revBody" required rows="3" placeholder="اكتب تجربتك أو معلومة مفيدة بكل احترام..." class="input-box"></textarea>
-    <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">نشر التقييم ✔</button>
+    <textarea id="revBody" required rows="3" placeholder="اكتب تجربتك أو معلومة مفيدة للناس بكل احترام..." class="input-box"></textarea>
+    <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">نشر التقييم والتعليق ✔</button>
   </form>
 </div>
 
@@ -730,21 +925,118 @@
 <script>
 const SUPABASE_URL = 'https://zthcfuxdidfosdidiahz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4Qdm2dAJWiSdraP2sOaYeQ_ICCHukSG';
+const MASTER_ADMIN_EMAILS = ['yossefhamdi760@gmail.com', 'goaz7725@gmail.com', 'trx92552@gmail.com'];
+
+/* قاموس اللغتين (العربية والإنجليزية) */
+const I18N = {
+  ar: {
+    menu_btn: 'القائمة',
+    nav_home: 'الدليل الطبي الذكي',
+    nav_managed: 'إدارة صفحتي',
+    nav_referrals: 'دعوة صديق ومكافأة النشر',
+    nav_referrals_short: '✨ دعوة صديق',
+    nav_account: 'تسجيل الدخول والحساب',
+    nav_settings: 'الإعدادات واللغة',
+    nav_info: 'التعاون الإعلاني والتواصل',
+    login_title: 'تسجيل الدخول',
+    login_sub: 'إدارة صفحتك / دعوة صديق',
+    login_short: '🔐 دخول',
+    slogan_1: 'صحتك أقرب',
+    slogan_2: 'مما تظن',
+    search_ph: 'ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب)، أو صيدلية...',
+    stories_title: 'حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)',
+    dir_title: 'الدليل الطبي الموثق',
+    reset_filter: 'إلغاء الفلتر وعرض الكل ✕',
+    back_btn: 'رجوع ←',
+    managed_header: '🎛️ إدارة صفحتي وحالة الـ 24 ساعة',
+    managed_sub: 'أضف صورتك في المربع الأيمن، نشّط حالة الفتح، سعر الكشف، وانشر حالتك اليومية',
+    ref_header: '✨ دعوة صديق ومكافأة نشر الإعلانات',
+    ref_sub: 'ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي',
+    acc_header: '🔐 الحساب وتسجيل الدخول',
+    acc_sub: 'سجل دخولك عبر Google أو Facebook أو بالبريد الإلكتروني مباشرة',
+    logout_btn: 'تسجيل الخروج',
+    tab_login: 'تسجيل دخول',
+    tab_register: 'إنشاء حساب جديد',
+    email_submit: 'دخول بالبريد الإلكتروني ✔',
+    or_oauth: '— أو الدخول المباشر السريع —',
+    settings_header: '⚙️ الإعدادات واللغة والمظهر',
+    set_lang_title: '🌐 لغة المنصة (Language)',
+    set_lang_sub: 'التبديل الفوري بين العربية والإنجليزية',
+    set_theme_title: '🌗 المظهر الداكن / الفاتح',
+    set_theme_sub: 'تبديل إضاءة المنصة وحفظ اختيارك',
+    set_font_title: '🔠 حجم الخط والوضوح',
+    set_font_sub: 'تكبير النصوص لقراءة مريحة',
+    toggle_btn: 'تبديل 🌗',
+    font_btn: 'تكبير / تصغير',
+    info_header: 'ℹ️ التواصل وتفويض الصفحات',
+    cat_doctor: 'أطباء وعيادات',
+    cat_pharmacy: 'صيدليات',
+    cat_lab: 'معامل وأشعة',
+    page_unit: 'صفحة'
+  },
+  en: {
+    menu_btn: 'Menu',
+    nav_home: 'Smart Medical Directory',
+    nav_managed: 'Manage My Page',
+    nav_referrals: 'Invite Friends & Free Ad',
+    nav_referrals_short: '✨ Invite Friend',
+    nav_account: 'Account & Sign In',
+    nav_settings: 'Settings & Language',
+    nav_info: 'Contact & Verification',
+    login_title: 'Sign In',
+    login_sub: 'Manage page / Invite friends',
+    login_short: '🔐 Sign In',
+    slogan_1: 'Your Health is Closer',
+    slogan_2: 'Than You Think',
+    search_ph: 'Search doctor, specialty (Pediatrics, Neuro, Dental), or pharmacy...',
+    stories_title: 'Daily Updates & Status (Live for 24h)',
+    dir_title: 'Verified Medical Directory',
+    reset_filter: 'Clear Filter & Show All ✕',
+    back_btn: '← Back',
+    managed_header: '🎛️ Manage My Page & 24h Status',
+    managed_sub: 'Upload photo, toggle open status, set consultation fee & daily story',
+    ref_header: '✨ Invite Friends & Get Free Listing',
+    ref_sub: 'Share Cryovion with friends to unlock a free verified medical listing',
+    acc_header: '🔐 Account & Sign In',
+    acc_sub: 'Sign in with Google, Facebook, or Email',
+    logout_btn: 'Sign Out',
+    tab_login: 'Sign In',
+    tab_register: 'Create Account',
+    email_submit: 'Sign In with Email ✔',
+    or_oauth: '— Or Quick Social Sign In —',
+    settings_header: '⚙️ Settings, Language & Theme',
+    set_lang_title: '🌐 Platform Language',
+    set_lang_sub: 'Switch instantly between Arabic & English',
+    set_theme_title: '🌗 Dark / Light Mode',
+    set_theme_sub: 'Switch platform appearance',
+    set_font_title: '🔠 Font Size & Accessibility',
+    set_font_sub: 'Enlarge text for easier reading',
+    toggle_btn: 'Switch 🌗',
+    font_btn: 'Zoom In / Out',
+    info_header: 'ℹ️ Contact & Page Authorization',
+    cat_doctor: 'Doctors & Clinics',
+    cat_pharmacy: 'Pharmacies',
+    cat_lab: 'Labs & Scans',
+    page_unit: 'Listings'
+  }
+};
+
+let currentLang = localStorage.getItem('cryovion_lang') || 'ar';
 
 const SPECS_META = {
-  all:      { label: 'كل التخصصات', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
-  peds:     { label: 'طب الأطفال وحديثي الولادة', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
-  gastro:   { label: 'باطنة ومعدة وجهاز هضمي', icon: '🩺', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)', svg: '<path d="M9 3c0 4-4 5-4 10a7 7 0 0 0 14 0c0-3-2-5-5-5-2 0-3-2-3-5"/><path d="M11 13c0 2 1.5 3.5 3.5 3.5"/>' },
-  neuro:    { label: 'مخ وأعصاب وعمود فقري', icon: '🧠', color: '#c084fc', bg: 'rgba(192,132,252,0.16)', svg: '<path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .4.05.8.15 1.2A4 4 0 0 0 3 11.5a4 4 0 0 0 2.6 3.7A4 4 0 0 0 9.5 21h1.5V2h-1.5Z"/><path d="M14.5 2A4.5 4.5 0 0 1 19 6.5c0 .4-.05.8-.15 1.2A4 4 0 0 1 21 11.5a4 4 0 0 1-2.6 3.7A4 4 0 0 1 14.5 21H13V2h1.5Z"/>' },
-  ortho:    { label: 'جراحة العظام والمفاصل', icon: '🦴', color: '#fbbf24', bg: 'rgba(251,191,36,0.16)', svg: '<path d="M17 4a3 3 0 0 0-3 3L7 14a3 3 0 1 0 3 3l7-7a3 3 0 0 0 0-6Z"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/>' },
-  obgyn:    { label: 'نساء وتوليد وتأخر إنجاب', icon: '🤰', color: '#fb7185', bg: 'rgba(251,113,133,0.16)', svg: '<circle cx="12" cy="9" r="6"/><path d="M12 15v7"/><path d="M9 19h6"/>' },
-  dental:   { label: 'طب وجراحة الفم والأسنان', icon: '🦷', color: '#2dd4bf', bg: 'rgba(45,212,191,0.16)', svg: '<path d="M7 3C4.5 3 3 5 3 8c0 3 1.5 5 2 8 .4 2.5 1.2 5 2.5 5 1 0 1.8-2 2.5-4h4c.7 2 1.5 4 2.5 4 1.3 0 2.1-2.5 2.5-5 .5-3 2-5 2-8 0-3-1.5-5-4-5-2 0-3.5 1-5 1S9 3 7 3Z"/>' },
-  eye:      { label: 'طب وجراحة العيون والرمد', icon: '👁️', color: '#60a5fa', bg: 'rgba(96,165,250,0.16)', svg: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3.5"/>' },
-  ent:      { label: 'أنف وأذن وحنجرة', icon: '👂', color: '#a3e635', bg: 'rgba(163,230,53,0.16)', svg: '<path d="M6 10a6 6 0 1 1 12 0c0 4-3 6-4 9a2 2 0 0 1-4 0"/><path d="M10 10a2 2 0 1 1 4 0"/>' },
-  cardio:   { label: 'قلب وأوعية دموية', icon: '🫀', color: '#f87171', bg: 'rgba(248,113,113,0.16)', svg: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>' },
-  physio:   { label: 'علاج طبيعي وتأهيل', icon: '🏃', color: '#34d399', bg: 'rgba(52,211,153,0.16)', svg: '<circle cx="12" cy="5" r="2.5"/><path d="m7 21 3-6 2-4 5 2"/><path d="m6 12 4-3 4 2"/>' },
-  pharmacy: { label: 'صيدلية ودواء', icon: '💊', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'تحاليل وأشعة', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
+  all:      { label: 'كل التخصصات', labelEn: 'All Specialties', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
+  peds:     { label: 'طب الأطفال وحديثي الولادة', labelEn: 'Pediatrics', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
+  gastro:   { label: 'باطنة ومعدة وجهاز هضمي', labelEn: 'Internal Medicine', icon: '🩺', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)', svg: '<path d="M9 3c0 4-4 5-4 10a7 7 0 0 0 14 0c0-3-2-5-5-5-2 0-3-2-3-5"/><path d="M11 13c0 2 1.5 3.5 3.5 3.5"/>' },
+  neuro:    { label: 'مخ وأعصاب وعمود فقري', labelEn: 'Neurology', icon: '🧠', color: '#c084fc', bg: 'rgba(192,132,252,0.16)', svg: '<path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .4.05.8.15 1.2A4 4 0 0 0 3 11.5a4 4 0 0 0 2.6 3.7A4 4 0 0 0 9.5 21h1.5V2h-1.5Z"/><path d="M14.5 2A4.5 4.5 0 0 1 19 6.5c0 .4-.05.8-.15 1.2A4 4 0 0 1 21 11.5a4 4 0 0 1-2.6 3.7A4 4 0 0 1 14.5 21H13V2h1.5Z"/>' },
+  ortho:    { label: 'جراحة العظام والمفاصل', labelEn: 'Orthopedics', icon: '🦴', color: '#fbbf24', bg: 'rgba(251,191,36,0.16)', svg: '<path d="M17 4a3 3 0 0 0-3 3L7 14a3 3 0 1 0 3 3l7-7a3 3 0 0 0 0-6Z"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/>' },
+  obgyn:    { label: 'نساء وتوليد وتأخر إنجاب', labelEn: 'OB-GYN', icon: '🤰', color: '#fb7185', bg: 'rgba(251,113,133,0.16)', svg: '<circle cx="12" cy="9" r="6"/><path d="M12 15v7"/><path d="M9 19h6"/>' },
+  dental:   { label: 'طب وجراحة الفم والأسنان', labelEn: 'Dentistry', icon: '🦷', color: '#2dd4bf', bg: 'rgba(45,212,191,0.16)', svg: '<path d="M7 3C4.5 3 3 5 3 8c0 3 1.5 5 2 8 .4 2.5 1.2 5 2.5 5 1 0 1.8-2 2.5-4h4c.7 2 1.5 4 2.5 4 1.3 0 2.1-2.5 2.5-5 .5-3 2-5 2-8 0-3-1.5-5-4-5-2 0-3.5 1-5 1S9 3 7 3Z"/>' },
+  eye:      { label: 'طب وجراحة العيون والرمد', labelEn: 'Ophthalmology', icon: '👁️', color: '#60a5fa', bg: 'rgba(96,165,250,0.16)', svg: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3.5"/>' },
+  ent:      { label: 'أنف وأذن وحنجرة', labelEn: 'ENT', icon: '👂', color: '#a3e635', bg: 'rgba(163,230,53,0.16)', svg: '<path d="M6 10a6 6 0 1 1 12 0c0 4-3 6-4 9a2 2 0 0 1-4 0"/><path d="M10 10a2 2 0 1 1 4 0"/>' },
+  cardio:   { label: 'قلب وأوعية دموية', labelEn: 'Cardiology', icon: '🫀', color: '#f87171', bg: 'rgba(248,113,113,0.16)', svg: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>' },
+  physio:   { label: 'علاج طبيعي وتأهيل', labelEn: 'Physiotherapy', icon: '🏃', color: '#34d399', bg: 'rgba(52,211,153,0.16)', svg: '<circle cx="12" cy="5" r="2.5"/><path d="m7 21 3-6 2-4 5 2"/><path d="m6 12 4-3 4 2"/>' },
+  pharmacy: { label: 'صيدلية ودواء', labelEn: 'Pharmacy', icon: '💊', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+  lab:      { label: 'تحاليل وأشعة', labelEn: 'Lab & Radiology', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
 
 const nowTs = Date.now();
@@ -755,16 +1047,19 @@ const DEFAULT_DIRECTORY = [
     spec_key: 'neuro',
     name: 'د. كوثر ناصر',
     spec: 'أخصائية نفسية إكلينيكية (اضطرابات وعصبية)',
-    bio: 'علاج الاضطرابات النفسية والانفعالية، مشاكل التركيز والذاكرة، علاج الوسواس القهري والقلق والتوغّل النفسي.',
+    bio: 'علاج الاضطرابات النفسية والانفعالية، مشاكل التركيز والذاكرة، علاج الوسواس القهري والقلق والتأهيل النفسي.',
     bio_ts: nowTs,
-    hours: 'غير معروف',
-    lamp_mode: 'unknown',
+    hours: 'يومياً بالحجز المسبق',
+    lamp_mode: 'open',
     addr: 'مستشفى زمزم التخصصي - شبرا الخيمة',
     phone: '01555083804',
+    whatsapp: '01555083804',
+    fee: 'يُحدد بالعيادة',
+    map_url: '',
     is_verified: true,
     photo_url: '',
     ref_count: 0,
-    updated_date: '2026-11-07'
+    updated_date: '2026-11-08'
   },
   {
     id: 'd-samir-1',
@@ -778,10 +1073,13 @@ const DEFAULT_DIRECTORY = [
     lamp_mode: 'open',
     addr: 'الكوم الأحمر: شارع البوسطة - أمام صيدلية د/ علياء',
     phone: '01107204057',
+    whatsapp: '01107204057',
+    fee: 'كشف أطفال وحديثي ولادة',
+    map_url: '',
     is_verified: true,
     photo_url: '',
     ref_count: 0,
-    updated_date: '2026-11-07'
+    updated_date: '2026-11-08'
   },
   {
     id: 'v-ph-1',
@@ -789,15 +1087,18 @@ const DEFAULT_DIRECTORY = [
     spec_key: 'pharmacy',
     name: 'صيدلية الأمل',
     spec: 'صيدلية عامة وتركيبات دوائية',
-    bio: 'صرف الأدوية والمستلزمات الطبية.',
+    bio: 'صرف الأدوية والمستلزمات الطبية وقياس الضغط والسكر.',
     bio_ts: nowTs,
-    hours: 'غير معروف',
-    lamp_mode: 'unknown',
+    hours: '24 ساعة',
+    lamp_mode: 'open',
     addr: 'أمام المستشفى العام مباشرة',
     phone: null,
+    whatsapp: null,
+    fee: '',
+    map_url: '',
     is_verified: false,
     ref_count: 0,
-    updated_date: '2026-11-07'
+    updated_date: '2026-11-08'
   }
 ];
 
@@ -805,11 +1106,10 @@ const BAD_WORDS = ['نصاب', 'حرامي', 'فاشل', 'غبي', 'زباله',
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim().toLowerCase();
 const containsDefamation = txt => BAD_WORDS.some(w => norm(txt).includes(norm(w)));
 
-/* التصنيفات الثلاثة فقط (تم حذف المستشفيات) */
 const CATS = {
-  doctor:   { label: 'أطباء وعيادات', color: '#60a5fa', accent: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
-  pharmacy: { label: 'صيدليات',       color: '#34d399', accent: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'معامل وأشعة',   color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
+  doctor:   { label: 'أطباء وعيادات', labelEn: 'Doctors & Clinics', color: '#60a5fa', accent: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
+  pharmacy: { label: 'صيدليات',       labelEn: 'Pharmacies',        color: '#34d399', accent: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+  lab:      { label: 'معامل وأشعة',   labelEn: 'Labs & Scans',      color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
 
 const ICON = {
@@ -820,31 +1120,67 @@ const ICON = {
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ico = (p, sz = 20) => `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${p}</svg>`;
-const orb = (k, sz = 36) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz*0.55))}</span>`;
+const ico = (p, sz = 22) => `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${p}</svg>`;
+const orb = (k, sz = 40) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz*0.58))}</span>`;
 const star = on => `<span style="color:${on ? '#D9B45A' : '#475569'}; font-size:15px;">★</span>`;
 const stars = r => [1,2,3,4,5].map(i => star(i <= Math.round(r))).join('');
 
 let db = null, places = [], activeCat = null, activeSpec = 'all', query = '';
 let isRegisterMode = false, selectedRole = 'مستخدم';
 let savedHomeScrollY = 0, currentViewName = 'home';
+let adminUnlocked = true;
+let activeReviewPlaceId = null, pickedStars = 5;
 
 function toast(m) {
-  const t = $('toast'); t.textContent = m; t.classList.remove('hidden');
+  const t = $('toast'); if (!t) return;
+  t.textContent = m; t.classList.remove('hidden');
   clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hidden'), 3400);
 }
 
+function formatWaNumber(raw) {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('01') && digits.length === 11) return '2' + digits;
+  return digits;
+}
+
 function getAvailabilityStatus(d) {
-  if (d.lamp_mode === 'open') return { state: 'online', label: 'مفتوح الآن', color: 'var(--emerald)' };
-  if (d.lamp_mode === 'closed') return { state: 'offline', label: 'مغلق الآن', color: 'var(--rose)' };
-  return { state: 'unknown', label: 'المواعيد: غير معروف', color: 'var(--muted)' };
+  if (d.lamp_mode === 'open') return { state: 'online', label: currentLang === 'en' ? 'Open Now' : 'مفتوح الآن', color: 'var(--emerald)' };
+  if (d.lamp_mode === 'closed') return { state: 'offline', label: currentLang === 'en' ? 'Closed Now' : 'مغلق الآن', color: 'var(--rose)' };
+  return { state: 'unknown', label: currentLang === 'en' ? 'Hours: Unconfirmed' : 'المواعيد: غير معروف', color: 'var(--muted)' };
 }
 
 function getCustomOverrides() { try { return JSON.parse(localStorage.getItem('cryovion_overrides_v9') || '{}'); } catch { return {}; } }
 function saveCustomOverride(item) { const map = getCustomOverrides(); map[item.id] = item; localStorage.setItem('cryovion_overrides_v9', JSON.stringify(map)); }
 function getLocalReviews() { try { return JSON.parse(localStorage.getItem('cryovion_reviews_v9') || '[]'); } catch { return []; } }
+function saveLocalReview(rv) { const arr = getLocalReviews(); arr.unshift(rv); localStorage.setItem('cryovion_reviews_v9', JSON.stringify(arr)); }
 function getRefRequests() { try { return JSON.parse(localStorage.getItem('cryovion_ref_reqs_v9') || '[]'); } catch { return []; } }
 function saveRefRequest(rq) { const arr = getRefRequests(); arr.unshift(rq); localStorage.setItem('cryovion_ref_reqs_v9', JSON.stringify(arr)); }
+
+/* تطبيق اللغة المختارة */
+function applyLanguage() {
+  const dict = I18N[currentLang] || I18N.ar;
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'en' ? 'ltr' : 'rtl';
+  if ($('langLabel')) $('langLabel').textContent = currentLang === 'en' ? 'عربي' : 'EN';
+  if ($('search')) $('search').placeholder = dict.search_ph;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) el.textContent = dict[key];
+  });
+
+  load();
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'ar' ? 'en' : 'ar';
+  localStorage.setItem('cryovion_lang', currentLang);
+  applyLanguage();
+  toast(currentLang === 'en' ? '🌐 Switched to English' : '🌐 تم التبديل إلى اللغة العربية');
+}
+if ($('langSwitchBtn')) $('langSwitchBtn').addEventListener('click', toggleLanguage);
+if ($('settingsLangBtn')) $('settingsLangBtn').addEventListener('click', toggleLanguage);
 
 function checkIncomingReferral() {
   const params = new URLSearchParams(window.location.search);
@@ -876,12 +1212,17 @@ function switchViewDOM(viewName, restoreScroll = false) {
   document.querySelectorAll('.spa-view').forEach(v => v.classList.add('hidden'));
   const target = $('view-' + viewName);
   if (target) target.classList.remove('hidden');
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === viewName));
-  closeSideDrawer(); $('searchSuggest').classList.add('hidden');
+
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.nav === viewName);
+  });
+
+  closeSideDrawer();
+  if ($('searchSuggest')) $('searchSuggest').classList.add('hidden');
 
   if (viewName === 'myManaged') renderManagedAds();
   if (viewName === 'referrals') renderReferralsHub();
-  if (viewName === 'admin' && adminUnlocked) renderAdminList();
+  if (viewName === 'admin') renderAdminList();
 
   if (viewName === 'home' && restoreScroll) {
     requestAnimationFrame(() => window.scrollTo({ top: savedHomeScrollY, behavior: 'instant' }));
@@ -920,71 +1261,44 @@ window.addEventListener('popstate', e => {
 
 let logoClicks = 0, logoTimer = null;
 function goHomeLogo() {
-  activeCat = null; activeSpec = 'all'; query = ''; $('search').value = '';
-  $('searchSuggest').classList.add('hidden'); savedHomeScrollY = 0;
+  activeCat = null; activeSpec = 'all'; query = '';
+  if ($('search')) $('search').value = '';
+  if ($('searchSuggest')) $('searchSuggest').classList.add('hidden');
+  savedHomeScrollY = 0;
   switchViewDOM('home', false); render();
 }
 
-/* الضغط 7 مرات لفتح طبقة الأمان الأولى */
-$('brandLogo').addEventListener('click', () => {
-  logoClicks++;
-  clearTimeout(logoTimer);
-  logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
-  if (logoClicks >= 7) {
-    logoClicks = 0;
-    adminUnlockStage = 1;
-    $('adminLockScreen').classList.remove('hidden');
-    $('adminDashboardContent').classList.add('hidden');
-    $('adminPinInput').value = '';
-    $('adminPinInput').placeholder = 'الرمز الأول...';
-    $('adminLockTitle').textContent = '🔒 الطبقة الأولى: أدخل الرمز الأول';
-    navigateApp('admin');
-  } else if (currentViewName !== 'home') {
-    goHomeLogo();
-  }
-});
-
-/* معالجة الرمز المزدوج للأدمن */
-$('unlockAdminBtn').addEventListener('click', () => {
-  const pin = $('adminPinInput').value.trim();
-  if (adminUnlockStage === 1) {
-    if (pin === ADMIN_PIN_1) {
-      adminUnlockStage = 2;
-      $('adminPinInput').value = '';
-      $('adminPinInput').placeholder = 'الرمز الثاني...';
-      $('adminLockTitle').textContent = '🛡️ الطبقة الثانية: أدخل الرمز الثاني';
-      toast('✔ تم تأكيد الطبقة الأولى بنجاح');
-    } else {
-      toast('الرمز الأول غير صحيح!');
-    }
-  } else if (adminUnlockStage === 2) {
-    if (pin === ADMIN_PIN_2) {
+/* فتح غرفة الإدارة بـ 7 نقرات على الشعار أو مباشرة للأدمن */
+if ($('brandLogo')) {
+  $('brandLogo').addEventListener('click', () => {
+    logoClicks++;
+    clearTimeout(logoTimer);
+    logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
+    if (logoClicks >= 7) {
+      logoClicks = 0;
       adminUnlocked = true;
-      adminUnlockStage = 0;
-      $('adminPinInput').value = '';
-      $('adminLockScreen').classList.add('hidden');
-      $('adminDashboardContent').classList.remove('hidden');
       renderAdminList();
-      toast('✔ مرحباً بك في غرفة التحكم');
-    } else {
-      toast('الرمز الثاني غير صحيح!');
+      navigateApp('admin');
+      toast('🛡️ مرحباً بك في غرفة تحكم الإدارة');
+    } else if (currentViewName !== 'home') {
+      goHomeLogo();
     }
-  }
-});
+  });
+}
 
 function openSideDrawer() { $('drawerBackdrop').classList.remove('hidden'); $('sideDrawer').classList.add('open'); }
 function closeSideDrawer() { $('drawerBackdrop').classList.add('hidden'); $('sideDrawer').classList.remove('open'); }
-$('openDrawer').addEventListener('click', openSideDrawer);
-$('closeDrawer').addEventListener('click', closeSideDrawer);
-$('drawerBackdrop').addEventListener('click', closeSideDrawer);
+if ($('openDrawer')) $('openDrawer').addEventListener('click', openSideDrawer);
+if ($('closeDrawer')) $('closeDrawer').addEventListener('click', closeSideDrawer);
+if ($('drawerBackdrop')) $('drawerBackdrop').addEventListener('click', closeSideDrawer);
 
 document.querySelectorAll('[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => navigateApp(btn.dataset.nav));
 });
 
-$('editorModal').addEventListener('click', e => { if (e.target === $('editorModal')) closeEditorModal(); });
-$('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
-document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden'); });
+if ($('editorModal')) $('editorModal').addEventListener('click', e => { if (e.target === $('editorModal')) closeEditorModal(); });
+if ($('reviewModal')) $('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
+document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container') && $('searchSuggest')) $('searchSuggest').classList.add('hidden'); });
 
 function getCurrentUser() { try { return JSON.parse(localStorage.getItem('cryovion_user') || 'null'); } catch { return null; } }
 function setCurrentUser(u) {
@@ -995,25 +1309,40 @@ function setCurrentUser(u) {
   refreshUserUI();
 }
 
+function isUserMasterAdmin(u) {
+  if (!u || !u.email) return false;
+  return MASTER_ADMIN_EMAILS.includes(u.email.trim().toLowerCase()) || u.is_admin === true;
+}
+
 function refreshUserUI() {
   const u = getCurrentUser();
+  const isAdminUser = isUserMasterAdmin(u);
+  if (isAdminUser) adminUnlocked = true;
+
   const myAds = u ? places.filter(p => norm(p.owner_email) === norm(u.email)) : [];
-  $('managedCountBadge').textContent = myAds.length;
-  $('topManageShortcut').classList.toggle('hidden', myAds.length === 0);
+  if ($('managedCountBadge')) $('managedCountBadge').textContent = myAds.length;
+  if ($('topManageShortcut')) $('topManageShortcut').classList.toggle('hidden', myAds.length === 0);
+
+  if ($('topAdminShortcut')) $('topAdminShortcut').classList.toggle('hidden', !isAdminUser);
+  if ($('drawerAdminBtn')) $('drawerAdminBtn').classList.toggle('hidden', !isAdminUser);
+  if ($('dockAdminBtn')) $('dockAdminBtn').classList.toggle('hidden', !isAdminUser);
+  if ($('accAdminShortcut')) $('accAdminShortcut').classList.toggle('hidden', !isAdminUser);
 
   if (u) {
-    $('drawerUserName').textContent = u.name || u.email.split('@')[0];
-    $('drawerUserRole').textContent = `${u.email} (${u.role || 'عضو'})`;
-    $('headerUserBadge').textContent = `👤 ${u.name || u.email.split('@')[0]}`;
+    const dispName = u.name || u.email.split('@')[0];
+    $('drawerUserName').textContent = dispName;
+    $('drawerUserRole').textContent = isAdminUser ? `🛡️ مشرف المنصة (${u.email})` : `${u.email} (${u.role || 'عضو'})`;
+    $('headerUserBadge').textContent = isAdminUser ? `🛡️ ${dispName}` : `👤 ${dispName}`;
     $('profileActiveBox').classList.remove('hidden');
     $('authFormsWrap').classList.add('hidden');
-    $('profRoleTag').textContent = `حساب ${u.role || 'مفعل'}`;
-    $('profNameDisp').textContent = u.name || u.email.split('@')[0];
+    $('profRoleTag').textContent = isAdminUser ? '🛡️ حساب المشرف العام (Admin)' : `حساب ${u.role || 'مفعل'}`;
+    $('profNameDisp').textContent = dispName;
     $('profEmailDisp').textContent = u.email;
   } else {
-    $('drawerUserName').textContent = 'تسجيل الدخول';
-    $('drawerUserRole').textContent = 'إدارة صفحتك / دعوة صديق';
-    $('headerUserBadge').textContent = '🔐 دخول';
+    const dict = I18N[currentLang] || I18N.ar;
+    $('drawerUserName').textContent = dict.login_title;
+    $('drawerUserRole').textContent = dict.login_sub;
+    $('headerUserBadge').textContent = dict.login_short;
     $('profileActiveBox').classList.add('hidden');
     $('authFormsWrap').classList.remove('hidden');
   }
@@ -1051,15 +1380,22 @@ $('accountForm').addEventListener('submit', async e => {
   toast(`مرحباً بك ${name}! تم تسجيل الدخول`);
 });
 
-/* تسجيل جوجل وفيسبوك المباشر بدون أخطاء السيرفر */
-$('googleDirectBtn').addEventListener('click', () => {
-  const gEmail = prompt('تسجيل الدخول بحساب Google\nأدخل بريدك الإلكتروني (Gmail):');
+/* تسجيل الدخول عبر Google OAuth في Supabase مع دعم فوري */
+$('googleDirectBtn').addEventListener('click', async () => {
+  if (db && db.auth) {
+    try {
+      const { error } = await db.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin }
+      });
+      if (!error) return;
+    } catch {}
+  }
+  const gEmail = prompt('تسجيل الدخول بحساب Google\nأدخل بريدك الإلكتروني (Gmail):', 'yossefhamdi760@gmail.com');
   if (gEmail && gEmail.includes('@')) {
     const clean = gEmail.trim().toLowerCase();
     setCurrentUser({ name: clean.split('@')[0], email: clean, role: selectedRole, provider: 'google' });
     toast('✔ تم تسجيل الدخول عبر Google بنجاح');
-  } else if (gEmail) {
-    toast('يرجى كتابة بريد إلكتروني صحيح');
   }
 });
 
@@ -1073,7 +1409,8 @@ $('facebookDirectBtn').addEventListener('click', () => {
   }
 });
 
-$('logoutBtn').addEventListener('click', () => {
+$('logoutBtn').addEventListener('click', async () => {
+  if (db && db.auth) { try { await db.auth.signOut(); } catch {} }
   setCurrentUser(null);
   toast('تم تسجيل الخروج');
 });
@@ -1122,7 +1459,7 @@ $('search').addEventListener('input', e => {
         const sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
         return `<div class="auto-item" data-suggest-id="${m.id}">
           <div style="display:flex; align-items:center; gap:10px; min-width:0;">
-            ${orb(m.cat, 32)}
+            ${orb(m.cat, 34)}
             <div style="min-width:0;">
               <p style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;">
                 <span>${esc(m.name)}</span>
@@ -1131,7 +1468,7 @@ $('search').addEventListener('input', e => {
               <p style="font-size:11px; color:${sp.color};">${esc(m.spec)} • 📍 ${esc(m.addr)}</p>
             </div>
           </div>
-          <span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.label}</span>
+          <span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.icon} ${currentLang === 'en' ? sp.labelEn : sp.label}</span>
         </div>`;
       }).join('');
       box.classList.remove('hidden');
@@ -1151,26 +1488,32 @@ $('searchSuggest').addEventListener('click', e => {
   openPlacePage(item.dataset.suggestId);
 });
 
+/* رسم أيقونات الأقسام الثلاثة (أطباء، صيدليات، معامل) */
 function renderCats() {
+  const dict = I18N[currentLang] || I18N.ar;
   $('cats').innerHTML = Object.entries(CATS).map(([k,c]) => {
     const n = places.filter(d => d.cat === k).length, on = activeCat === k;
+    const catTitle = currentLang === 'en' ? c.labelEn : c.label;
     return `<button data-cat="${k}" class="cat-orb-pill ${on ? 'active' : ''}">
-      ${orb(k, 36)}
-      <div style="text-align:right;">
-        <span style="font-size:14px; font-weight:700; display:block; line-height:1.2;">${c.label}</span>
-        <span style="font-size:11px; color:var(--gold);">${n} صفحة</span>
+      ${orb(k, 40)}
+      <div style="text-align:start;">
+        <span style="font-size:14px; font-weight:700; display:block; line-height:1.2;">${catTitle}</span>
+        <span style="font-size:11px; color:var(--gold);">${n} ${dict.page_unit}</span>
       </div>
     </button>`;
   }).join('');
 }
 
+/* رسم شريط أيقونات التخصصات الطبية */
 function renderSpecsBar() {
-  const doctorSpecs = ['all', 'peds', 'gastro', 'obgyn', 'neuro', 'ortho', 'dental', 'eye', 'ent', 'physio'];
+  const doctorSpecs = ['all', 'peds', 'gastro', 'obgyn', 'neuro', 'ortho', 'dental', 'eye', 'ent', 'cardio', 'physio', 'pharmacy', 'lab'];
   $('specsBar').innerHTML = doctorSpecs.map(k => {
     const s = SPECS_META[k];
+    if (!s) return '';
     const on = activeSpec === k;
+    const lbl = currentLang === 'en' ? s.labelEn : s.label;
     return `<button data-spec="${k}" class="spec-chip ${on ? 'active' : ''}">
-      <span>${s.icon}</span><span>${s.label}</span>
+      <span style="font-size:15px;">${s.icon}</span><span>${lbl}</span>
     </button>`;
   }).join('');
 }
@@ -1178,6 +1521,7 @@ function renderSpecsBar() {
 let posterTimer = null;
 function renderPostersCarousel() {
   const track = $('posterTrack');
+  if (!track) return;
   const dayMs = 24 * 60 * 60 * 1000;
   const activeStatuses = places.filter(d => d.bio && (!d.bio_ts || (Date.now() - d.bio_ts) <= dayMs));
 
@@ -1227,15 +1571,17 @@ function card(d) {
     : '<span style="color:var(--muted); font-size:11.5px;">الرقم قيد التأكيد والتدقيق</span>';
 
   const verificationBadge = d.is_verified
-    ? `<span style="color:var(--gold); font-size:12px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>`
-    : `<span style="color:var(--muted); font-size:11px;" title="جاري جمع وتدقيق البيانات">⏳ جاري جمع البيانات وتدقيقها</span>`;
+    ? `<span style="color:var(--gold); font-size:11.5px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>`
+    : `<span style="color:var(--muted); font-size:11px;" title="جاري جمع وتدقيق البيانات">⏳ قيد التدقيق</span>`;
 
   const rightPhotoHtml = d.photo_url
     ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" loading="lazy">`
     : `<div style="text-align:center; padding:8px;">
-        <div style="font-size:34px; margin-bottom:4px;">${spMeta.icon}</div>
-        <span style="font-size:10.5px; color:var(--muted); font-weight:700; display:block;">${c.label}</span>
+        <div style="font-size:36px; margin-bottom:4px;">${spMeta.icon}</div>
+        <span style="font-size:10.5px; color:var(--muted); font-weight:700; display:block;">${currentLang === 'en' ? c.labelEn : c.label}</span>
       </div>`;
+
+  const waNum = formatWaNumber(d.whatsapp || d.phone);
 
   return `<article data-act="openPage" data-id="${d.id}" class="entity-card ${isPedsDoctor ? 'peds-dignified' : ''}" style="--cat-accent:${isPedsDoctor ? '#f472b6' : c.accent};">
     ${doctorWatermarkHtml}
@@ -1258,19 +1604,22 @@ function card(d) {
               ${spMeta.icon} ${esc(d.spec)}
             </span>
             ${verificationBadge}
+            <span style="font-size:11.5px; color:var(--gold);">★ ${d.rate || 5} (${d.n})</span>
           </div>
 
           <div style="margin-top:9px; font-size:12.5px; color:var(--muted); display:grid; gap:3px;">
             <p>📍 <b style="color:var(--text);">العنوان:</b> ${esc(d.addr)}</p>
-            <p>🕒 <b style="color:var(--text);">مواعيد الفتح:</b> ${esc(d.hours || 'غير معروف')}</p>
+            <p>🕒 <b style="color:var(--text);">المواعيد:</b> ${esc(d.hours || 'غير معروف')}</p>
+            ${d.fee ? `<p>💰 <b style="color:var(--gold);">سعر الكشف:</b> <span style="color:var(--text); font-weight:700;">${esc(d.fee)}</span></p>` : ''}
             <p>📞 <b style="color:var(--text);">الهاتف:</b> ${phoneDisplay}</p>
           </div>
         </div>
 
-        <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between;">
-          <span style="font-size:11.5px; color:var(--gold); font-weight:700;">عرض بطاقة المكان الكاملة ←</span>
+        <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+          <span style="font-size:11.5px; color:var(--gold); font-weight:700;">عرض التفاصيل والتقييمات ←</span>
           <div style="display:flex; gap:6px;">
-            ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()" style="background:var(--emerald); color:#fff; padding:5px 12px; border-radius:9px; font-size:11.5px; font-weight:700;">📞 اتصل</a>` : ''}
+            ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()" style="background:var(--emerald); color:#fff; padding:5px 11px; border-radius:9px; font-size:11.5px; font-weight:700;">📞 اتصل</a>` : ''}
+            ${(waNum && d.is_verified) ? `<a href="https://wa.me/${waNum}" target="_blank" onclick="event.stopPropagation()" style="background:var(--whatsapp); color:#fff; padding:5px 11px; border-radius:9px; font-size:11.5px; font-weight:700;">💬 واتساب</a>` : ''}
           </div>
         </div>
       </div>
@@ -1289,9 +1638,12 @@ function render() {
 
   $('list').innerHTML = res.map(card).join('');
   $('totalCountBadge').textContent = res.length;
-  $('empty').textContent = 'لا توجد نتائج مطابقة لهذا الفلتر.';
+  $('empty').textContent = currentLang === 'en' ? 'No matching results found.' : 'لا توجد نتائج مطابقة لهذا الفلتر.';
   $('empty').classList.toggle('hidden', res.length > 0);
-  $('listTitle').textContent = activeSpec !== 'all' ? SPECS_META[activeSpec].label : (activeCat ? CATS[activeCat].label : 'الدليل الطبي الموثق');
+  const dict = I18N[currentLang] || I18N.ar;
+  $('listTitle').textContent = activeSpec !== 'all'
+    ? (currentLang === 'en' ? SPECS_META[activeSpec].labelEn : SPECS_META[activeSpec].label)
+    : (activeCat ? (currentLang === 'en' ? CATS[activeCat].labelEn : CATS[activeCat].label) : dict.dir_title);
   $('showAll').classList.toggle('hidden', !activeCat && activeSpec === 'all');
   renderCats();
   renderSpecsBar();
@@ -1303,15 +1655,31 @@ function renderPlacePageDOM(id) {
   const c = CATS[d.cat] || CATS.doctor;
   const spMeta = SPECS_META[d.spec_key] || SPECS_META.gastro;
   const u = getCurrentUser();
-  const canManage = adminUnlocked || (u && norm(u.email) === norm(d.owner_email) && d.owner_email);
+  const canManage = adminUnlocked || isUserMasterAdmin(u) || (u && norm(u.email) === norm(d.owner_email) && d.owner_email);
 
   const phoneRowText = (d.phone && d.is_verified)
     ? `📞 ${esc(d.phone)}`
-    : `<span style="color:var(--muted);">لا تتوفر أرقام هواتف معتمدة بعد</span>`;
+    : `<span style="color:var(--muted);">الرقم قيد التأكيد والتدقيق</span>`;
 
   const verificationBadgePage = d.is_verified
     ? `<span style="color:var(--gold); font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>`
     : `<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>`;
+
+  const waNum = formatWaNumber(d.whatsapp || d.phone);
+  const mapSearchLink = d.map_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.name + ' ' + d.addr)}`;
+
+  const reviewsListHtml = (d.reviews && d.reviews.length)
+    ? d.reviews.map(r => `
+      <div class="entity-card" style="padding:12px 16px; border-color:var(--border-soft);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <strong style="font-size:13.5px; color:var(--gold);">👤 ${esc(r.author || 'زائر')}</strong>
+          <span>${stars(r.stars || 5)}</span>
+        </div>
+        <p style="font-size:13px; color:var(--text);">${esc(r.body)}</p>
+        <span style="font-size:10.5px; color:var(--muted);">${esc(r.date || '')}</span>
+      </div>
+    `).join('')
+    : `<p style="font-size:13px; color:var(--muted); text-align:center; padding:18px;">لا توجد تعليقات بعد. كن أول من يشارك تجربته!</p>`;
 
   $('placePageContent').innerHTML = `
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
@@ -1328,10 +1696,10 @@ function renderPlacePageDOM(id) {
 
     <div class="noon-hero-grid">
       <div class="noon-showcase">
-        ${d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" style="width:100%; height:230px; object-fit:cover; border-radius:16px; margin-bottom:10px;">` : `<div style="font-size:54px; margin-bottom:10px;">${spMeta.icon}</div>`}
+        ${d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" style="width:100%; height:230px; object-fit:cover; border-radius:16px; margin-bottom:10px;">` : `<div style="font-size:58px; margin-bottom:10px;">${spMeta.icon}</div>`}
         <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color};">${spMeta.icon} ${esc(d.spec)}</span>
         <h2 class="font-display" style="font-size:22px; margin-top:8px; color:#fff;">${esc(d.name)}</h2>
-        <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">"${esc(d.bio || '')}"</p>
+        <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">"${esc(d.bio || 'صحتك أقرب مما تظن')}"</p>
       </div>
 
       <div>
@@ -1344,28 +1712,78 @@ function renderPlacePageDOM(id) {
         </div>
 
         <h1 class="font-display" style="font-size:26px; margin-top:8px;">${esc(d.name)}</h1>
-        <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+        <div style="margin-top:4px; display:flex; align-items:center; gap:10px;">
           <span>${stars(d.rate || 5)}</span>
-          <span style="font-size:12px; color:var(--muted);">(${d.n} تقييم)</span>
+          <span style="font-size:12.5px; color:var(--gold); font-weight:700;">${d.rate || 5} / 5 (${d.n} تقييم)</span>
+          <button onclick="openReviewModal('${d.id}')" style="background:rgba(217,180,90,0.15); color:var(--gold); border:1px solid var(--border); padding:3px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">+ أضف تقييمك</button>
         </div>
 
         <table class="noon-table">
           <tr><th>حالة التوثيق</th><td>${verificationBadgePage}</td></tr>
           <tr><th>التخصص الدقيق</th><td style="color:${spMeta.color};">${esc(d.spec)}</td></tr>
-          <tr><th>العنوان المؤكد</th><td>📍 ${esc(d.addr)}</td></tr>
-          <tr><th>مواعيد الفتح</th><td>🕒 ${esc(d.hours || 'غير معروف')}</td></tr>
-          <tr><th>رقم الهاتف</th><td>${phoneRowText}</td></tr>
-          <tr><th>آخر تحديث</th><td>📅 ${esc(d.updated_date || '2026-11-07')}</td></tr>
+          ${d.cat === 'doctor' ? `<tr><th>💰 سعر الكشف</th><td style="color:var(--gold);">${esc(d.fee || 'يُحدد بالعيادة')}</td></tr>` : ''}
+          <tr><th>📍 العنوان المؤكد</th><td>${esc(d.addr)}</td></tr>
+          <tr><th>🕒 مواعيد الفتح</th><td>${esc(d.hours || 'غير معروف')}</td></tr>
+          <tr><th>📞 رقم الهاتف</th><td>${phoneRowText}</td></tr>
+          <tr><th>📅 آخر تحديث</th><td>${esc(d.updated_date || '2026-11-08')}</td></tr>
         </table>
 
-        <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:10px; font-weight:700; font-size:13px;">
-          ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:13px; border-radius:14px; text-align:center;">📞 اتصال مباشر</a>` : `<span style="background:rgba(255,255,255,0.05); color:var(--muted); padding:13px; border-radius:14px; text-align:center; font-size:11.5px;">لا يتوفر رقم هاتف معتمد</span>`}
-          <button data-act="share" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border-soft); padding:13px; border-radius:14px;">✨ دعوة صديق للمكان</button>
+        <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; font-weight:700; font-size:13px;">
+          ${(d.phone && d.is_verified) ? `<a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:13px; border-radius:14px; text-align:center;">📞 اتصال مباشر</a>` : ''}
+          ${(waNum && d.is_verified) ? `<a href="https://wa.me/${waNum}" target="_blank" style="background:var(--whatsapp); color:#fff; padding:13px; border-radius:14px; text-align:center;">💬 مراسلة واتساب</a>` : ''}
+          <a href="${esc(mapSearchLink)}" target="_blank" style="background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35); padding:13px; border-radius:14px; text-align:center;">🗺️ الموقع على الخريطة</a>
+          <button data-act="share" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border); color:var(--gold); padding:13px; border-radius:14px;">✨ دعوة صديق للمكان</button>
         </div>
       </div>
     </div>
+
+    <!-- قسم التقييمات والتعليقات -->
+    <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border-soft);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 class="font-display" style="font-size:18px; color:var(--gold);">💬 تقييمات وتجارب الزوار (${d.n})</h3>
+        <button onclick="openReviewModal('${d.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">⭐ إضافة تقييم وتعليق</button>
+      </div>
+      <div style="display:grid; gap:10px;">${reviewsListHtml}</div>
+    </div>
   `;
 }
+
+/* نافذة التقييم بالنجوم */
+function renderStarPicker() {
+  $('starPick').innerHTML = [1,2,3,4,5].map(n => `
+    <button type="button" onclick="setPickedStars(${n})" style="font-size:28px; color:${n <= pickedStars ? '#D9B45A' : '#475569'};">★</button>
+  `).join('');
+}
+window.setPickedStars = n => { pickedStars = n; renderStarPicker(); };
+window.openReviewModal = id => {
+  activeReviewPlaceId = id;
+  pickedStars = 5;
+  renderStarPicker();
+  $('revAuthor').value = '';
+  $('revBody').value = '';
+  $('reviewModal').classList.remove('hidden');
+};
+window.closeReviewModal = () => $('reviewModal').classList.add('hidden');
+
+$('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = $('revBody').value.trim();
+  if (containsDefamation(body)) return toast('🚫 التعليق يحتوي على كلمات غير لائقة');
+  const u = getCurrentUser();
+  const author = $('revAuthor').value.trim() || (u ? u.name : 'زائر');
+  saveLocalReview({
+    id: crypto.randomUUID(),
+    place_id: activeReviewPlaceId,
+    author,
+    stars: pickedStars,
+    body,
+    date: new Date().toISOString().split('T')[0]
+  });
+  closeReviewModal();
+  await load();
+  if (currentViewName === 'placePage') renderPlacePageDOM(activeReviewPlaceId);
+  toast('✔ شكراً لك! تم نشر تقييمك بنجاح');
+});
 
 function openPlacePage(id) {
   if (currentViewName === 'home') {
@@ -1494,7 +1912,7 @@ function renderReferralsHub() {
 
       <div style="display:flex; gap:8px;">
         <input readonly value="${esc(myRefUrl)}" class="input-box" style="font-size:12.5px;">
-        <button onclick="navigator.clipboard.writeText('${esc(myRefUrl)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 18px; border-radius:12px; font-size:13px; white-space:nowrap;">✨ دعوة صديق 📋</button>
+        <button onclick="navigator.clipboard.writeText('${esc(myRefUrl)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 18px; border-radius:12px; font-size:13px; white-space:nowrap;">✨ نسخ الرابط 📋</button>
       </div>
     </div>
 
@@ -1503,7 +1921,7 @@ function renderReferralsHub() {
       <input id="rqTitle" required placeholder="اسم النشاط أو العيادة *" class="input-box">
       <input id="rqType" required placeholder="نوع النشاط *" class="input-box">
       <input id="rqPhone" required placeholder="رقم الهاتف أو الواتساب *" class="input-box">
-      <textarea id="rqDesc" required rows="2" placeholder="تفاصيل الإعلان والعنوان..." class="input-box"></textarea>
+      <textarea id="rqDesc" required rows="2" placeholder="تفاصيل الإعلان والعنوان وسعر الكشف..." class="input-box"></textarea>
       <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">إرسال الطلب للإدارة (${totalRefs} صديق) ✔</button>
     </form>
   `;
@@ -1543,7 +1961,7 @@ function renderAdminList() {
         <span style="font-size:11px; color:var(--gold); font-weight:700;">[${(SPECS_META[p.spec_key]||SPECS_META.gastro).label}]</span>
         <strong style="font-size:15px; margin-right:6px;">${esc(p.name)}</strong>
         <p style="font-size:12px; color:var(--muted); margin-top:2px;">
-          موثق: <b style="color:${p.is_verified ? 'var(--gold)' : 'var(--muted)'};">${p.is_verified ? 'نعم' : 'قيد التدقيق'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b>
+          موثق: <b style="color:${p.is_verified ? 'var(--gold)' : 'var(--muted)'};">${p.is_verified ? 'نعم ✔' : 'قيد التدقيق'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b>
         </p>
       </div>
       <div style="display:flex; gap:6px;">
@@ -1571,15 +1989,18 @@ window.openEditorModal = id => {
   $('edBio').value = existing ? (existing.bio || '') : '';
   $('edPhotoUrl').value = existing ? (existing.photo_url || '') : '';
   $('edAddr').value = existing ? existing.addr : '';
-  $('edIsVerified').checked = existing ? !!existing.is_verified : false;
-  $('edLampMode').value = existing ? (existing.lamp_mode || 'unknown') : 'unknown';
+  $('edFee').value = existing && existing.fee ? existing.fee : '';
+  $('edMapUrl').value = existing && existing.map_url ? existing.map_url : '';
+  $('edIsVerified').checked = existing ? !!existing.is_verified : true;
+  $('edLampMode').value = existing ? (existing.lamp_mode || 'unknown') : 'open';
   $('edHours').value = existing && existing.hours !== 'غير معروف' ? existing.hours : '';
   $('edPhone').value = existing && existing.phone ? existing.phone : '';
+  $('edWhatsapp').value = existing && existing.whatsapp ? existing.whatsapp : (existing && existing.phone ? existing.phone : '');
   $('edOwnerEmail').value = existing && existing.owner_email ? existing.owner_email : '';
   $('edRefCount').value = existing ? (existing.ref_count || 0) : 0;
 
   $('ownerAssignWrap').classList.toggle('hidden', !adminUnlocked);
-  $('editorTitle').textContent = existing ? `تحديث بيانات: ${existing.name}` : 'إضافة صفحة جديدة';
+  $('editorTitle').textContent = existing ? `تحديث بيانات: ${existing.name}` : 'إضافة صفحة / منشأة جديدة';
   $('editorModal').classList.remove('hidden');
 };
 window.closeEditorModal = () => $('editorModal').classList.add('hidden');
@@ -1606,10 +2027,13 @@ $('editorForm').addEventListener('submit', async e => {
     bio_ts: Date.now(),
     photo_url: $('edPhotoUrl').value.trim(),
     addr: $('edAddr').value.trim() || 'غير معروف',
+    fee: $('edFee').value.trim(),
+    map_url: $('edMapUrl').value.trim(),
     is_verified: $('edIsVerified').checked,
     lamp_mode: $('edLampMode').value,
     hours: $('edHours').value.trim() || 'غير معروف',
     phone: $('edPhone').value.trim() || null,
+    whatsapp: $('edWhatsapp').value.trim() || $('edPhone').value.trim() || null,
     owner_email: adminUnlocked ? $('edOwnerEmail').value.trim().toLowerCase() : (existing ? existing.owner_email : ''),
     ref_count: adminUnlocked ? (parseInt($('edRefCount').value, 10) || 0) : (existing ? (existing.ref_count || 0) : 0),
     status: 'approved', updated_date: today
@@ -1621,7 +2045,7 @@ $('editorForm').addEventListener('submit', async e => {
   if (currentViewName === 'placePage') renderPlacePageDOM(id);
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'myManaged') renderManagedAds();
-  toast('✔ تم حفظ التعديلات بنجاح!');
+  toast('✔ تم حفظ ونشر التعديلات فوراً!');
 });
 
 window.deleteAd = async id => {
@@ -1640,12 +2064,23 @@ async function share(id) {
   } catch {}
 }
 
-let big = false;
-const toggleBig = () => { big = !big; document.documentElement.style.fontSize = big ? '18px' : '16px'; toast(big ? 'تم تكبير الخط' : 'الحجم الطبيعي'); };
+let big = localStorage.getItem('cryovion_big_font') === 'true';
+if (big) document.documentElement.style.fontSize = '18px';
+const toggleBig = () => {
+  big = !big;
+  localStorage.setItem('cryovion_big_font', String(big));
+  document.documentElement.style.fontSize = big ? '18px' : '16px';
+  toast(big ? '🔠 تم تكبير الخط' : '🔠 الحجم الطبيعي');
+};
 $('bigText').addEventListener('click', toggleBig);
 $('settingsBigTextBtn').addEventListener('click', toggleBig);
 
-const toggleTheme = () => { document.documentElement.classList.toggle('light'); toast('تم تبديل المظهر'); };
+if (localStorage.getItem('cryovion_theme') === 'light') document.documentElement.classList.add('light');
+const toggleTheme = () => {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('cryovion_theme', isLight ? 'light' : 'dark');
+  toast(isLight ? '☀️ تم تفعيل المظهر الفاتح' : '🌙 تم تفعيل المظهر الداكن');
+};
 $('themeToggleBtn').addEventListener('click', toggleTheme);
 $('quickThemeBtn').addEventListener('click', toggleTheme);
 
@@ -1669,11 +2104,29 @@ document.addEventListener('click', e => {
   else if (a === 'openPage') openPlacePage(id);
 });
 
-if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
-  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* تهيئة Supabase والتحقق التلقائي من جلسة Google OAuth وجدول admins */
+async function initSupabaseSession() {
+  if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    try {
+      const { data: { session } } = await db.auth.getSession();
+      if (session && session.user) {
+        const email = session.user.email;
+        const name = session.user.user_metadata?.full_name || email.split('@')[0];
+        let isAdminInDb = MASTER_ADMIN_EMAILS.includes(email.toLowerCase());
+        try {
+          const { data: adm } = await db.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
+          if (adm) isAdminInDb = true;
+        } catch {}
+        setCurrentUser({ name, email, role: isAdminInDb ? 'مشرف' : 'عضو', is_admin: isAdminInDb, uid: session.user.id });
+      }
+    } catch {}
+  }
 }
+
 history.replaceState({ view: 'home' }, '', '');
-load().then(() => checkIncomingReferral());
+applyLanguage();
+initSupabaseSession().then(() => checkIncomingReferral());
 </script>
 <script src="cryovion-backend.js"></script>
 </body>
