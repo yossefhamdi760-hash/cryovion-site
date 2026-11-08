@@ -2771,5 +2771,70 @@ window.getAvailabilityStatus = function (d) {
   setTimeout(patchUserRole, 500);
 })();
 </script>
+  <style>
+/* شارة التوثيق الذهبية الدائرية بنمط X وفيسبوك */
+.gold-badge-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #0b0f19;
+  border-radius: 50%;
+  margin-right: 6px; /* على يسار الاسم في الواجهة العربية */
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.45);
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.gold-badge-verified svg {
+  width: 10px;
+  height: 10px;
+  stroke: #0b0f19;
+  stroke-width: 3.5;
+  fill: none;
+}
+</style>
+
+<script>
+(function() {
+  // أيقونة الصح داخل الدائرة الذهبية
+  var GOLD_BADGE_HTML = '<span class="gold-badge-verified" title="جهة رسمية موثقة"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
+
+  // 1) استبدال شارة التوثيق في الكروت والصفحات بالشارة الذهبية الجديدة على يسار الاسم
+  function updateBadgesUI() {
+    // تحديث الشارات في عناوين الكروت والصفحات
+    document.querySelectorAll('.is-verified, .verified-badge, [data-verified="true"]').forEach(function(el) {
+      if (!el.dataset.goldified) {
+        el.outerHTML = GOLD_BADGE_HTML;
+      }
+    });
+  }
+
+  // 2) حماية زر تفعيل التوثيق داخل نافذة التعديل (Editor Modal)
+  var _oe = window.openEditorModal;
+  if (_oe) {
+    window.openEditorModal = function(id) {
+      var res = _oe.apply(this, arguments);
+      setTimeout(function() {
+        var vBox = document.getElementById('edVerified') || document.querySelector('input[name="is_verified"]');
+        if (vBox) {
+          var isAdm = typeof isUserMasterAdmin === 'function' ? isUserMasterAdmin() : false;
+          // إذا لم تكن أنت الأدمن، يتم تعطيل خيار التوثيق تماماً وإخفاؤه
+          vBox.disabled = !isAdm;
+          var parentLabel = vBox.closest('label') || vBox.parentElement;
+          if (parentLabel && !isAdm) {
+            parentLabel.style.display = 'none';
+          }
+        }
+      }, 50);
+      return res;
+    };
+  }
+
+  // تشغيل التحديث البصري باستمرار ليتماشى مع التمرير والفلترة
+  setInterval(updateBadgesUI, 800);
+})();
+</script>
 </body>
 </html>
