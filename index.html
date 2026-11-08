@@ -2145,6 +2145,62 @@ history.replaceState({ view: 'home' }, '', '');
 applyLanguage();
 initSupabaseSession().then(() => checkIncomingReferral());
 </script>
-<script src="cryovion-backend.js"></script>
+<script>
+(function () {
+  const ADMIN = 'yossefhamdi760@gmail.com';
+  MASTER_ADMIN_EMAILS.splice(0, MASTER_ADMIN_EMAILS.length, ADMIN);
+  let verifiedEmail = null; // لا يُملأ إلا من جلسة Google الحقيقية
+  adminUnlocked = false;
+
+  window.isUserMasterAdmin = u => !!(u && u.email && verifiedEmail &&
+    verifiedEmail === ADMIN && u.email.trim().toLowerCase() === verifiedEmail);
+  const sync = () => { adminUnlocked = isUserMasterAdmin(getCurrentUser()); };
+
+  // منع غير الأدمن من فتح غرفة الإدارة
+  const _sv = window.switchViewDOM;
+  window.switchViewDOM = function (v, r) { sync(); if (v === 'admin' && !adminUnlocked) v = 'home'; return _sv.call(this, v, r); };
+
+  // إصلاح galleryHtml غير المعرّف + مزامنة الصلاحية
+  const _rp = window.renderPlacePageDOM;
+  window.renderPlacePageDOM = function (id) {
+    sync();
+    const d = places.find(x => x.id === id) || {};
+    window.galleryHtml = (d.gallery && d.gallery.length > 1)
+      ? <div style="display:flex; gap:8px; overflow-x:auto; margin-top:18px;">${d.gallery.map(s => <img src="${esc(s)}" style="width:110px; height:110px; object-fit:cover; border-radius:12px; border:1px solid var(--border);">).join('')}</div>
+      : '';
+    return _rp.call(this, id);
+  };
+  const _oe = window.openEditorModal;
+  window.openEditorModal = function (id) { sync(); return _oe.call(this, id); };
+  const _da = window.deleteAd;
+  window.deleteAd = function (id) { sync(); if (!adminUnlocked) return toast('الحذف للأدمن فقط'); return _da.call(this, id); };
+  $('editorForm').addEventListener('submit', sync, true);
+
+  // Google: دخول حقيقي فقط، بدون prompt يقبل أي إيميل
+  $('googleDirectBtn').addEventListener('click', async e => {
+    e.stopImmediatePropagation();
+    if (!db) return toast('الخدمة غير متاحة حالياً');
+    const { error } = await db.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+    if (error) toast('تعذر الدخول عبر Google');
+  }, true);
+
+  // الجلسة الحقيقية تحدد الأدمن، وتُعاد رسم البيانات دون أن تختفي
+  async function applySession(s) {
+    verifiedEmail = (s && s.user && s.user.email) ? s.user.email.toLowerCase() : null;
+    if (s && s.user) {
+      const e = s.user.email, md = s.user.user_metadata || {};
+      setCurrentUser({ name: md.full_name  md.name  e.split('@')[0], email: e, role: 'عضو',
+        uid: s.user.id, provider: (s.user.app_metadata && s.user.app_metadata.provider) || 'google' });
+    }
+    sync(); refreshUserUI();
+    if (!places.length) await load();
+  }
+  if (db) {
+    db.auth.getSession().then(({ data }) => applySession(data.session));
+    db.auth.onAuthStateChange((_e, s) => setTimeout(() => applySession(s), 0));
+  }
+  refreshUserUI();
+})();
+</script>
 </body>
 </html>
