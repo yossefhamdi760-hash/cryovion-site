@@ -2255,7 +2255,7 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
   setInterval(enforce, 1500);
 })();
 </script>
-  <script>
+<script>
 (function () {
   var DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   var pending = null;
@@ -2497,7 +2497,7 @@ window.getAvailabilityStatus = function (d) {
   recompute(); renderPostersCarousel(); renderSpecsBar();
 })();
 </script>
-  <script>
+<script>
 /* Cryovion: قاعدة بيانات مشتركة (Supabase). تُلصق بعد كل الكتل السابقة وقبل </body> */
 (function () {
   if (!db) { return; }
@@ -2653,73 +2653,49 @@ window.getAvailabilityStatus = function (d) {
   window.load();
 })();
 </script>
- <script>
+<script>
 (function() {
   var _rp = window.renderPlacePageDOM;
   window.renderPlacePageDOM = function(id) {
-    // إيقاف أي قراءة قديمة فور الانتقال لصفحة جديدة
     window.speechSynthesis.cancel();
-
     var html = _rp.call(this, id);
     setTimeout(function() {
       var container = document.querySelector('#placePageContent .entity-card') || document.querySelector('#placePageContent');
       if (container && !document.getElementById('ttsBtn')) {
         var btn = document.createElement('button');
         btn.id = 'ttsBtn';
-        
         function setPlayUI() {
           btn.innerHTML = '🔊 استماع للبيانات';
           btn.style.background = 'rgba(16,185,129,0.15)';
           btn.style.color = 'var(--emerald)';
         }
-
         function setStopUI() {
           btn.innerHTML = '⏹️ إيقاف الصوت';
           btn.style.background = 'rgba(244,63,94,0.18)';
           btn.style.color = 'var(--rose)';
         }
-
         btn.style.cssText = 'padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; margin:10px 0; width:100%; justify-content:center; transition:all 0.2s ease;';
         setPlayUI();
-
         btn.onclick = function() {
-          // إذا كان الصوت يعمل بالفعل، أوقفه فوراً
           if (window.speechSynthesis.speaking) {
             window.speechSynthesis.cancel();
             setPlayUI();
             return;
           }
-
           var place = places.find(function(p) { return p.id === id; });
           if (!place) return;
-
           window.speechSynthesis.cancel();
           var textToRead = "مرحباً بك في " + place.name + ". " + 
                            (place.spec ? "التخصص: " + place.spec + ". " : "") + 
                            (place.bio ? place.bio + ". " : "") + 
                            (place.hours ? "مواعيد العمل: " + place.hours + ". " : "");
-                           
           var msg = new SpeechSynthesisUtterance(textToRead);
           msg.lang = 'ar-SA';
           msg.rate = 0.9;
-
-          // تحويل الزر إلى زر إيقاف بمجرد بدء النطق
-          msg.onstart = function() {
-            setStopUI();
-          };
-
-          // إعادة الزر لشكله الطبيعي عند انتهاء القراءة أو إلغائها
-          msg.onend = function() {
-            setPlayUI();
-          };
-
-          msg.onerror = function() {
-            setPlayUI();
-          };
-
+          msg.onstart = function() { setStopUI(); };
+          msg.onend = msg.onerror = function() { setPlayUI(); };
           window.speechSynthesis.speak(msg);
         };
-
         if (container.firstChild) {
           container.insertBefore(btn, container.firstChild);
         } else {
@@ -2731,19 +2707,16 @@ window.getAvailabilityStatus = function (d) {
   };
 })();
 </script>
-  <script>
+<script>
 (function () {
   var ADMIN = 'yossefhamdi760@gmail.com';
   if (typeof MASTER_ADMIN_EMAILS !== 'undefined') {
     MASTER_ADMIN_EMAILS.splice(0, MASTER_ADMIN_EMAILS.length, ADMIN);
   }
-
-  // فحص مباشر للإيميل لضمان بقاء الصلاحية
   window.isUserMasterAdmin = function (u) {
     if (!u) u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
     return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN);
   };
-
   var ADMIN_IDS = ['dockAdminBtn', 'drawerAdminBtn', 'topAdminShortcut', 'accAdminShortcut'];
   function enforce() {
     var ok = isUserMasterAdmin();
@@ -2753,8 +2726,6 @@ window.getAvailabilityStatus = function (d) {
       if (el) el.classList.toggle('hidden', !ok);
     });
   }
-
-  // ترقية الرتبة إلى مشرف فور قراءة الجلسة
   function patchUserRole() {
     if (typeof getCurrentUser === 'function' && typeof setCurrentUser === 'function') {
       var u = getCurrentUser();
@@ -2765,14 +2736,12 @@ window.getAvailabilityStatus = function (d) {
     }
     enforce();
   }
-
   setInterval(patchUserRole, 1000);
   document.addEventListener('DOMContentLoaded', patchUserRole);
   setTimeout(patchUserRole, 500);
 })();
 </script>
 <style>
-/* شارة التوثيق الذهبية بنمط X */
 .gold-badge-verified {
   display: inline-flex !important;
   align-items: center;
@@ -2793,25 +2762,17 @@ window.getAvailabilityStatus = function (d) {
   stroke-width: 3.5;
   fill: none;
 }
-/* إخفاء أي علامة توثيق قديمة سواء كانت نص أو إيموجي */
 .badge-verified, .verified-tick, span[title*="موثق"] {
   display: none !important;
 }
 </style>
-
 <script>
 (function() {
   var BADGE = '<span class="gold-badge-verified" title="جهة رسمية موثقة"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
-
-  // حقن الشارة بجانب الاسم في الكروت وصفحة التفاصيل
   function applyGoldBadges() {
     if (typeof places === 'undefined') return;
-
-    // فحص كل منشأة موثقة
     places.forEach(function(p) {
       if (!p.is_verified) return;
-
-      // البحث عن كل عنصر يحتوي على اسم المنشأة بالضبط
       document.querySelectorAll('h1, h2, h3, h4, .entity-name, .place-title').forEach(function(el) {
         if (el.textContent.trim().indexOf(p.name) !== -1 && !el.querySelector('.gold-badge-verified')) {
           el.insertAdjacentHTML('beforeend', BADGE);
@@ -2819,8 +2780,6 @@ window.getAvailabilityStatus = function (d) {
       });
     });
   }
-
-  // حصر خيار التوثيق في يد الأدمن فقط داخل المودال
   var _openModal = window.openEditorModal;
   if (_openModal) {
     window.openEditorModal = function(id) {
@@ -2837,92 +2796,7 @@ window.getAvailabilityStatus = function (d) {
       return res;
     };
   }
-
   setInterval(applyGoldBadges, 600);
-})();
-</script>
-  <style>
-/* شارة التوثيق الذهبية */
-.gold-badge-verified {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; margin-inline-start: 6px; vertical-align: middle; flex-shrink: 0;
-  background: linear-gradient(135deg, #FFE27A 0%, #E8B923 55%, #B8860B 100%);
-  border-radius: 50%; box-shadow: 0 0 7px rgba(255, 215, 0, 0.5);
-}
-.gold-badge-verified svg { width: 11px; height: 11px; stroke: #0b0f19; stroke-width: 3.6; fill: none; }
-
-/* إخفاء نصوص التوثيق القديمة في الكروت */
-.entity-card span[title="تمت مراجعة وتأكيد البيانات بنسبة 100%"],
-.entity-card span[title="جاري جمع وتدقيق البيانات"] { display: none !important; }
-</style>
-
-<script>
-(function () {
-  var ADMIN = 'yossefhamdi760@gmail.com';
-  var BADGE = '<span class="gold-badge-verified" title="موثق رسمياً"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
-
-  // الأدمن فقط: إيميلك + دالة الأصل. لا نستخدم adminUnlocked لأنها true افتراضياً في كودك.
-  function isAdmin() {
-    var u = getCurrentUser();
-    return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN && isUserMasterAdmin(u));
-  }
-  function find(id) { return places.find(function (p) { return p.id === id; }); }
-
-  // حقن الشارة في الكروت (للموثق فقط، وتُزال إن زال التوثيق)
-  function inject() {
-    document.querySelectorAll('#list article[data-id]').forEach(function (a) {
-      var p = find(a.dataset.id), h = a.querySelector('h3');
-      if (!h) return;
-      var has = h.querySelector('.gold-badge-verified');
-      if (p && p.is_verified === true) { if (!has) h.insertAdjacentHTML('beforeend', BADGE); }
-      else if (has) has.remove();
-    });
-  }
-  var queued = false;
-  function schedule() {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(function () { queued = false; inject(); });
-  }
-  var list = document.getElementById('list');
-  if (list) new MutationObserver(schedule).observe(list, { childList: true });
-
-  // صفحة التفاصيل: اعتراض الدالة الأصلية
-  var _rp = window.renderPlacePageDOM;
-  if (typeof _rp === 'function') {
-    window.renderPlacePageDOM = function (id) {
-      var r = _rp.apply(this, arguments);
-      var p = find(id), h = document.querySelector('#placePageContent h1');
-      if (h && p && p.is_verified === true && !h.querySelector('.gold-badge-verified')) {
-        h.insertAdjacentHTML('beforeend', BADGE);
-      }
-      return r;
-    };
-  }
-
-  // حماية التوثيق: للأدمن فقط
-  var _oe = window.openEditorModal;
-  if (typeof _oe === 'function') {
-    window.openEditorModal = function (id) {
-      var r = _oe.apply(this, arguments);
-      var chk = document.getElementById('edIsVerified');
-      if (!chk) return r;
-      var wrap = chk.parentElement ? chk.parentElement.parentElement : null;
-      var ex = id ? find(id) : null;
-      if (isAdmin()) {
-        chk.disabled = false;
-        chk.checked = ex ? !!ex.is_verified : true;   // صفحة جديدة: مفعّل للأدمن فقط
-        if (wrap) wrap.classList.remove('hidden');
-      } else {
-        chk.checked = ex ? !!ex.is_verified : false;  // القيمة الحقيقية تُحفظ كما هي
-        chk.disabled = true;
-        if (wrap) wrap.classList.add('hidden');
-      }
-      return r;
-    };
-  }
-
-  inject();
 })();
 </script>
 </body>
