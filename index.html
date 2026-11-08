@@ -2287,7 +2287,7 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
   };
 
   /* ===== 2) النقطة تعمل حسب المواعيد والإجازات ===== */
-  window.getAvailabilityStatus = function (d) {
+window.getAvailabilityStatus = function (d) {
     var en = currentLang === 'en';
     function st(state, color, ar, e) { return { state: state, color: color, label: en ? e : ar }; }
     if (d.lamp_mode === 'open') return st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now');
@@ -2295,7 +2295,7 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
     if (d.lamp_mode === 'auto' && d.sched) {
       var s = d.sched, now = new Date(), off = s.off ? s.off : [];
       if (off.indexOf(now.getDay()) > -1) return st('offline', 'var(--rose)', 'إجازة اليوم', 'Day Off');
-      if (s.h24) return st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now');
+      if (s.h24) return st('online', 'var(--emerald)', 'مفتوح 24 ساعة', 'Open 24h');
       if (s.from && s.to) {
         var m = now.getHours() * 60 + now.getMinutes();
         var f = s.from.split(':'), t = s.to.split(':');
@@ -2304,7 +2304,7 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
         return isOpen ? st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now') : st('offline', 'var(--rose)', 'مغلق الآن', 'Closed Now');
       }
     }
-    return st('unknown', 'var(--muted)', 'المواعيد: غير معروف', 'Hours: Unconfirmed');
+    return st('unknown', 'var(--muted)', 'لم تُفعل من المُفوض', 'Not Configured');
   };
   $('edLampMode').insertAdjacentHTML('afterbegin', '<option value="auto">⏱️ تلقائي حسب المواعيد</option>');
   $('edHours').parentElement.insertAdjacentHTML('afterend',
