@@ -2653,5 +2653,47 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
   window.load();
 })();
 </script>
+  <script>
+(function() {
+  var _rp = window.renderPlacePageDOM;
+  window.renderPlacePageDOM = function(id) {
+    var html = _rp.call(this, id);
+    // تأخير بسيط لضمان تحميل عناصر الصفحة قبل زرع الزر
+    setTimeout(function() {
+      var container = document.querySelector('#placePageContent .entity-card') || document.querySelector('#placePageContent');
+      if (container && !document.getElementById('ttsBtn')) {
+        var btn = document.createElement('button');
+        btn.id = 'ttsBtn';
+        btn.innerHTML = '🔊 استماع للبيانات';
+        btn.style.cssText = 'background:rgba(16,185,129,0.15); color:var(--emerald); padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; margin: 10px 0; width: 100%; justify-content: center;';
+        
+        btn.onclick = function() {
+          var place = places.find(function(p) { return p.id === id; });
+          if (!place) return;
+          
+          window.speechSynthesis.cancel();
+          var textToRead = "مرحباً بك في " + place.name + ". " + 
+                           (place.spec ? "التخصص: " + place.spec + ". " : "") + 
+                           (place.bio ? place.bio + ". " : "") + 
+                           (place.hours ? "مواعيد العمل: " + place.hours + ". " : "");
+                           
+          var msg = new SpeechSynthesisUtterance(textToRead);
+          msg.lang = 'ar-SA';
+          msg.rate = 0.9;
+          window.speechSynthesis.speak(msg);
+        };
+        
+        // وضع الزر في أعلى كارت البيانات
+        if(container.firstChild) {
+            container.insertBefore(btn, container.firstChild);
+        } else {
+            container.appendChild(btn);
+        }
+      }
+    }, 100);
+    return html;
+  };
+})();
+</script>
 </body>
 </html>
