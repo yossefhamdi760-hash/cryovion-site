@@ -7,6 +7,55 @@
 <title>Cryovion | صحتك أقرب مما تظن</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
+  /* 1. ضبط حجم الأيقونة المائية لتظل خلفية ناعمة ولا تكبر */
+.doctor-watermark {
+  position: absolute !important;
+  left: 10px !important;
+  bottom: -8px !important;
+  width: 110px !important;
+  height: 110px !important;
+  max-width: 110px !important;
+  max-height: 110px !important;
+  opacity: 0.08 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* 2. تصحيح أبعاد صور ومربعات بطاقة الهوية */
+.id-card-right-photo {
+  max-width: 140px !important;
+  height: 152px !important;
+  overflow: hidden !important;
+}
+.id-card-right-photo img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* 3. شارة التوثيق الذهبية وعلامة الصح الداكنة */
+.gold-badge-verified {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  margin-inline-start: 6px !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #FFE27A 0%, #E8B923 55%, #B8860B 100%) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.45) !important;
+}
+.gold-badge-verified svg {
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+  stroke: #09131f !important;
+  stroke-width: 3.5 !important;
+  fill: none !important;
+}
 <style>
   :root {
     --bg: #040911; --surface: #09131f; --surface-glass: rgba(9, 19, 31, 0.88);
