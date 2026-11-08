@@ -2731,5 +2731,45 @@ window.getAvailabilityStatus = function (d) {
   };
 })();
 </script>
+  <script>
+(function () {
+  var ADMIN = 'yossefhamdi760@gmail.com';
+  if (typeof MASTER_ADMIN_EMAILS !== 'undefined') {
+    MASTER_ADMIN_EMAILS.splice(0, MASTER_ADMIN_EMAILS.length, ADMIN);
+  }
+
+  // فحص مباشر للإيميل لضمان بقاء الصلاحية
+  window.isUserMasterAdmin = function (u) {
+    if (!u) u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN);
+  };
+
+  var ADMIN_IDS = ['dockAdminBtn', 'drawerAdminBtn', 'topAdminShortcut', 'accAdminShortcut'];
+  function enforce() {
+    var ok = isUserMasterAdmin();
+    window.adminUnlocked = ok;
+    ADMIN_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden', !ok);
+    });
+  }
+
+  // ترقية الرتبة إلى مشرف فور قراءة الجلسة
+  function patchUserRole() {
+    if (typeof getCurrentUser === 'function' && typeof setCurrentUser === 'function') {
+      var u = getCurrentUser();
+      if (u && u.email && u.email.trim().toLowerCase() === ADMIN && u.role !== 'مشرف') {
+        setCurrentUser(Object.assign({}, u, { role: 'مشرف' }));
+        if (typeof refreshUserUI === 'function') refreshUserUI();
+      }
+    }
+    enforce();
+  }
+
+  setInterval(patchUserRole, 1000);
+  document.addEventListener('DOMContentLoaded', patchUserRole);
+  setTimeout(patchUserRole, 500);
+})();
+</script>
 </body>
 </html>
