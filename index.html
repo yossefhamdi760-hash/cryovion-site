@@ -7,56 +7,57 @@
 <title>Cryovion | صحتك أقرب مما تظن</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
-  /* 1. ضبط حجم الأيقونة المائية لتظل خلفية ناعمة ولا تكبر */
-.doctor-watermark {
-  position: absolute !important;
-  left: 10px !important;
-  bottom: -8px !important;
-  width: 110px !important;
-  height: 110px !important;
-  max-width: 110px !important;
-  max-height: 110px !important;
-  opacity: 0.08 !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
-}
-
-/* 2. تصحيح أبعاد صور ومربعات بطاقة الهوية */
-.id-card-right-photo {
-  max-width: 140px !important;
-  height: 152px !important;
-  overflow: hidden !important;
-}
-.id-card-right-photo img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-
-/* 3. شارة التوثيق الذهبية وعلامة الصح الداكنة */
-.gold-badge-verified {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  margin-inline-start: 6px !important;
-  vertical-align: middle !important;
-  flex-shrink: 0 !important;
-  background: linear-gradient(135deg, #FFE27A 0%, #E8B923 55%, #B8860B 100%) !important;
-  border-radius: 50% !important;
-  box-shadow: 0 0 6px rgba(255, 215, 0, 0.45) !important;
-}
-.gold-badge-verified svg {
-  display: block !important;
-  width: 11px !important;
-  height: 11px !important;
-  stroke: #09131f !important;
-  stroke-width: 3.5 !important;
-  fill: none !important;
-}
 <style>
+  /* 1. ضبط حجم الأيقونة المائية لتظل خلفية ناعمة ولا تكبر */
+  .doctor-watermark {
+    position: absolute !important;
+    left: 10px !important;
+    bottom: -8px !important;
+    width: 110px !important;
+    height: 110px !important;
+    max-width: 110px !important;
+    max-height: 110px !important;
+    opacity: 0.08 !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+
+  /* 2. تصحيح أبعاد صور ومربعات بطاقة الهوية */
+  .id-card-right-photo {
+    max-width: 140px !important;
+    height: 152px !important;
+    overflow: hidden !important;
+  }
+  .id-card-right-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* 3. شارة التوثيق الذهبية وعلامة الصح الداكنة */
+  .gold-badge-verified {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    margin-inline-start: 6px !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+    background: linear-gradient(135deg, #FFE27A 0%, #E8B923 55%, #B8860B 100%) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.45) !important;
+  }
+  .gold-badge-verified svg {
+    display: block !important;
+    width: 11px !important;
+    height: 11px !important;
+    stroke: #09131f !important;
+    stroke-width: 3.5 !important;
+    fill: none !important;
+  }
+
   :root {
     --bg: #040911; --surface: #09131f; --surface-glass: rgba(9, 19, 31, 0.88);
     --card: #0f1c2e; --card-hover: #15263d; --border: rgba(217, 180, 90, 0.26);
@@ -164,15 +165,6 @@
   .badge-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 99px; font-size: 11.5px; font-weight: 700; }
   .gold-bg { background: linear-gradient(135deg, #F6E29A 0%, #D9B45A 55%, #9B7119 100%); color: #050811; font-weight: 700; }
   .toast-box { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 200; padding: 11px 20px; border-radius: 14px; font-weight: 700; font-size: 13px; max-width: 90vw; text-align: center; box-shadow: 0 12px 30px rgba(0,0,0,0.6); }
-
-  /* شارة التوثيق الذهبية الأصيلة */
-  .gold-badge-verified {
-    display: inline-flex !important; align-items: center; justify-content: center;
-    width: 18px; height: 18px; margin-inline-start: 6px; vertical-align: middle; flex-shrink: 0;
-    background: linear-gradient(135deg, #FFE27A 0%, #E8B923 55%, #B8860B 100%);
-    border-radius: 50%; box-shadow: 0 0 7px rgba(255, 215, 0, 0.5);
-  }
-  .gold-badge-verified svg { width: 11px; height: 11px; stroke: #0b0f19; stroke-width: 3.6; fill: none; }
 </style>
 </head>
 <body>
