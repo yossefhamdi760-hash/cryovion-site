@@ -2255,5 +2255,247 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
   setInterval(enforce, 1500);
 })();
 </script>
+  <script>
+(function () {
+  var DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  var pending = null;
+  function or(a, b) { return a ? a : b; }
+  function byId(id) { return places.find(function (x) { return x.id === id; }); }
+  function t12(t) {
+    var p = t.split(':'), h = +p[0], s = h >= 12 ? 'م' : 'ص';
+    h = h % 12; if (h === 0) h = 12;
+    return h + (p[1] === '00' ? '' : ':' + p[1]) + ' ' + s;
+  }
+
+  /* ===== 5) تخصصات جديدة ===== */
+  var NEW = {
+    surgery:   { label: 'الجراحة', labelEn: 'Surgery', icon: '⚕️', color: '#f97316', bg: 'rgba(249,115,22,0.16)' },
+    nutrition: { label: 'التغذية والتخسيس', labelEn: 'Nutrition & Slimming', icon: '🥗', color: '#84cc16', bg: 'rgba(132,204,22,0.16)' },
+    cosmetic:  { label: 'التجميل', labelEn: 'Cosmetic', icon: '💄', color: '#ec4899', bg: 'rgba(236,72,153,0.16)' },
+    laser:     { label: 'الليزر', labelEn: 'Laser', icon: '🔆', color: '#facc15', bg: 'rgba(250,204,21,0.16)' }
+  };
+  Object.keys(NEW).forEach(function (k) { SPECS_META[k] = NEW[k]; });
+  $('edSpecKey').insertAdjacentHTML('beforeend',
+    '<option value="surgery">⚕️ الجراحة</option><option value="nutrition">🥗 التغذية والتخسيس</option>' +
+    '<option value="cosmetic">💄 التجميل</option><option value="laser">🔆 الليزر</option>');
+  window.renderSpecsBar = function () {
+    var list = ['all','peds','gastro','obgyn','neuro','ortho','surgery','dental','eye','ent','cardio','physio','nutrition','cosmetic','laser','pharmacy','lab'];
+    $('specsBar').innerHTML = list.map(function (k) {
+      var s = SPECS_META[k]; if (!s) return '';
+      return '<button data-spec="' + k + '" class="spec-chip ' + (activeSpec === k ? 'active' : '') + '"><span style="font-size:15px;">' + s.icon + '</span><span>' + (currentLang === 'en' ? s.labelEn : s.label) + '</span></button>';
+    }).join('');
+  };
+
+  /* ===== 2) النقطة تعمل حسب المواعيد والإجازات ===== */
+  window.getAvailabilityStatus = function (d) {
+    var en = currentLang === 'en';
+    function st(state, color, ar, e) { return { state: state, color: color, label: en ? e : ar }; }
+    if (d.lamp_mode === 'open') return st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now');
+    if (d.lamp_mode === 'closed') return st('offline', 'var(--rose)', 'مغلق الآن', 'Closed Now');
+    if (d.lamp_mode === 'auto' && d.sched) {
+      var s = d.sched, now = new Date(), off = s.off ? s.off : [];
+      if (off.indexOf(now.getDay()) > -1) return st('offline', 'var(--rose)', 'إجازة اليوم', 'Day Off');
+      if (s.h24) return st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now');
+      if (s.from && s.to) {
+        var m = now.getHours() * 60 + now.getMinutes();
+        var f = s.from.split(':'), t = s.to.split(':');
+        var a = +f[0] * 60 + +f[1], b = +t[0] * 60 + +t[1];
+        var isOpen = a <= b ? (m >= a && m < b) : (m >= a || m < b);
+        return isOpen ? st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now') : st('offline', 'var(--rose)', 'مغلق الآن', 'Closed Now');
+      }
+    }
+    return st('unknown', 'var(--muted)', 'المواعيد: غير معروف', 'Hours: Unconfirmed');
+  };
+  $('edLampMode').insertAdjacentHTML('afterbegin', '<option value="auto">⏱️ تلقائي حسب المواعيد</option>');
+  $('edHours').parentElement.insertAdjacentHTML('afterend',
+    '<div style="display:grid; gap:8px;">' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
+    '<label style="font-size:11px; color:var(--muted);">من الساعة<input id="edFrom" type="time" class="input-box"></label>' +
+    '<label style="font-size:11px; color:var(--muted);">إلى الساعة<input id="edTo" type="time" class="input-box"></label></div>' +
+    '<label style="font-size:12px; display:flex; gap:6px; align-items:center;"><input type="checkbox" id="edH24"> مفتوح 24 ساعة</label>' +
+    '<div style="font-size:11px; color:var(--emerald); font-weight:700;">أيام الإجازة (تظهر مغلق تلقائياً):</div>' +
+    '<div style="display:flex; flex-wrap:wrap; gap:8px;">' +
+    DAYS.map(function (n, i) { return '<label style="font-size:12px; display:inline-flex; gap:4px; align-items:center;"><input type="checkbox" class="offd" value="' + i + '">' + n + '</label>'; }).join('') +
+    '</div><p style="font-size:11px; color:var(--muted);">اختر "تلقائي حسب المواعيد" في القائمة أعلاه لتعمل النقطة بالوقت. إن تركت المواعيد فارغة تبقى "غير معروف".</p></div>');
+
+  $('editorForm').addEventListener('submit', function () {
+    var off = [];
+    document.querySelectorAll('.offd').forEach(function (c) { if (c.checked) off.push(+c.value); });
+    pending = { from: $('edFrom').value, to: $('edTo').value, h24: $('edH24').checked, off: off };
+    if (!$('edHours').value.trim()) {
+      if (pending.h24) $('edHours').value = '24 ساعة';
+      else if (pending.from && pending.to) $('edHours').value = 'من ' + t12(pending.from) + ' إلى ' + t12(pending.to);
+    }
+    setTimeout(function () { pending = null; }, 0);
+  }, true);
+
+  var _sc = window.saveCustomOverride;
+  window.saveCustomOverride = function (item) {
+    if (pending && item && !item.deleted) { item.sched = pending; pending = null; }
+    return _sc.call(this, item);
+  };
+
+  var _oe = window.openEditorModal;
+  window.openEditorModal = function (id) {
+    _oe.call(this, id);
+    var p = id ? byId(id) : null, s = (p && p.sched) ? p.sched : {};
+    $('edFrom').value = or(s.from, ''); $('edTo').value = or(s.to, ''); $('edH24').checked = !!s.h24;
+    document.querySelectorAll('.offd').forEach(function (c) { c.checked = (s.off ? s.off : []).indexOf(+c.value) > -1; });
+    if (!p) $('edLampMode').value = 'auto';
+    $('edIsVerified').parentElement.parentElement.classList.toggle('hidden', !adminUnlocked);
+  };
+
+  window.quickToggleLamp = async function (id) {
+    var p = byId(id); if (!p) return;
+    var order = ['auto', 'open', 'closed', 'unknown'];
+    var nx = order[(order.indexOf(p.lamp_mode) + 1) % 4];
+    saveCustomOverride(Object.assign({}, p, { lamp_mode: nx }));
+    await load(); renderManagedAds();
+    toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ غير معروف' }[nx]);
+  };
+
+  function recompute() {
+    places.forEach(function (p) { var a = getAvailabilityStatus(p); p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color; });
+    if (currentViewName === 'home') render();
+  }
+  setInterval(recompute, 60000);
+
+  /* ===== 1) ظهور رقم الهاتف في البطاقة والصفحة والإعلان ===== */
+  var _card = window.card;
+  window.card = function (d) {
+    if (d.phone && !d.is_verified) {
+      var h = _card.call(this, Object.assign({}, d, { is_verified: true }));
+      return h.replace(/<span style="color:var\(--gold\); font-size:11\.5px; font-weight:700;"[^>]*>✔ موثق ورسمي<\/span>/, '<span style="color:var(--muted); font-size:11px;">⏳ قيد التدقيق</span>');
+    }
+    return _card.call(this, d);
+  };
+  var _rp = window.renderPlacePageDOM;
+  window.renderPlacePageDOM = function (id) {
+    var p = byId(id), was = p ? p.is_verified : true, fake = p && p.phone && !was;
+    if (fake) p.is_verified = true;
+    var r = _rp.call(this, id);
+    if (fake) {
+      p.is_verified = was;
+      var td = document.querySelector('#placePageContent .noon-table td');
+      if (td) td.innerHTML = '<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>';
+    }
+    return r;
+  };
+
+  /* ===== 4) حالة المطوّر Cryovion + شريط الحالات برقم الهاتف ===== */
+  function getDev() { try { return JSON.parse(localStorage.getItem('cryovion_dev_status')); } catch (e) { return null; } }
+  window.renderPostersCarousel = function () {
+    var track = $('posterTrack'); if (!track) return;
+    var now = Date.now(), day = 86400000, html = '', dev = getDev();
+    if (dev && now - dev.ts <= day) {
+      html += '<div class="poster-card" style="border-color:var(--gold); cursor:default;"><div class="poster-top-quarter">' +
+        '<div style="display:flex; align-items:center; gap:7px;"><span class="brand-mark gold-bg" style="width:28px; height:28px; border-radius:8px; font-size:14px;">C</span>' +
+        '<span class="brand-text font-display" style="font-size:18px;">Cryovion</span></div>' +
+        '<span class="badge-pill gold-bg" style="font-size:10px; padding:2px 9px;">✔ تحديث رسمي</span></div>' +
+        '<div class="poster-bio-body">' + esc(dev.text) + '</div></div>';
+    }
+    places.forEach(function (d) {
+      if (!d.bio) return;
+      if (d.bio_ts && now - d.bio_ts > day) return;
+      var sp = SPECS_META[d.spec_key] ? SPECS_META[d.spec_key] : SPECS_META.gastro;
+      var thumb = d.photo_url ? '<img src="' + esc(d.photo_url) + '" class="poster-mini-thumb" alt="">' : '<span class="poster-mini-thumb t-' + d.cat + '">' + sp.icon + '</span>';
+      var wa = formatWaNumber(or(d.whatsapp, d.phone)), foot = '';
+      if (d.phone) {
+        foot = '<div style="display:flex; gap:6px; padding-top:6px;"><a href="tel:' + esc(d.phone) + '" style="background:var(--emerald); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">📞 ' + esc(d.phone) + '</a>' +
+          (wa ? '<a href="https://wa.me/' + wa + '" target="_blank" style="background:var(--whatsapp); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">💬</a>' : '') + '</div>';
+      }
+      html += '<div data-act="openPage" data-id="' + d.id + '" class="poster-card"><div class="poster-top-quarter">' +
+        '<div style="display:flex; align-items:center; gap:7px; min-width:0;">' + thumb + '<span style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + esc(d.name) + '</span></div>' +
+        '<span style="display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; color:' + d.avail_color + '; flex-shrink:0;"><span class="status-dot ' + d.avail_state + '"></span><span>' + esc(d.avail_label) + '</span></span></div>' +
+        '<div class="poster-bio-body">' + esc(d.bio) + '</div>' + foot + '</div>';
+    });
+    track.innerHTML = html;
+    clearInterval(posterTimer);
+    posterTimer = setInterval(function () {
+      var mx = track.scrollWidth - track.clientWidth;
+      if (Math.abs(track.scrollLeft) >= mx - 20) track.scrollTo({ left: 0, behavior: 'smooth' });
+      else track.scrollBy({ left: -354, behavior: 'smooth' });
+    }, 4200);
+  };
+
+  // صندوق نشر حالة المطوّر داخل غرفة الإدارة
+  $('adminDashboardContent').insertAdjacentHTML('afterbegin',
+    '<div class="entity-card" style="border-color:var(--gold); display:grid; gap:8px; cursor:default;">' +
+    '<b style="color:var(--gold);">📣 حالة رسمية من Cryovion (تظهر 24 ساعة في الشريط)</b>' +
+    '<textarea id="devText" rows="2" class="input-box" placeholder="تحديث جديد، ميزة، إعلان للمستخدمين..."></textarea>' +
+    '<div style="display:flex; gap:8px;"><button type="button" id="devPub" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر باسم Cryovion ✔</button>' +
+    '<button type="button" id="devDel" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">حذف</button></div></div>');
+  var dv = getDev(); if (dv) $('devText').value = dv.text;
+  $('devPub').addEventListener('click', function () {
+    var t = $('devText').value.trim(); if (!t) return toast('اكتب نص الحالة أولاً');
+    localStorage.setItem('cryovion_dev_status', JSON.stringify({ text: t, ts: Date.now() }));
+    renderPostersCarousel(); toast('✔ تم نشر حالة Cryovion');
+  });
+  $('devDel').addEventListener('click', function () {
+    localStorage.removeItem('cryovion_dev_status'); $('devText').value = ''; renderPostersCarousel(); toast('تم حذف الحالة');
+  });
+
+  // نشر الحالة اليومية مباشرة من "إدارة صفحتي"
+  var _rm = window.renderManagedAds;
+  window.renderManagedAds = function () {
+    _rm.apply(this, arguments);
+    document.querySelectorAll('#managedListBox > .entity-card').forEach(function (el) {
+      var m = el.innerHTML.match(/openEditorModal\('([^']+)'\)/);
+      if (!m || el.querySelector('.qs')) return;
+      var id = m[1], p = byId(id), box = document.createElement('div');
+      box.className = 'qs';
+      box.style.cssText = 'background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:8px;';
+      box.innerHTML = '<b style="font-size:13px; color:var(--gold);">📢 انشر حالتك اليومية (تظهر 24 ساعة)</b>' +
+        '<textarea class="input-box qsText" rows="2" placeholder="مثال: متاح كشف الليلة حتى 9 مساءً..."></textarea>' +
+        '<div style="display:flex; gap:8px;"><button type="button" class="gold-bg qsPub" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة ✔</button>' +
+        '<button type="button" class="qsDel" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">حذف</button></div>';
+      el.appendChild(box);
+      box.querySelector('.qsText').value = p ? or(p.bio, '') : '';
+      function save(text) {
+        var q = byId(id); if (!q) return;
+        if (containsDefamation(text)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
+        saveCustomOverride(Object.assign({}, q, { bio: text, bio_ts: Date.now() }));
+        load().then(function () { renderManagedAds(); toast(text ? '✔ تم نشر حالتك' : 'تم حذف الحالة'); });
+      }
+      box.querySelector('.qsPub').addEventListener('click', function () {
+        var t = box.querySelector('.qsText').value.trim(); if (!t) return toast('اكتب الحالة أولاً'); save(t);
+      });
+      box.querySelector('.qsDel').addEventListener('click', function () { save(''); });
+    });
+  };
+
+  /* ===== 3) تفويض صاحب الصفحة بزر واحد ===== */
+  window.delegatePage = function (id) {
+    var p = byId(id); if (!p) return;
+    var em = prompt('اكتب إيميل صاحب الصفحة لتفويضه بالتحكم الكامل في "' + p.name + '" (اتركه فارغاً لإلغاء التفويض):', or(p.owner_email, ''));
+    if (em === null) return;
+    em = em.trim().toLowerCase();
+    if (em && em.indexOf('@') < 0) return toast('إيميل غير صحيح');
+    saveCustomOverride(Object.assign({}, p, { owner_email: em }));
+    load().then(function () {
+      renderAdminList();
+      if (!em) return toast('تم إلغاء التفويض');
+      var msg = 'تم تفويض إيميلك (' + em + ') للتحكم الكامل بصفحة "' + p.name + '" على Cryovion. سجّل الدخول بهذا الإيميل من ' + location.origin + ' ثم افتح "إدارة صفحتي".';
+      try { navigator.clipboard.writeText(msg); } catch (e) {}
+      toast('✔ تم التفويض ونُسخت رسالة الدعوة لتبعثها له');
+    });
+  };
+  var _ral = window.renderAdminList;
+  window.renderAdminList = function () {
+    _ral.apply(this, arguments);
+    document.querySelectorAll('#adminAllPlacesList > .entity-card').forEach(function (el) {
+      var m = el.innerHTML.match(/openEditorModal\('([^']+)'\)/);
+      if (!m || el.querySelector('.deleg')) return;
+      var b = document.createElement('button');
+      b.className = 'deleg'; b.type = 'button'; b.textContent = '🔑 تفويض';
+      b.style.cssText = 'background:rgba(16,185,129,0.2); color:var(--emerald); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;';
+      b.addEventListener('click', function () { delegatePage(m[1]); });
+      el.lastElementChild.prepend(b);
+    });
+  };
+
+  recompute(); renderPostersCarousel(); renderSpecsBar();
+})();
+</script>
 </body>
 </html>
