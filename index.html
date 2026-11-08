@@ -1,83 +1,57 @@
+History.replaceState({ view: 'home' }, '', '');
+applyLanguage();
+initSupabaseSession().then(function () { checkIncomingReferral(); });
+</script>
+
 <style>
-/* شارة التوثيق الذهبية الفاخرة بنمط X وفيسبوك */
+/* شارة التوثيق الذهبية (دائرية بعلامة صح داكنة) */
 .gold-badge-verified {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  margin-inline-start: 6px;
-  vertical-align: middle;
-  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; margin-inline-start: 6px; vertical-align: middle; flex-shrink: 0;
   background: linear-gradient(135deg, #FFE27A 0%, #E8B923 55%, #B8860B 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 7px rgba(255, 215, 0, 0.5);
+  border-radius: 50%; box-shadow: 0 0 7px rgba(255, 215, 0, 0.5);
 }
-.gold-badge-verified svg {
-  width: 11px;
-  height: 11px;
-  stroke: #0b0f19;
-  stroke-width: 3.6;
-  fill: none;
-}
+.gold-badge-verified svg { width: 11px; height: 11px; stroke: #0b0f19; stroke-width: 3.6; fill: none; }
 </style>
 
 <script>
 /* ======================================================================
-   Cryovion: الطبقة الموحدة النهائية (مصححة بالكامل ومضمونة)
+   Cryovion: طبقة موحدة واحدة فوق السكربت الأصلي (لا تكرار، لا مؤقتات صلاحيات)
    1) الصلاحيات   2) التخصصات والمواعيد   3) العرض (شارة/هاتف/صوت)
    4) الحالات اليومية   5) التفويض   6) قاعدة البيانات   7) الجلسة
    ====================================================================== */
 (function () {
   var ADMIN = 'yossefhamdi760@gmail.com';
   var DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  var BADGE = '<span class="gold-badge-verified" title="جهة رسمية موثقة"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
-  var ADMIN_BTN_IDS = ['dockAdminBtn', 'drawerAdminBtn', 'topAdminShortcut', 'accAdminShortcut'];
+  var BADGE = '<span class="gold-badge-verified" title="موثق رسمياً"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
   var sessEmail = null, pendingSched = null, devStatus = null, refCache = [];
   var q = Promise.resolve(), uploaded = {};
 
   function or(a, b) { return a ? a : b; }
   function byId(id) { return places.find(function (x) { return x.id === id; }); }
   function isAdm() { return isUserMasterAdmin(getCurrentUser()); }
-  
-  // دالة مزامنة صارمة تضمن ظهور أزرار غرفة التحكم للأدمن دائماً
-  function sync() {
-    adminUnlocked = isAdm();
-    ADMIN_BTN_IDS.forEach(function (id) {
-      var el = $(id);
-      if (el) el.classList.toggle('hidden', !adminUnlocked);
-    });
-    return adminUnlocked;
-  }
-
+  function sync() { adminUnlocked = isAdm(); return adminUnlocked; }
   function t12(t) {
     var p = t.split(':'), h = +p[0], s = h >= 12 ? 'م' : 'ص';
     h = h % 12; if (h === 0) h = 12;
     return h + (p[1] === '00' ? '' : ':' + p[1]) + ' ' + s;
   }
 
-  /* ---------- 1) الصلاحيات: تثبيت رتبة المشرف دون سقوط الجلسة ---------- */
+  /* ---------- 1) الصلاحيات: الأدمن = جلسة Google حقيقية بإيميلك فقط ---------- */
   MASTER_ADMIN_EMAILS.splice(0, MASTER_ADMIN_EMAILS.length, ADMIN);
+  adminUnlocked = false;
 
   window.isUserMasterAdmin = function (u) {
-    if (!u) u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-    return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN);
+    return !!(u && u.email && u.verified === true && u.email.trim().toLowerCase() === ADMIN);
   };
 
   var _scu = window.setCurrentUser;
   window.setCurrentUser = function (u) {
-    if (u && u.email) {
-      var cleanEmail = u.email.trim().toLowerCase();
-      if (cleanEmail === ADMIN) {
-        u.role = 'مشرف';
-        u.verified = true;
-      } else if (sessEmail && cleanEmail === sessEmail) {
-        u.verified = true;
-      }
+    if (u && u.email && sessEmail && u.email.toLowerCase() === sessEmail) {
+      u.verified = true;
+      if (sessEmail === ADMIN) u.role = 'مشرف';
     }
-    var res = _scu.call(this, u);
-    sync();
-    return res;
+    return _scu.call(this, u);
   };
 
   var _ru = window.refreshUserUI;
@@ -109,22 +83,19 @@
     laser:     { label: 'الليزر', labelEn: 'Laser', icon: '🔆', color: '#facc15', bg: 'rgba(250,204,21,0.16)' }
   };
   Object.keys(NEW_SPECS).forEach(function (k) { SPECS_META[k] = NEW_SPECS[k]; });
-  if ($('edSpecKey')) {
-    $('edSpecKey').insertAdjacentHTML('beforeend',
-      '<option value="surgery">⚕️ الجراحة</option><option value="nutrition">🥗 التغذية والتخسيس</option>' +
-      '<option value="cosmetic">💄 التجميل</option><option value="laser">🔆 الليزر</option>');
-  }
+  $('edSpecKey').insertAdjacentHTML('beforeend',
+    '<option value="surgery">⚕️ الجراحة</option><option value="nutrition">🥗 التغذية والتخسيس</option>' +
+    '<option value="cosmetic">💄 التجميل</option><option value="laser">🔆 الليزر</option>');
 
   window.renderSpecsBar = function () {
     var list = ['all', 'peds', 'gastro', 'obgyn', 'neuro', 'ortho', 'surgery', 'dental', 'eye', 'ent', 'cardio', 'physio', 'nutrition', 'cosmetic', 'laser', 'pharmacy', 'lab'];
-    if (!$('specsBar')) return;
     $('specsBar').innerHTML = list.map(function (k) {
       var s = SPECS_META[k]; if (!s) return '';
       return '<button data-spec="' + k + '" class="spec-chip ' + (activeSpec === k ? 'active' : '') + '"><span style="font-size:15px;">' + s.icon + '</span><span>' + (currentLang === 'en' ? s.labelEn : s.label) + '</span></button>';
     }).join('');
   };
 
-  /* ---------- 3) حالة النشاط حسب المواعيد والإجازات ---------- */
+  /* ---------- 2) حالة النشاط حسب المواعيد والإجازات ---------- */
   window.getAvailabilityStatus = function (d) {
     var en = currentLang === 'en';
     function st(state, color, ar, e) { return { state: state, color: color, label: en ? e : ar }; }
@@ -145,21 +116,17 @@
     return st('unknown', 'var(--muted)', 'لم تُفعل من المُفوض', 'Not Configured');
   };
 
-  if ($('edLampMode')) {
-    $('edLampMode').insertAdjacentHTML('afterbegin', '<option value="auto">⏱️ تلقائي حسب المواعيد</option>');
-  }
-  if ($('edHours') && $('edHours').parentElement) {
-    $('edHours').parentElement.insertAdjacentHTML('afterend',
-      '<div style="display:grid; gap:8px;">' +
-      '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
-      '<label style="font-size:11px; color:var(--muted);">من الساعة<input id="edFrom" type="time" class="input-box"></label>' +
-      '<label style="font-size:11px; color:var(--muted);">إلى الساعة<input id="edTo" type="time" class="input-box"></label></div>' +
-      '<label style="font-size:12px; display:flex; gap:6px; align-items:center;"><input type="checkbox" id="edH24"> مفتوح 24 ساعة</label>' +
-      '<div style="font-size:11px; color:var(--emerald); font-weight:700;">أيام الإجازة (تظهر مغلق تلقائياً):</div>' +
-      '<div style="display:flex; flex-wrap:wrap; gap:8px;">' +
-      DAYS.map(function (n, i) { return '<label style="font-size:12px; display:inline-flex; gap:4px; align-items:center;"><input type="checkbox" class="offd" value="' + i + '">' + n + '</label>'; }).join('') +
-      '</div><p style="font-size:11px; color:var(--muted);">اختر "تلقائي حسب المواعيد" لتعمل النقطة بالوقت. إن لم تُفعَّل تظهر "لم تُفعل من المُفوض".</p></div>');
-  }
+  $('edLampMode').insertAdjacentHTML('afterbegin', '<option value="auto">⏱️ تلقائي حسب المواعيد</option>');
+  $('edHours').parentElement.insertAdjacentHTML('afterend',
+    '<div style="display:grid; gap:8px;">' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
+    '<label style="font-size:11px; color:var(--muted);">من الساعة<input id="edFrom" type="time" class="input-box"></label>' +
+    '<label style="font-size:11px; color:var(--muted);">إلى الساعة<input id="edTo" type="time" class="input-box"></label></div>' +
+    '<label style="font-size:12px; display:flex; gap:6px; align-items:center;"><input type="checkbox" id="edH24"> مفتوح 24 ساعة</label>' +
+    '<div style="font-size:11px; color:var(--emerald); font-weight:700;">أيام الإجازة (تظهر مغلق تلقائياً):</div>' +
+    '<div style="display:flex; flex-wrap:wrap; gap:8px;">' +
+    DAYS.map(function (n, i) { return '<label style="font-size:12px; display:inline-flex; gap:4px; align-items:center;"><input type="checkbox" class="offd" value="' + i + '">' + n + '</label>'; }).join('') +
+    '</div><p style="font-size:11px; color:var(--muted);">اختر "تلقائي حسب المواعيد" لتعمل النقطة بالوقت. إن لم تُفعَّل تظهر "لم تُفعل من المُفوض".</p></div>');
 
   $('editorForm').addEventListener('submit', function () {
     var off = [];
@@ -177,17 +144,11 @@
     sync();
     _oe.call(this, id);
     var p = id ? byId(id) : null, s = (p && p.sched) ? p.sched : {};
-    if ($('edFrom')) $('edFrom').value = or(s.from, '');
-    if ($('edTo')) $('edTo').value = or(s.to, '');
-    if ($('edH24')) $('edH24').checked = !!s.h24;
+    $('edFrom').value = or(s.from, ''); $('edTo').value = or(s.to, ''); $('edH24').checked = !!s.h24;
     document.querySelectorAll('.offd').forEach(function (c) { c.checked = (s.off ? s.off : []).indexOf(+c.value) > -1; });
-    if (!p && $('edLampMode')) $('edLampMode').value = 'auto';
-    // إخفاء وقفل خيار التوثيق تماماً عن غير الأدمن
-    if ($('edIsVerified')) {
-      $('edIsVerified').disabled = !adminUnlocked;
-      var verBox = $('edIsVerified').closest('label') || $('edIsVerified').parentElement.parentElement;
-      if (verBox) verBox.classList.toggle('hidden', !adminUnlocked);
-    }
+    if (!p) $('edLampMode').value = 'auto';
+    // التوثيق بيد الأدمن فقط: يختفي الخيار عن غيره
+    $('edIsVerified').parentElement.parentElement.classList.toggle('hidden', !adminUnlocked);
   };
 
   window.quickToggleLamp = async function (id) {
@@ -196,32 +157,23 @@
     var nx = order[(order.indexOf(p.lamp_mode) + 1) % 4];
     saveCustomOverride(Object.assign({}, p, { lamp_mode: nx }));
     await load(); renderManagedAds();
-    toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ لم تُفعل من المُفوض' }[nx]);
+    toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ لم تُفعل' }[nx]);
   };
 
   function recompute() {
     places.forEach(function (p) { var a = getAvailabilityStatus(p); p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color; });
     if (currentViewName === 'home') render();
   }
-  setInterval(recompute, 60000);
-  /* ---------- 4) العرض: الشارة الذهبية المضمونة + القراءة الصوتية ---------- */
-  var VER_ON = /<span[^>]*>✔\s*موثق ورسمي<\/span>/g;
+  setInterval(recompute, 60000); // المؤقت الوحيد: تحديث النقطة مع مرور الوقت
+
+  /* ---------- 3) العرض: الهاتف ظاهر دائماً، الشارة للموثق فقط، قراءة صوتية ---------- */
+  var VER_ON = /<span style="color:var\(--gold\); font-size:11\.5px; font-weight:700;"[^>]*>✔ موثق ورسمي<\/span>/;
   var _card = window.card;
   window.card = function (d) {
     var v = !!d.is_verified;
     var h = _card.call(this, Object.assign({}, d, { is_verified: true }));
-    // استبدال النص القديم بعلامة قيد التدقيق لغير الموثق، أو مسحه للموثق لأن الشارة بجانب الاسم تكفي
     h = h.replace(VER_ON, function () { return v ? '' : '<span style="color:var(--muted); font-size:11px;">⏳ قيد التدقيق</span>'; });
-    // حقن الشارة الذهبية بجانب الاسم بأمان مهما كانت بنية الـ HTML
-    if (v && d.name) {
-      var safeName = esc(d.name);
-      var spanTarget = '<span>' + safeName + '</span>';
-      if (h.indexOf(spanTarget) !== -1) {
-        h = h.replace(spanTarget, spanTarget + BADGE);
-      } else {
-        h = h.replace(safeName, safeName + BADGE);
-      }
-    }
+    if (v) h = h.replace('<span>' + esc(d.name) + '</span>', function (m) { return m + BADGE; });
     return h;
   };
 
@@ -229,16 +181,15 @@
     var t = 'مرحباً بك في ' + p.name + '. ';
     if (p.spec) t += 'التخصص: ' + p.spec + '. ';
     if (p.bio) t += p.bio + '. ';
-    if (p.hours && p.hours !== 'غير معروف' && p.hours !== 'لم تُفعل من المُفوض') t += 'مواعيد العمل: ' + p.hours + '. ';
-    if (p.addr && p.addr !== 'غير معروف') t += 'العنوان: ' + p.addr + '. ';
+    if (p.hours && p.hours !== 'غير معروف') t += 'مواعيد العمل: ' + p.hours + '. ';
     return t;
   }
   function ttsButton(p) {
     var b = document.createElement('button');
     b.type = 'button'; b.id = 'ttsBtn';
-    b.style.cssText = 'padding:10px 14px; border-radius:10px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:6px; margin:10px 0; width:100%; justify-content:center; border:1px solid rgba(16,185,129,0.3); cursor:pointer;';
-    function idle() { b.textContent = '🔊 استماع للبيانات الصوتية'; b.style.background = 'rgba(16,185,129,0.15)'; b.style.color = 'var(--emerald)'; }
-    function busy() { b.textContent = '⏹️ إيقاف القراءة الصوتية'; b.style.background = 'rgba(244,63,94,0.18)'; b.style.color = 'var(--rose)'; }
+    b.style.cssText = 'padding:9px 14px; border-radius:10px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:6px; margin:10px 0; width:100%; justify-content:center;';
+    function idle() { b.textContent = '🔊 استماع للبيانات'; b.style.background = 'rgba(16,185,129,0.15)'; b.style.color = 'var(--emerald)'; }
+    function busy() { b.textContent = '⏹️ إيقاف الصوت'; b.style.background = 'rgba(244,63,94,0.18)'; b.style.color = 'var(--rose)'; }
     idle();
     b.addEventListener('click', function () {
       if (!window.speechSynthesis) return toast('المتصفح لا يدعم القراءة الصوتية');
@@ -262,24 +213,21 @@
     window.galleryHtml = g;
     if (p) p.is_verified = true;
     try { _rp.call(this, id); } finally { if (p) p.is_verified = v; }
-    var box = $('placePageContent');
-    if (box) {
-      var h1 = box.querySelector('h1, h2, .place-title'), td = box.querySelector('.noon-table td');
-      if (h1 && v && !h1.querySelector('.gold-badge-verified')) h1.insertAdjacentHTML('beforeend', BADGE);
-      if (td && !v) td.innerHTML = '<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>';
-      if (p && !$('ttsBtn')) box.insertAdjacentElement('afterbegin', ttsButton(p));
-    }
+    var box = $('placePageContent'), h1 = box.querySelector('h1'), td = box.querySelector('.noon-table td');
+    if (h1 && v) h1.insertAdjacentHTML('beforeend', BADGE);
+    if (td && !v) td.innerHTML = '<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>';
+    if (p) box.insertAdjacentElement('afterbegin', ttsButton(p));
   };
 
-  /* ---------- 5) الحالات اليومية + حالة Cryovion الرسمية ---------- */
+  /* ---------- 4) الحالات اليومية + حالة Cryovion الرسمية ---------- */
   window.renderPostersCarousel = function () {
     var track = $('posterTrack'); if (!track) return;
     var now = Date.now(), day = 86400000, html = '';
     if (devStatus && now - devStatus.ts <= day) {
       html += '<div class="poster-card" style="border-color:var(--gold); cursor:default;"><div class="poster-top-quarter">' +
         '<div style="display:flex; align-items:center; gap:7px;"><span class="brand-mark gold-bg" style="width:28px; height:28px; border-radius:8px; font-size:14px;">C</span>' +
-        '<span class="brand-text font-display" style="font-size:18px;">Cryovion</span>' + BADGE + '</div>' +
-        '<span class="badge-pill gold-bg" style="font-size:10px; padding:2px 9px;">تحديث رسمي</span></div>' +
+        '<span class="brand-text font-display" style="font-size:18px;">Cryovion</span></div>' +
+        '<span class="badge-pill gold-bg" style="font-size:10px; padding:2px 9px;">✔ تحديث رسمي</span></div>' +
         '<div class="poster-bio-body">' + esc(devStatus.text) + '</div></div>';
     }
     places.forEach(function (d) {
@@ -306,26 +254,24 @@
     }, 4200);
   };
 
-  if ($('adminDashboardContent') && !$('devText')) {
-    $('adminDashboardContent').insertAdjacentHTML('afterbegin',
-      '<div class="entity-card" style="border-color:var(--gold); display:grid; gap:8px; cursor:default;">' +
-      '<b style="color:var(--gold);">📣 حالة رسمية من Cryovion (تظهر 24 ساعة في الشريط)</b>' +
-      '<textarea id="devText" rows="2" class="input-box" placeholder="تحديث جديد، ميزة، إعلان للمستخدمين..."></textarea>' +
-      '<div style="display:flex; gap:8px;"><button type="button" id="devPub" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر باسم Cryovion ✔</button>' +
-      '<button type="button" id="devDel" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">حذف</button></div></div>');
+  $('adminDashboardContent').insertAdjacentHTML('afterbegin',
+    '<div class="entity-card" style="border-color:var(--gold); display:grid; gap:8px; cursor:default;">' +
+    '<b style="color:var(--gold);">📣 حالة رسمية من Cryovion (تظهر 24 ساعة في الشريط)</b>' +
+    '<textarea id="devText" rows="2" class="input-box" placeholder="تحديث جديد، ميزة، إعلان للمستخدمين..."></textarea>' +
+    '<div style="display:flex; gap:8px;"><button type="button" id="devPub" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر باسم Cryovion ✔</button>' +
+    '<button type="button" id="devDel" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">حذف</button></div></div>');
 
-    $('devPub').addEventListener('click', function () {
-      var t = $('devText').value.trim(); if (!t) return toast('اكتب نص الحالة أولاً');
-      devStatus = { text: t, ts: Date.now() };
-      renderPostersCarousel(); toast('✔ تم نشر حالة Cryovion');
-      if (db) q = q.then(function () { return db.from('site_status').upsert({ id: 1, text: devStatus.text, ts: devStatus.ts }); })
-        .then(function (r) { if (r && r.error) toast('رُفض النشر: ' + r.error.message); }).catch(function () {});
-    });
-    $('devDel').addEventListener('click', function () {
-      devStatus = null; $('devText').value = ''; renderPostersCarousel(); toast('تم حذف الحالة');
-      if (db) q = q.then(function () { return db.from('site_status').delete().eq('id', 1); }).catch(function () {});
-    });
-  }
+  $('devPub').addEventListener('click', function () {
+    var t = $('devText').value.trim(); if (!t) return toast('اكتب نص الحالة أولاً');
+    devStatus = { text: t, ts: Date.now() };
+    renderPostersCarousel(); toast('✔ تم نشر حالة Cryovion');
+    if (db) q = q.then(function () { return db.from('site_status').upsert({ id: 1, text: devStatus.text, ts: devStatus.ts }); })
+      .then(function (r) { if (r && r.error) toast('رُفض النشر: ' + r.error.message); }).catch(function () {});
+  });
+  $('devDel').addEventListener('click', function () {
+    devStatus = null; $('devText').value = ''; renderPostersCarousel(); toast('تم حذف الحالة');
+    if (db) q = q.then(function () { return db.from('site_status').delete().eq('id', 1); }).catch(function () {});
+  });
 
   var _rm = window.renderManagedAds;
   window.renderManagedAds = function () {
@@ -355,7 +301,7 @@
     });
   };
 
-  /* ---------- 6) التفويض (يمنح التوثيق تلقائياً، والأدمن فقط يملكه) ---------- */
+  /* ---------- 5) التفويض (يمنح التوثيق تلقائياً، والأدمن فقط يملكه) ---------- */
   window.delegatePage = function (id) {
     if (!sync()) return toast('التفويض للأدمن فقط');
     var p = byId(id); if (!p) return;
@@ -372,7 +318,6 @@
       toast('✔ تم التفويض والتوثيق ونُسخت رسالة الدعوة لتبعثها له');
     });
   };
-
   var _ral = window.renderAdminList;
   window.renderAdminList = function () {
     _ral.apply(this, arguments);
@@ -387,12 +332,12 @@
     });
   };
 
-  /* ---------- 7) قاعدة البيانات السحابية المشتركة (Supabase) ---------- */
+  /* ---------- 6) قاعدة البيانات المشتركة (Supabase) ---------- */
   var _sco = window.saveCustomOverride;
   window.saveCustomOverride = function (item) {
     if (pendingSched && item && !item.deleted) { item.sched = pendingSched; pendingSched = null; }
     if (!db) { return _sco.call(this, item); }
-    if (!item.deleted && !item.name) return;
+    if (!item.deleted && !item.name) return; // عناصر ناقصة (مثل عدّاد الدعوات) لا تُكتب فوق الصفحة
     var copy = JSON.parse(JSON.stringify(item));
     q = q.then(function () { return dbWrite(copy); }).catch(function (e) { console.error(e); toast('تعذر الحفظ في قاعدة البيانات'); });
   };
@@ -450,7 +395,8 @@
         row.owner_email = it.owner_email ? it.owner_email.toLowerCase() : null;
         row.ref_count = or(it.ref_count, 0);
         row.status = 'approved';
-        res = await db.from('places').upsert(row);
+        res = await db.from('places').update(row).eq('id', it.id).select('id');
+        if (!res.error && (!res.data || !res.data.length)) res = await db.from('places').insert(row);
       } else {
         res = await db.from('places').update(row).eq('id', it.id);
       }
@@ -515,7 +461,7 @@
       if (isAdm()) {
         var rq = await db.from('ad_requests').select('*').order('created_at', { ascending: false });
         refCache = (rq.data ? rq.data : []).map(function (x) { return Object.assign({}, x, { desc: x.description, refs: '—' }); });
-        if ($('devText')) $('devText').value = devStatus ? devStatus.text : '';
+        $('devText').value = devStatus ? devStatus.text : '';
       } else { refCache = []; }
 
       refreshUserUI(); render(); renderPostersCarousel();
@@ -523,27 +469,28 @@
     };
   }
 
-  /* ---------- 8) الجلسة والأزرار ---------- */
-  if ($('googleDirectBtn')) {
-    $('googleDirectBtn').addEventListener('click', async function (e) {
-      e.stopImmediatePropagation();
-      if (!db) return toast('الخدمة غير متاحة حالياً');
-      var res = await db.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
-      if (res.error) toast('تعذر الدخول عبر Google');
-    }, true);
-  }
+  /* ---------- 7) الجلسة: Google حقيقي فقط، وتبقى حتى تنتهي فعلياً ---------- */
+  $('googleDirectBtn').addEventListener('click', async function (e) {
+    e.stopImmediatePropagation();
+    if (!db) return toast('الخدمة غير متاحة حالياً');
+    var res = await db.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+    if (res.error) toast('تعذر الدخول عبر Google');
+  }, true);
 
   async function applySession(s) {
-    sessEmail = (s && s.user && s.user.email) ? s.user.email.trim().toLowerCase() : null;
+    sessEmail = (s && s.user && s.user.email) ? s.user.email.toLowerCase() : null;
     if (s && s.user) {
-      var e = s.user.email.trim().toLowerCase(), md = s.user.user_metadata ? s.user.user_metadata : {};
+      var e = s.user.email, md = s.user.user_metadata ? s.user.user_metadata : {};
       var nm = md.full_name ? md.full_name : (md.name ? md.name : e.split('@')[0]);
-      setCurrentUser({ name: nm, email: e, role: e === ADMIN ? 'مشرف' : 'عضو', uid: s.user.id, provider: 'google', verified: true });
+      setCurrentUser({ name: nm, email: e, role: sessEmail === ADMIN ? 'مشرف' : 'عضو', uid: s.user.id, provider: 'google', verified: true });
+    } else {
+      var u = getCurrentUser();
+      if (u && u.verified) setCurrentUser(null);
     }
-    sync();
     refreshUserUI();
   }
 
+  // الأزرار على الهاتف: لمس + نقر بلا تكرار
   var lastNav = 0;
   function navTap(e) {
     var b = e.target.closest('[data-nav]'); if (!b) return;
