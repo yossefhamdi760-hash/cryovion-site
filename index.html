@@ -2653,24 +2653,46 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
   window.load();
 })();
 </script>
-  <script>
+ <script>
 (function() {
   var _rp = window.renderPlacePageDOM;
   window.renderPlacePageDOM = function(id) {
+    // إيقاف أي قراءة قديمة فور الانتقال لصفحة جديدة
+    window.speechSynthesis.cancel();
+
     var html = _rp.call(this, id);
-    // تأخير بسيط لضمان تحميل عناصر الصفحة قبل زرع الزر
     setTimeout(function() {
       var container = document.querySelector('#placePageContent .entity-card') || document.querySelector('#placePageContent');
       if (container && !document.getElementById('ttsBtn')) {
         var btn = document.createElement('button');
         btn.id = 'ttsBtn';
-        btn.innerHTML = '🔊 استماع للبيانات';
-        btn.style.cssText = 'background:rgba(16,185,129,0.15); color:var(--emerald); padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; margin: 10px 0; width: 100%; justify-content: center;';
         
+        function setPlayUI() {
+          btn.innerHTML = '🔊 استماع للبيانات';
+          btn.style.background = 'rgba(16,185,129,0.15)';
+          btn.style.color = 'var(--emerald)';
+        }
+
+        function setStopUI() {
+          btn.innerHTML = '⏹️ إيقاف الصوت';
+          btn.style.background = 'rgba(244,63,94,0.18)';
+          btn.style.color = 'var(--rose)';
+        }
+
+        btn.style.cssText = 'padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; margin:10px 0; width:100%; justify-content:center; transition:all 0.2s ease;';
+        setPlayUI();
+
         btn.onclick = function() {
+          // إذا كان الصوت يعمل بالفعل، أوقفه فوراً
+          if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            setPlayUI();
+            return;
+          }
+
           var place = places.find(function(p) { return p.id === id; });
           if (!place) return;
-          
+
           window.speechSynthesis.cancel();
           var textToRead = "مرحباً بك في " + place.name + ". " + 
                            (place.spec ? "التخصص: " + place.spec + ". " : "") + 
@@ -2680,14 +2702,28 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
           var msg = new SpeechSynthesisUtterance(textToRead);
           msg.lang = 'ar-SA';
           msg.rate = 0.9;
+
+          // تحويل الزر إلى زر إيقاف بمجرد بدء النطق
+          msg.onstart = function() {
+            setStopUI();
+          };
+
+          // إعادة الزر لشكله الطبيعي عند انتهاء القراءة أو إلغائها
+          msg.onend = function() {
+            setPlayUI();
+          };
+
+          msg.onerror = function() {
+            setPlayUI();
+          };
+
           window.speechSynthesis.speak(msg);
         };
-        
-        // وضع الزر في أعلى كارت البيانات
-        if(container.firstChild) {
-            container.insertBefore(btn, container.firstChild);
+
+        if (container.firstChild) {
+          container.insertBefore(btn, container.firstChild);
         } else {
-            container.appendChild(btn);
+          container.appendChild(btn);
         }
       }
     }, 100);
