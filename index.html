@@ -1432,5 +1432,28 @@ applyLanguage();
 initSupabaseSession().then(() => { checkIncomingReferral(); load(); });
 
 </script>
+  <!-- 1. استعادة ألوان الأقسام (أطباء، صيدليات، معامل) -->
+<style>
+  .t-doctor { background: linear-gradient(145deg, #3b82f6, #1d4ed8) !important; }
+  .t-pharmacy { background: linear-gradient(145deg, #10b981, #047857) !important; }
+  .t-lab { background: linear-gradient(145deg, #a855f7, #6d28d9) !important; }
+</style>
+
+<!-- 2. إصلاح مشكلة زر التوثيق لتسمح لك بإلغائه بسهولة -->
+<script>
+(function() {
+  var _originalOpenModal = window.openEditorModal;
+  window.openEditorModal = function(id) {
+    if (_originalOpenModal) _originalOpenModal(id);
+    
+    // إصلاح حالة علامة الصح فور فتح النافذة
+    var ex = id ? places.find(function(x) { return x.id === id; }) : null;
+    var chk = document.getElementById('edIsVerified');
+    if (chk) {
+      chk.checked = ex ? (ex.is_verified === true) : false;
+    }
+  };
+})();
+</script>
 </body>
 </html>
