@@ -2497,5 +2497,161 @@ initSupabaseSession().then(function () { checkIncomingReferral(); });
   recompute(); renderPostersCarousel(); renderSpecsBar();
 })();
 </script>
+  <script>
+/* Cryovion: قاعدة بيانات مشتركة (Supabase). تُلصق بعد كل الكتل السابقة وقبل </body> */
+(function () {
+  if (!db) { return; }
+  var COLS = 'id,cat,spec_key,name,spec,bio,bio_ts,photo_url,gallery,addr,hours,lamp_mode,sched,phone,whatsapp,fee,map_url,is_verified,ref_count,status,created_at,updated_at';
+  var q = Promise.resolve(), up = {}, refCache = [];
+  function or(a, b) { return a ? a : b; }
+  function isAdm() { return isUserMasterAdmin(getCurrentUser()); }
+  function sess() { return db.auth.getSession().then(function (r) { return r.data.session; }); }
+  function byId(id) { return places.find(function (x) { return x.id === id; }); }
+
+  function compress(url) {
+    return new Promise(function (res, rej) {
+      var i = new Image();
+      i.onload = function () {
+        var k = Math.min(1, 900 / i.width), c = document.createElement('canvas');
+        c.width = i.width * k; c.height = i.height * k;
+        c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+        c.toBlob(function (b) { if (b) res(b); else rej(); }, 'image/jpeg', 0.82);
+      };
+      i.onerror = rej; i.src = url;
+    });
+  }
+  async function pub(src, uid) {
+    if (!src || src.indexOf('data:') !== 0) return src;
+    if (up[src]) return up[src];
+    var blob = await compress(src);
+    var path = uid + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+    var r = await db.storage.from('place-photos').upload(path, blob, { contentType: 'image/jpeg' });
+    if (r.error) throw r.error;
+    up[src] = db.storage.from('place-photos').getPublicUrl(path).data.publicUrl;
+    return up[src];
+  }
+
+  async function dbWrite(it) {
+    var s = await sess();
+    if (!s) { if (getCurrentUser()) toast('انتهت الجلسة، سجّل الدخول عبر Google من جديد'); return; }
+    var admin = isAdm();
+    if (it.deleted) {
+      if (!admin) return;
+      var d = await db.from('places').delete().eq('id', it.id);
+      if (d.error) toast('تعذر الحذف');
+      return;
+    }
+    if (!admin && !byId(it.id)) { toast('إضافة الصفحات للأدمن فقط'); return; }
+    var gal = it.gallery ? it.gallery : [];
+    var row = {
+      id: it.id, cat: it.cat, spec_key: it.spec_key, name: it.name, spec: or(it.spec, ''),
+      bio: or(it.bio, ''), bio_ts: or(it.bio_ts, null), photo_url: await pub(it.photo_url, s.user.id),
+      gallery: await Promise.all(gal.map(function (g) { return pub(g, s.user.id); })),
+      addr: or(it.addr, ''), hours: or(it.hours, 'غير معروف'), lamp_mode: or(it.lamp_mode, 'unknown'),
+      sched: or(it.sched, null), phone: or(it.phone, null), whatsapp: or(it.whatsapp, null),
+      fee: or(it.fee, null), map_url: or(it.map_url, null)
+    };
+    var res;
+    if (admin) {
+      row.is_verified = !!it.is_verified;
+      row.owner_email = it.owner_email ? it.owner_email.toLowerCase() : null;
+      row.ref_count = or(it.ref_count, 0);
+      row.status = 'approved';
+      res = await db.from('places').upsert(row);
+    } else {
+      res = await db.from('places').update(row).eq('id', it.id);
+    }
+    if (res.error) { console.error(res.error); toast('رُفض الحفظ: ليست لديك صلاحية على هذه الصفحة'); }
+  }
+
+  var prev = window.saveCustomOverride;
+  window.saveCustomOverride = function (item) {
+    try { prev.call(this, item); } catch (e) {}
+    try { localStorage.removeItem('cryovion_overrides_v9'); } catch (e) {}
+    var copy = JSON.parse(JSON.stringify(item));
+    q = q.then(function () { return dbWrite(copy); }).catch(function (e) { console.error(e); toast('تعذر الحفظ في قاعدة البيانات'); });
+  };
+
+  window.saveLocalReview = function (rv) {
+    q = q.then(function () {
+      return db.from('reviews').insert({ place_id: rv.place_id, author: rv.author, stars: rv.stars, body: rv.body });
+    }).then(function (r) { if (r && r.error) toast('تعذر نشر التقييم'); }).catch(function () {});
+  };
+
+  window.getRefRequests = function () { return refCache; };
+  window.saveRefRequest = function (rq) {
+    q = q.then(async function () {
+      var s = await sess(); if (!s) return;
+      var r = await db.from('ad_requests').insert({ user_id: s.user.id, user_name: rq.user_name, user_email: s.user.email,
+        title: rq.title, type: rq.type, phone: rq.phone, description: rq.desc });
+      if (r.error) toast('تعذر إرسال الطلب');
+    }).catch(function () {});
+  };
+
+  window.load = async function () {
+    try { await q; } catch (e) {}
+    var rows = [], revs = [], failed = false;
+    var r = await Promise.all([
+      db.from('places').select(COLS).eq('status', 'approved').order('created_at', { ascending: false }),
+      db.from('reviews').select('*').order('created_at', { ascending: false }),
+      db.from('site_status').select('*').eq('id', 1).maybeSingle()
+    ]);
+    if (r[0].error) { failed = true; console.error(r[0].error); } else { rows = r[0].data ? r[0].data : []; }
+    revs = r[1].data ? r[1].data : [];
+    if (r[2].data) localStorage.setItem('cryovion_dev_status', JSON.stringify({ text: r[2].data.text, ts: r[2].data.ts }));
+    else localStorage.removeItem('cryovion_dev_status');
+
+    if (failed) { rows = DEFAULT_DIRECTORY.map(function (x) { return Object.assign({}, x); }); }
+    else if (!rows.length && isAdm()) {
+      rows = DEFAULT_DIRECTORY.map(function (x) { return Object.assign({}, x); });
+      q = q.then(function () { return Promise.all(rows.map(function (x) { return dbWrite(x); })); }).catch(function () {});
+    }
+
+    places = rows.map(function (d) {
+      var rv = revs.filter(function (x) { return x.place_id === d.id; }).map(function (x) {
+        return { author: x.author, stars: x.stars, body: x.body, date: (x.created_at ? x.created_at.slice(0, 10) : '') };
+      });
+      var rated = rv.filter(function (x) { return x.stars > 0; });
+      var o = Object.assign({}, d, {
+        hours: or(d.hours, 'غير معروف'), addr: or(d.addr, 'غير معروف'), bio: or(d.bio, ''),
+        gallery: d.gallery ? d.gallery : [], phone: or(d.phone, null), whatsapp: or(d.whatsapp, null),
+        fee: or(d.fee, ''), map_url: or(d.map_url, ''), reviews: rv, n: rated.length,
+        rate: rated.length ? Math.round(rated.reduce(function (a, x) { return a + x.stars; }, 0) / rated.length * 10) / 10 : 5,
+        updated_date: d.updated_at ? d.updated_at.slice(0, 10) : or(d.updated_date, '')
+      });
+      var a = getAvailabilityStatus(o);
+      o.avail_state = a.state; o.avail_label = a.label; o.avail_color = a.color;
+      return o;
+    });
+
+    var s = await sess();
+    if (s) {
+      var m = await db.rpc('my_places_meta');
+      (m.data ? m.data : []).forEach(function (x) { var p = byId(x.id); if (p) p.owner_email = x.owner_email; });
+    }
+    if (isAdm()) {
+      var rq = await db.from('ad_requests').select('*').order('created_at', { ascending: false });
+      refCache = (rq.data ? rq.data : []).map(function (x) { return Object.assign({}, x, { desc: x.description, refs: '—' }); });
+    } else { refCache = []; }
+
+    refreshUserUI(); render(); renderPostersCarousel();
+    if (currentViewName === 'admin') renderAdminList();
+  };
+
+  // حالة Cryovion الرسمية تُحفظ للجميع
+  var dp = $('devPub'), dd = $('devDel');
+  if (dp) dp.addEventListener('click', function () {
+    var t = $('devText').value.trim(); if (!t) return;
+    q = q.then(function () { return db.from('site_status').upsert({ id: 1, text: t, ts: Date.now() }); })
+      .then(function (r) { if (r && r.error) toast('رُفض النشر: للأدمن فقط'); }).catch(function () {});
+  });
+  if (dd) dd.addEventListener('click', function () {
+    q = q.then(function () { return db.from('site_status').delete().eq('id', 1); }).catch(function () {});
+  });
+
+  db.auth.onAuthStateChange(function () { setTimeout(function () { window.load(); }, 400); });
+  window.load();
+})();
+</script>
 </body>
 </html>
