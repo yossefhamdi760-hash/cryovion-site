@@ -2771,18 +2771,17 @@ window.getAvailabilityStatus = function (d) {
   setTimeout(patchUserRole, 500);
 })();
 </script>
-  <style>
-/* شارة التوثيق الذهبية الدائرية بنمط X وفيسبوك */
+<style>
+/* شارة التوثيق الذهبية بنمط X */
 .gold-badge-verified {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   width: 17px;
   height: 17px;
   background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  color: #0b0f19;
   border-radius: 50%;
-  margin-right: 6px; /* على يسار الاسم في الواجهة العربية */
+  margin-right: 6px;
   box-shadow: 0 0 6px rgba(255, 215, 0, 0.45);
   vertical-align: middle;
   flex-shrink: 0;
@@ -2794,46 +2793,52 @@ window.getAvailabilityStatus = function (d) {
   stroke-width: 3.5;
   fill: none;
 }
+/* إخفاء أي علامة توثيق قديمة سواء كانت نص أو إيموجي */
+.badge-verified, .verified-tick, span[title*="موثق"] {
+  display: none !important;
+}
 </style>
 
 <script>
 (function() {
-  // أيقونة الصح داخل الدائرة الذهبية
-  var GOLD_BADGE_HTML = '<span class="gold-badge-verified" title="جهة رسمية موثقة"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
+  var BADGE = '<span class="gold-badge-verified" title="جهة رسمية موثقة"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
 
-  // 1) استبدال شارة التوثيق في الكروت والصفحات بالشارة الذهبية الجديدة على يسار الاسم
-  function updateBadgesUI() {
-    // تحديث الشارات في عناوين الكروت والصفحات
-    document.querySelectorAll('.is-verified, .verified-badge, [data-verified="true"]').forEach(function(el) {
-      if (!el.dataset.goldified) {
-        el.outerHTML = GOLD_BADGE_HTML;
-      }
+  // حقن الشارة بجانب الاسم في الكروت وصفحة التفاصيل
+  function applyGoldBadges() {
+    if (typeof places === 'undefined') return;
+
+    // فحص كل منشأة موثقة
+    places.forEach(function(p) {
+      if (!p.is_verified) return;
+
+      // البحث عن كل عنصر يحتوي على اسم المنشأة بالضبط
+      document.querySelectorAll('h1, h2, h3, h4, .entity-name, .place-title').forEach(function(el) {
+        if (el.textContent.trim().indexOf(p.name) !== -1 && !el.querySelector('.gold-badge-verified')) {
+          el.insertAdjacentHTML('beforeend', BADGE);
+        }
+      });
     });
   }
 
-  // 2) حماية زر تفعيل التوثيق داخل نافذة التعديل (Editor Modal)
-  var _oe = window.openEditorModal;
-  if (_oe) {
+  // حصر خيار التوثيق في يد الأدمن فقط داخل المودال
+  var _openModal = window.openEditorModal;
+  if (_openModal) {
     window.openEditorModal = function(id) {
-      var res = _oe.apply(this, arguments);
+      var res = _openModal.apply(this, arguments);
       setTimeout(function() {
-        var vBox = document.getElementById('edVerified') || document.querySelector('input[name="is_verified"]');
-        if (vBox) {
+        var chk = document.getElementById('edVerified') || document.querySelector('input[type="checkbox"][id*="verif"]');
+        if (chk) {
           var isAdm = typeof isUserMasterAdmin === 'function' ? isUserMasterAdmin() : false;
-          // إذا لم تكن أنت الأدمن، يتم تعطيل خيار التوثيق تماماً وإخفاؤه
-          vBox.disabled = !isAdm;
-          var parentLabel = vBox.closest('label') || vBox.parentElement;
-          if (parentLabel && !isAdm) {
-            parentLabel.style.display = 'none';
-          }
+          chk.disabled = !isAdm;
+          var parent = chk.closest('label') || chk.parentElement;
+          if (parent && !isAdm) parent.style.display = 'none';
         }
       }, 50);
       return res;
     };
   }
 
-  // تشغيل التحديث البصري باستمرار ليتماشى مع التمرير والفلترة
-  setInterval(updateBadgesUI, 800);
+  setInterval(applyGoldBadges, 600);
 })();
 </script>
 </body>
