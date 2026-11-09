@@ -1697,5 +1697,57 @@ history.replaceState({ view: 'home' }, '', '');
 applyLanguage();
 initSupabaseSession().then(() => checkIncomingReferral());
 </script>
+  <script>
+/* إصلاح شامل للتحكم الكامل في علامة التوثيق (منح / سحب / مربع فارغ افتراضياً) */
+(function () {
+  // 1. السماح لك كأدمن بالتحكم المباشر حتى لو لم تكتمل جلسة OAuth
+  window.isUserMasterAdmin = function (u) {
+    if (!u) u = getCurrentUser();
+    return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN_EMAIL);
+  };
+
+  // 2. إبطال مراقب الإيميل الذي كان يغير علامة التوثيق تلقائياً رغماً عنك
+  var oldOwnerInput = document.getElementById('edOwnerEmail');
+  if (oldOwnerInput && oldOwnerInput.parentNode) {
+    var cleanOwnerInput = oldOwnerInput.cloneNode(true);
+    oldOwnerInput.parentNode.replaceChild(cleanOwnerInput, oldOwnerInput);
+  }
+
+  // 3. جعل مربع التوثيق فارغاً افتراضياً عند الإضافة، ويقرأ الحالة الحقيقية عند التعديل
+  var _origOpenEditor = window.openEditorModal;
+  window.openEditorModal = function (id) {
+    _origOpenEditor(id);
+    var ex = id ? byId(id) : null;
+    var chk = document.getElementById('edIsVerified');
+    var wrap = document.getElementById('verifyWrap');
+    var isAdm = isUserMasterAdmin(getCurrentUser());
+    
+    if (chk) {
+      // فارغ (false) لأي صفحة جديدة، ويطابق الحالة المحفوظة بالضبط للصفحة الموجودة
+      chk.checked = ex ? (ex.is_verified === true) : false;
+      chk.disabled = !isAdm;
+    }
+    if (wrap) {
+      wrap.classList.toggle('hidden', !isAdm);
+    }
+  };
+
+  // 4. إصلاح زر (منح التوثيق / سحب التوثيق) السريع في لوحة الأدمن ليعمل فوراً
+  window.toggleVerify = async function (id) {
+    var p = byId(id);
+    if (!p || !isUserMasterAdmin(getCurrentUser())) return;
+    var nextState = !p.is_verified;
+    p.is_verified = nextState; // تحديث فوري في الذاكرة
+    savePlace(Object.assign({}, p, { is_verified: nextState }));
+    render();
+    renderAdminList();
+    toast(nextState ? '✔ تم منح التوثيق' : 'تم سحب التوثيق');
+    await load();
+    renderAdminList();
+  };
+
+  refreshUserUI();
+})();
+</script>
 </body>
 </html>
