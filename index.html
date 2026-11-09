@@ -2374,5 +2374,78 @@ appReady = true;
 Cryovion.emit('ready');
 initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
 </script>
+  <script>
+(function () {
+  /* 1) إبقاء السطر الأول فقط في الفوتر وإخفاء سطر التنبيه بالنسخ */
+  const foot = document.getElementById('siteFooter');
+  if (foot && foot.children[1]) foot.children[1].remove();
+
+  /* 2) رسم شريط DNA ثلاثي الأبعاد مائل بزاوية القطر ومضيء بالفيروزي والذهبي مثل التصميم الأصلي */
+  const dnaSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 720" fill="none">
+    <defs>
+      <linearGradient id="cHelix1" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.85"/>
+        <stop offset="45%" stop-color="#2dd4bf" stop-opacity="0.95"/>
+        <stop offset="75%" stop-color="#D9B45A" stop-opacity="0.85"/>
+        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.9"/>
+      </linearGradient>
+      <linearGradient id="cHelix2" x1="1" y1="1" x2="0" y2="0">
+        <stop offset="0%" stop-color="#D9B45A" stop-opacity="0.8"/>
+        <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#67e8f9" stop-opacity="0.85"/>
+      </linearGradient>
+      <filter id="cGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+    </defs>
+    <!-- دوران مائل من أسفل اليسار إلى أعلى اليمين كما في بوستر Cryovion -->
+    <g transform="rotate(-28 160 360) translate(10, -40)" filter="url(#cGlow)">
+      <!-- درجات السلم الداخلية (Rungs) -->
+      <g stroke="url(#cHelix1)" stroke-width="2" stroke-linecap="round" opacity="0.55">
+        <line x1="95" y1="70" x2="215" y2="70"/><line x1="112" y1="98" x2="198" y2="98"/>
+        <line x1="112" y1="162" x2="198" y2="162"/><line x1="95" y1="190" x2="215" y2="190"/>
+        <line x1="95" y1="220" x2="215" y2="220"/><line x1="112" y1="248" x2="198" y2="248"/>
+        <line x1="112" y1="312" x2="198" y2="312"/><line x1="95" y1="340" x2="215" y2="340"/>
+        <line x1="95" y1="370" x2="215" y2="370"/><line x1="112" y1="398" x2="198" y2="398"/>
+        <line x1="112" y1="462" x2="198" y2="462"/><line x1="95" y1="490" x2="215" y2="490"/>
+        <line x1="95" y1="520" x2="215" y2="520"/><line x1="112" y1="548" x2="198" y2="548"/>
+        <line x1="112" y1="612" x2="198" y2="612"/><line x1="95" y1="640" x2="215" y2="640"/>
+        <line x1="95" y1="670" x2="215" y2="670"/><line x1="112" y1="698" x2="198" y2="698"/>
+      </g>
+      <!-- الشريط الحلزوني الأول (مزدوج الإطار لإعطاء عمق زجاجي ثلاثي الأبعاد) -->
+      <path d="M80,20 C240,95 70,170 230,245 C70,320 240,395 80,470 C240,545 70,620 230,695 C140,740 100,770 155,800" stroke="url(#cHelix1)" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M80,20 C240,95 70,170 230,245 C70,320 240,395 80,470 C240,545 70,620 230,695 C140,740 100,770 155,800" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>
+      <!-- الشريط الحلزوني الثاني المعاكس -->
+      <path d="M230,20 C70,95 240,170 80,245 C240,320 70,395 230,470 C70,545 240,620 80,695 C170,740 210,770 155,800" stroke="url(#cHelix2)" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M230,20 C70,95 240,170 80,245 C240,320 70,395 230,470 C70,545 240,620 80,695 C170,740 210,770 155,800" stroke="#FFF6C2" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+      <!-- الجزيئات والنقاط المضيئة المتناثرة حول الشريط -->
+      <g fill="#5eead4" opacity="0.85">
+        <circle cx="95" cy="70" r="3"/><circle cx="215" cy="70" r="3" fill="#F6E29A"/>
+        <circle cx="72" cy="120" r="1.8"/><circle cx="238" cy="145" r="2.2" fill="#F6E29A"/>
+        <circle cx="95" cy="190" r="3" fill="#F6E29A"/><circle cx="215" cy="190" r="3"/>
+        <circle cx="95" cy="220" r="3"/><circle cx="215" cy="220" r="3" fill="#F6E29A"/>
+        <circle cx="65" cy="280" r="2"/><circle cx="242" cy="300" r="1.6"/>
+        <circle cx="95" cy="340" r="3" fill="#F6E29A"/><circle cx="215" cy="340" r="3"/>
+        <circle cx="95" cy="370" r="3"/><circle cx="215" cy="370" r="3" fill="#F6E29A"/>
+        <circle cx="70" cy="430" r="2.2" fill="#F6E29A"/><circle cx="235" cy="450" r="1.8"/>
+        <circle cx="95" cy="490" r="3" fill="#F6E29A"/><circle cx="215" cy="490" r="3"/>
+        <circle cx="95" cy="520" r="3"/><circle cx="215" cy="520" r="3" fill="#F6E29A"/>
+        <circle cx="95" cy="640" r="3" fill="#F6E29A"/><circle cx="215" cy="640" r="3"/>
+      </g>
+    </g>
+  </svg>`;
+  const bgUri = 'data:image/svg+xml;utf8,' + encodeURIComponent(dnaSvg);
+  Cryovion.css(`
+    .side-drawer::before {
+      background-image: url("${bgUri}") !important;
+      background-size: 115% auto !important;
+      background-position: center center !important;
+      opacity: 0.28 !important;
+      filter: drop-shadow(0 0 12px rgba(45,212,191,0.35));
+    }
+  `);
+})();
+</script>
 </body>
 </html>
