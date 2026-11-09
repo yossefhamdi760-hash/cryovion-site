@@ -1697,56 +1697,152 @@ history.replaceState({ view: 'home' }, '', '');
 applyLanguage();
 initSupabaseSession().then(() => checkIncomingReferral());
 </script>
-  <script>
-/* إصلاح شامل للتحكم الكامل في علامة التوثيق (منح / سحب / مربع فارغ افتراضياً) */
-(function () {
-  // 1. السماح لك كأدمن بالتحكم المباشر حتى لو لم تكتمل جلسة OAuth
-  window.isUserMasterAdmin = function (u) {
-    if (!u) u = getCurrentUser();
-    return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN_EMAIL);
-  };
+ <!-- =========================================================================
+     حزمة التسريع الصاروخية + شارة التوثيق الزرقاء الفخمة
+     ========================================================================= -->
+<style>
+/* إخفاء الشارات والنصوص القديمة تماماً */
+.badge-verified, .verified-tick, span[title*="موثق"], .gold-badge-verified { display: none !important; }
 
-  // 2. إبطال مراقب الإيميل الذي كان يغير علامة التوثيق تلقائياً رغماً عنك
-  var oldOwnerInput = document.getElementById('edOwnerEmail');
-  if (oldOwnerInput && oldOwnerInput.parentNode) {
-    var cleanOwnerInput = oldOwnerInput.cloneNode(true);
-    oldOwnerInput.parentNode.replaceChild(cleanOwnerInput, oldOwnerInput);
+/* تصميم الشارة الزرقاء الفخمة والرمادية الجديدة */
+.vbadge-new {
+  display: inline-flex !important; align-items: center; justify-content: center;
+  width: 19px; height: 19px; border-radius: 50%;
+  margin-inline-start: 6px; vertical-align: middle; flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.vbadge-new svg { width: 11px; height: 11px; fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 1. الحالة الموثقة (أزرق فخم) */
+.vbadge-new.v-true {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.45);
+}
+.vbadge-new.v-true svg { stroke: #ffffff; }
+
+/* 2. الحالة غير الموثقة (رمادي باهت) */
+.vbadge-new.v-false {
+  background: rgba(148, 163, 184, 0.15);
+  border: 1.5px solid rgba(148, 163, 184, 0.3);
+  box-shadow: none;
+}
+.vbadge-new.v-false svg { stroke: rgba(148, 163, 184, 0.6); }
+
+/* تكبير الشارة في صفحة التفاصيل */
+h1 .vbadge-new, .noon-showcase h2 .vbadge-new { width: 26px; height: 26px; margin-inline-start: 10px; }
+h1 .vbadge-new svg, .noon-showcase h2 .vbadge-new svg { width: 15px; height: 15px; }
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  // 1. دالة بناء الشارة الذكية
+  function getNewBadge(isVerified) {
+    var stateClass = isVerified ? 'v-true' : 'v-false';
+    var titleText = isVerified ? 'جهة موثقة رسمياً' : 'لم يتم توثيق البيانات بعد';
+    return '<span class="vbadge-new ' + stateClass + '" title="' + titleText + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>';
   }
 
-  // 3. جعل مربع التوثيق فارغاً افتراضياً عند الإضافة، ويقرأ الحالة الحقيقية عند التعديل
+  // 2. حقن الشارة في الكروت القديمة (تتجاوز المشاكل السابقة)
+  var _oldCard = window.card;
+  if (_oldCard) {
+    window.card = function(d) {
+      var html = _oldCard.call(this, d);
+      var nameTag = '<span>' + esc(d.name) + '</span>';
+      return html.replace(nameTag, nameTag + getNewBadge(d.is_verified));
+    };
+  }
+
+  // 3. حقن الشارة في صفحة التفاصيل
+  var _oldRenderPage = window.renderPlacePageDOM;
+  if (_oldRenderPage) {
+    window.renderPlacePageDOM = function(id) {
+      var r = _oldRenderPage.call(this, id);
+      var d = places.find(function(x) { return x.id === id; });
+      var h1 = document.querySelector('#placePageContent h1');
+      var h2 = document.querySelector('#placePageContent .noon-showcase h2');
+      if (d) {
+        var badgeHtml = getNewBadge(d.is_verified);
+        if (h1 && !h1.querySelector('.vbadge-new')) h1.insertAdjacentHTML('beforeend', badgeHtml);
+        if (h2 && !h2.querySelector('.vbadge-new')) h2.insertAdjacentHTML('beforeend', badgeHtml);
+      }
+      return r;
+    };
+  }
+
+  // 4. إصلاح المربع في نافذة التعديل (فارغ افتراضياً)
   var _origOpenEditor = window.openEditorModal;
-  window.openEditorModal = function (id) {
-    _origOpenEditor(id);
-    var ex = id ? byId(id) : null;
-    var chk = document.getElementById('edIsVerified');
-    var wrap = document.getElementById('verifyWrap');
-    var isAdm = isUserMasterAdmin(getCurrentUser());
+  if (_origOpenEditor) {
+    window.openEditorModal = function (id) {
+      _origOpenEditor(id);
+      var ex = id ? places.find(function(x){ return x.id === id; }) : null;
+      var chk = document.getElementById('edIsVerified');
+      if (chk) {
+        chk.checked = ex ? (ex.is_verified === true) : false;
+        chk.disabled = !adminUnlocked;
+      }
+    };
+  }
+
+  // 5. حل مشكلة اللاج والبطء المزعج (تسريع صاروخي للبحث)
+  var searchInput = document.getElementById('search');
+  if (searchInput) {
+    var newSearch = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newSearch, searchInput);
+    var searchTimeout;
     
-    if (chk) {
-      // فارغ (false) لأي صفحة جديدة، ويطابق الحالة المحفوظة بالضبط للصفحة الموجودة
-      chk.checked = ex ? (ex.is_verified === true) : false;
-      chk.disabled = !isAdm;
-    }
-    if (wrap) {
-      wrap.classList.toggle('hidden', !isAdm);
-    }
-  };
+    newSearch.addEventListener('input', function(e) {
+      query = e.target.value;
+      var raw = query.trim(), q = norm(raw), box = document.getElementById('searchSuggest');
+      
+      if (!q) { box.classList.add('hidden'); }
+      else {
+        var matches = places.filter(function(d){ return norm(d.name + ' ' + d.spec + ' ' + d.addr).includes(q); }).slice(0, 6);
+        if (matches.length) {
+          box.innerHTML = matches.map(function(m) {
+            var sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
+            return '<div class="auto-item" data-suggest-id="' + m.id + '"><div style="display:flex; align-items:center; gap:10px; min-width:0;">' + orb(m.cat, 34) + '<div style="min-width:0;"><p style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;"><span>' + esc(m.name) + '</span><span class="status-dot ' + m.avail_state + '"></span></p><p style="font-size:11px; color:' + sp.color + ';">' + esc(m.spec) + ' • 📍 ' + esc(m.addr) + '</p></div></div><span class="badge-pill" style="background:' + sp.bg + '; color:' + sp.color + '; flex-shrink:0;">' + sp.icon + ' ' + (currentLang === 'en' ? sp.labelEn : sp.label) + '</span></div>';
+          }).join('');
+          box.classList.remove('hidden');
+        } else {
+          box.innerHTML = '<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق لـ "' + esc(raw) + '"</div>';
+          box.classList.remove('hidden');
+        }
+      }
+      if (currentViewName !== 'home') switchViewDOM('home', false);
+      
+      // هنا يكمن السر: لا نُعيد رسم الكروت كلها مع كل حرف، ننتظر حتى تتوقف عن الكتابة بجزء من الثانية!
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function() { render(); }, 200); 
+    });
+  }
 
-  // 4. إصلاح زر (منح التوثيق / سحب التوثيق) السريع في لوحة الأدمن ليعمل فوراً
-  window.toggleVerify = async function (id) {
-    var p = byId(id);
-    if (!p || !isUserMasterAdmin(getCurrentUser())) return;
-    var nextState = !p.is_verified;
-    p.is_verified = nextState; // تحديث فوري في الذاكرة
-    savePlace(Object.assign({}, p, { is_verified: nextState }));
-    render();
-    renderAdminList();
-    toast(nextState ? '✔ تم منح التوثيق' : 'تم سحب التوثيق');
-    await load();
-    renderAdminList();
-  };
+  // 6. إيقاف التحديث العشوائي القديم الذي كان يستنزف المعالج كل 60 ثانية
+  window.recomputeAllAuto = function() {}; // تعطيل الدالة القديمة الثقيلة
+  
+  // تشغيل تحديث "خفيف وذكي" للمواعيد لا يُرهق الجهاز
+  setInterval(function() {
+    var changed = false;
+    places.forEach(function(p) {
+      var a = getAvailabilityStatus(p);
+      if (p.avail_state !== a.state) {
+        p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color;
+        changed = true;
+      }
+    });
+    // لا يتم إعادة الرسم إلا إذا تغيرت حالة عيادة من مفتوح لمغلق فعلياً
+    if (changed && currentViewName === 'home') render();
+  }, 60000);
 
-  refreshUserUI();
+  // تحديث فوري أخير للواجهة لتطبيق التعديلات الجديدة
+  setTimeout(function() { 
+    render(); 
+    if (currentViewName === 'placePage' && history.state && history.state.placeId) {
+      renderPlacePageDOM(history.state.placeId); 
+    }
+  }, 300);
+
 })();
 </script>
 </body>
