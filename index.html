@@ -5,18 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#041b21">
 <title>Cryovion | صحتك أقرب مما تظن</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://zthcfuxdidfosdidiahz.supabase.co" crossorigin>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700&family=Reem+Kufi:wght@700&display=swap" rel="stylesheet">
 <style>
 /* ================= 1) المتغيرات والألوان ================= */
 :root {
-  --bg:#040911; --surface:#09131f; --surface-glass:rgba(9,19,31,.88); --card:#0f1c2e; --card-hover:#15263d;
+  --bg:#040911; --surface:#09131f; --surface-glass:rgba(9,19,31,.97); --card:#0f1c2e; --card-hover:#15263d;
   --border:rgba(217,180,90,.26); --border-soft:rgba(255,255,255,.08); --text:#f8fafc; --muted:#94a3b8;
   --gold:#D9B45A; --gold-light:#F6E29A; --emerald:#10b981; --whatsapp:#25D366; --teal-glow:#14b8a6;
   --rose:#f43f5e; --blue:#3b82f6; --violet:#a855f7; --radius-lg:24px; --radius-md:16px;
 }
 html.light {
-  --bg:#e2eeec; --surface:#f4f9f8; --surface-glass:rgba(244,249,248,.92); --card:#fff; --card-hover:#f1f5f9;
+  --bg:#e2eeec; --surface:#f4f9f8; --surface-glass:rgba(244,249,248,.97); --card:#fff; --card-hover:#f1f5f9;
   --border:rgba(11,46,58,.18); --border-soft:rgba(11,46,58,.09); --text:#0B2E3A; --muted:#64748b;
 }
 
@@ -25,18 +28,19 @@ html.light {
 html, body {
   background-color:var(--bg); color:var(--text);
   font-family:'IBM Plex Sans Arabic','Plus Jakarta Sans',Tahoma,sans-serif;
-  line-height:1.55; overflow-x:hidden; scroll-behavior:smooth;
+  line-height:1.55; overflow-x:hidden;
 }
 html[dir="ltr"] body { font-family:'Plus Jakarta Sans','IBM Plex Sans Arabic',sans-serif; }
 .font-display { font-family:'Reem Kufi','IBM Plex Sans Arabic',sans-serif; }
 .hidden { display:none !important; }
 button, input, select, textarea { font-family:inherit; color:inherit; border:none; background:none; }
-button { cursor:pointer; transition:all .18s ease; }
+button { cursor:pointer; transition:background-color .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, opacity .15s ease; touch-action:manipulation; }
 a { text-decoration:none; color:inherit; }
 .gold-bg { background:linear-gradient(135deg,#F6E29A 0%,#D9B45A 55%,#9B7119 100%); color:#050811; font-weight:700; }
 .t-doctor { background:linear-gradient(145deg,#3b82f6,#1d4ed8); }
 .t-pharmacy { background:linear-gradient(145deg,#10b981,#047857); }
 .t-lab { background:linear-gradient(145deg,#a855f7,#6d28d9); }
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; animation:none !important; } }
 
 /* ================= 3) الشريط العلوي والشعار ================= */
 .top-ambient-bar { max-width:1260px; margin:0 auto; padding:12px 20px 8px; display:flex; align-items:center; justify-content:space-between; }
@@ -45,15 +49,15 @@ a { text-decoration:none; color:inherit; }
 .brand-text { font-size:24px; font-weight:700; letter-spacing:.8px; background:linear-gradient(135deg,#fff 0%,#D9B45A 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 html.light .brand-text { background:linear-gradient(135deg,#0B2E3A 0%,#8A6718 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .top-ctrl-btn { padding:6px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border-soft); color:var(--gold); font-weight:700; font-size:12.5px; display:inline-flex; align-items:center; gap:5px; }
-.top-ctrl-btn:hover { border-color:var(--gold); transform:translateY(-1px); }
+.top-ctrl-btn:hover { border-color:var(--gold); }
 
 /* ================= 4) شريط الأيقونات الأيمن (Dock) ================= */
-.right-icon-dock { position:fixed; top:50%; right:12px; transform:translateY(-50%); z-index:85; display:flex; flex-direction:column; gap:8px; background:var(--surface-glass); backdrop-filter:blur(16px); padding:8px; border-radius:20px; border:1px solid var(--border); box-shadow:0 15px 35px rgba(0,0,0,.65); }
+.right-icon-dock { position:fixed; top:50%; right:12px; transform:translateY(-50%); z-index:85; display:flex; flex-direction:column; gap:8px; background:var(--surface-glass); padding:8px; border-radius:20px; border:1px solid var(--border); box-shadow:0 8px 20px rgba(0,0,0,.5); }
 html[dir="ltr"] .right-icon-dock { right:auto; left:12px; }
 .dock-item { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:var(--muted); position:relative; background:rgba(255,255,255,.03); border:1px solid transparent; }
-.dock-item:hover { color:var(--gold); background:rgba(217,180,90,.12); border-color:var(--border); transform:scale(1.06); }
+.dock-item:hover { color:var(--gold); background:rgba(217,180,90,.12); border-color:var(--border); }
 .dock-item.active { background:linear-gradient(135deg,#F6E29A 0%,#D9B45A 55%,#9B7119 100%); color:#050811; box-shadow:0 4px 14px rgba(217,180,90,.35); }
-.dock-tooltip { position:absolute; right:calc(100% + 10px); background:var(--card); color:var(--gold); border:1px solid var(--border); padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700; white-space:nowrap; opacity:0; pointer-events:none; transform:translateX(6px); transition:all .18s ease; box-shadow:0 6px 18px rgba(0,0,0,.5); }
+.dock-tooltip { position:absolute; right:calc(100% + 10px); background:var(--card); color:var(--gold); border:1px solid var(--border); padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700; white-space:nowrap; opacity:0; pointer-events:none; transform:translateX(6px); transition:opacity .15s ease, transform .15s ease; }
 html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:translateX(-6px); }
 .dock-item:hover .dock-tooltip { opacity:1; transform:translateX(0); }
 @media (max-width:1024px) {
@@ -62,12 +66,12 @@ html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:tr
 }
 
 /* ================= 5) النافذة الرئيسية ================= */
-.main-window { max-width:1200px; margin:0 auto 80px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 25px 60px -15px rgba(0,0,0,.8); min-height:86vh; position:relative; overflow:hidden; }
-.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border-soft); background:rgba(4,24,30,.78); backdrop-filter:blur(12px); position:sticky; top:0; z-index:40; }
-html.light .window-nav { background:rgba(255,255,255,.88); }
-.menu-trigger { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:12px; background:rgba(15,28,46,.85); border:1px solid var(--border); color:var(--gold); font-weight:700; font-size:13px; }
+.main-window { max-width:1200px; margin:0 auto 80px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 14px 34px -12px rgba(0,0,0,.7); min-height:86vh; position:relative; overflow:hidden; }
+.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border-soft); background:rgba(4,24,30,.97); position:sticky; top:0; z-index:40; }
+html.light .window-nav { background:rgba(255,255,255,.97); }
+.menu-trigger { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:12px; background:rgba(15,28,46,.95); border:1px solid var(--border); color:var(--gold); font-weight:700; font-size:13px; }
 html.light .menu-trigger { background:var(--card); }
-.menu-trigger:hover { border-color:var(--gold-light); transform:translateY(-1px); }
+.menu-trigger:hover { border-color:var(--gold-light); }
 
 /* ================= 6) الواجهة الزمردية والبحث ================= */
 .jevi-hero-stage { position:relative; padding:26px 20px 24px; text-align:center; border-bottom:1px solid rgba(45,212,191,.25); overflow:hidden;
@@ -75,32 +79,32 @@ html.light .menu-trigger { background:var(--card); }
     repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 48px),
     repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 48px);
   box-shadow:inset 0 -24px 40px -15px rgba(4,15,25,.9),inset 0 1px 0 rgba(255,255,255,.2); }
-.jevi-spotlight { position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:540px; height:260px; background:radial-gradient(circle,rgba(94,234,212,.35) 0%,rgba(217,180,90,.12) 45%,transparent 72%); filter:blur(22px); pointer-events:none; z-index:0; }
+.jevi-spotlight { position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:540px; height:260px; background:radial-gradient(circle,rgba(94,234,212,.3) 0%,rgba(217,180,90,.1) 45%,transparent 72%); pointer-events:none; z-index:0; }
 .jevi-3d-emblem { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:240px; height:240px; border-radius:50%; background:radial-gradient(circle at 35% 30%,rgba(45,212,191,.18),rgba(6,78,59,.08) 60%,transparent 75%); border:1px solid rgba(94,234,212,.14); box-shadow:inset 0 0 40px rgba(45,212,191,.15); pointer-events:none; z-index:0; }
 .jevi-hero-content { position:relative; z-index:2; }
-.elegant-slogan { font-size:clamp(26px,3.8vw,38px); font-weight:700; letter-spacing:.4px; margin-bottom:16px; display:inline-flex; align-items:center; gap:10px; text-shadow:0 8px 28px rgba(0,0,0,.65); }
+.elegant-slogan { font-size:clamp(26px,3.8vw,38px); font-weight:700; letter-spacing:.4px; margin-bottom:16px; display:inline-flex; align-items:center; gap:10px; text-shadow:0 4px 14px rgba(0,0,0,.6); }
 .slogan-white { color:#fff; }
 .slogan-gold { background:linear-gradient(135deg,#FFF6C2 0%,#D9B45A 55%,#B8860B 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .ai-search-container { max-width:780px; margin:0 auto; position:relative; z-index:50; }
-.ai-search-box { display:flex; align-items:center; gap:10px; background:rgba(8,22,34,.86); backdrop-filter:blur(12px); border:1.5px solid rgba(94,234,212,.35); border-radius:18px; padding:6px 8px 6px 14px; box-shadow:0 16px 38px -10px rgba(0,0,0,.75),inset 0 1px 1px rgba(255,255,255,.15); }
-.ai-search-box:focus-within { border-color:var(--gold); box-shadow:0 0 28px -4px rgba(20,184,166,.45); }
+.ai-search-box { display:flex; align-items:center; gap:10px; background:rgba(8,22,34,.95); border:1.5px solid rgba(94,234,212,.35); border-radius:18px; padding:6px 8px 6px 14px; box-shadow:0 10px 24px -10px rgba(0,0,0,.75),inset 0 1px 1px rgba(255,255,255,.15); }
+.ai-search-box:focus-within { border-color:var(--gold); box-shadow:0 0 22px -4px rgba(20,184,166,.45); }
 .ai-search-input { flex:1; padding:9px 6px; font-size:15px; color:#fff; outline:none; }
 .ai-search-input::placeholder { color:#94a3b8; }
-.autocomplete-dropdown { position:absolute; top:calc(100% + 6px); right:0; left:0; background:var(--card); border:1px solid var(--gold); border-radius:16px; box-shadow:0 20px 45px rgba(0,0,0,.88); max-height:290px; overflow-y:auto; text-align:start; z-index:80; padding:6px; }
+.autocomplete-dropdown { position:absolute; top:calc(100% + 6px); right:0; left:0; background:var(--card); border:1px solid var(--gold); border-radius:16px; box-shadow:0 14px 30px rgba(0,0,0,.8); max-height:290px; overflow-y:auto; text-align:start; z-index:80; padding:6px; }
 .auto-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; border-bottom:1px solid var(--border-soft); }
 .auto-item:hover { background:var(--card-hover); }
 
 /* ================= 7) الأقسام والتخصصات ================= */
 .cats-modern-bar { max-width:720px; margin:18px auto 0; display:flex; justify-content:center; align-items:center; gap:14px; }
-.cat-orb-pill { display:inline-flex; align-items:center; gap:12px; padding:10px 20px 10px 14px; border-radius:99px; background:rgba(7,20,32,.75); border:1px solid rgba(94,234,212,.28); box-shadow:0 8px 20px -8px rgba(0,0,0,.6); transition:all .2s ease; flex:1; max-width:220px; justify-content:center; color:#fff; }
-.cat-orb-pill:hover { border-color:var(--gold); transform:translateY(-2px); }
-.cat-orb-pill.active { background:linear-gradient(135deg,rgba(217,180,90,.32),rgba(10,30,44,.95)); border:1.5px solid var(--gold); box-shadow:0 0 25px rgba(217,180,90,.25); }
-.orb-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,.35); }
+.cat-orb-pill { display:inline-flex; align-items:center; gap:12px; padding:10px 20px 10px 14px; border-radius:99px; background:rgba(7,20,32,.9); border:1px solid rgba(94,234,212,.28); box-shadow:0 5px 12px -6px rgba(0,0,0,.6); flex:1; max-width:220px; justify-content:center; color:#fff; }
+.cat-orb-pill:hover { border-color:var(--gold); }
+.cat-orb-pill.active { background:linear-gradient(135deg,rgba(217,180,90,.32),rgba(10,30,44,.95)); border:1.5px solid var(--gold); box-shadow:0 0 18px rgba(217,180,90,.25); }
+.orb-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; box-shadow:0 3px 8px rgba(0,0,0,.35); }
 .specs-filter-bar { max-width:1040px; margin:14px auto 0; display:flex; gap:8px; overflow-x:auto; padding:4px 4px 2px; scrollbar-width:none; justify-content:center; flex-wrap:wrap; }
 .specs-filter-bar::-webkit-scrollbar { display:none; }
-.spec-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:99px; font-size:12.5px; font-weight:700; background:rgba(8,22,35,.78); border:1px solid rgba(255,255,255,.14); color:#e2e8f0; white-space:nowrap; transition:all .15s ease; }
-.spec-chip:hover { border-color:var(--gold); color:#fff; transform:translateY(-1px); }
-.spec-chip.active { background:var(--gold); color:#050811; border-color:var(--gold); box-shadow:0 4px 12px rgba(217,180,90,.3); }
+.spec-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:99px; font-size:12.5px; font-weight:700; background:rgba(8,22,35,.9); border:1px solid rgba(255,255,255,.14); color:#e2e8f0; white-space:nowrap; }
+.spec-chip:hover { border-color:var(--gold); color:#fff; }
+.spec-chip.active { background:var(--gold); color:#050811; border-color:var(--gold); box-shadow:0 3px 8px rgba(217,180,90,.3); }
 @media (max-width:640px) {
   .main-window { border-radius:24px 24px 0 0; margin-bottom:70px; border-left:none; border-right:none; }
   .cats-modern-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:100%; }
@@ -111,51 +115,27 @@ html.light .menu-trigger { background:var(--card); }
 
 /* ================= 8) شريط الحالات (24 ساعة) ================= */
 .poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; }
-.poster-track { display:flex; gap:14px; overflow-x:auto; scroll-behavior:smooth; scroll-snap-type:x mandatory; padding:6px 2px 12px; scrollbar-width:none; }
+.poster-track { display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px 2px 12px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
 .poster-track::-webkit-scrollbar { display:none; }
-.poster-card { flex:0 0 340px; scroll-snap-align:start; border-radius:20px; padding:12px 15px; background:linear-gradient(155deg,#132238 0%,#0b1322 100%); border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; height:154px; transition:transform .18s ease,border-color .18s ease; position:relative; }
-.poster-card:hover { transform:translateY(-3px); border-color:var(--gold); }
+.poster-card { flex:0 0 340px; scroll-snap-align:start; border-radius:20px; padding:12px 15px; background:linear-gradient(155deg,#132238 0%,#0b1322 100%); border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; height:154px; transition:border-color .15s ease; position:relative; }
+.poster-card:hover { border-color:var(--gold); }
 .poster-top-quarter { height:28%; min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid rgba(217,180,90,.22); padding-bottom:7px; }
 .poster-mini-thumb { width:28px; height:28px; border-radius:8px; object-fit:cover; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; border:1px solid var(--gold); }
 .poster-bio-body { flex:1; padding-top:8px; font-size:12.5px; color:#e2e8f0; line-height:1.55; overflow-y:auto; scrollbar-width:none; }
 .poster-bio-body::-webkit-scrollbar { display:none; }
 
-/* ================= 9) النقطة المضيئة وشارة التوثيق الذكية ================= */
+/* ================= 9) النقطة المضيئة وشارة التوثيق ================= */
 .status-dot { width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
-.status-dot.online { background:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 10px #10b981; }
+.status-dot.online { background:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 8px #10b981; }
 .status-dot.offline { background:#f43f5e; box-shadow:0 0 0 2px rgba(244,63,94,.2); }
 .status-dot.unknown { background:#94a3b8; box-shadow:0 0 0 2px rgba(148,163,184,.2); }
-
-/* إخفاء نصوص التوثيق القديمة تماماً لعدم التشويش */
-.badge-verified, .verified-tick, span[title*="موثق"], .gold-badge-verified { display: none !important; }
-
-/* تصميم الشارة الزرقاء الملكية والرمادية الباهتة الجديدة */
-.vbadge-smart {
-  display: inline-flex !important; align-items: center; justify-content: center;
-  width: 19px; height: 19px; border-radius: 50%;
-  margin-inline-start: 6px; vertical-align: middle; flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-.vbadge-smart svg { width: 11px; height: 11px; fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
-
-/* حالة موثق (أزرق ملكي) */
-.vbadge-smart.v-true {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.45);
-}
-.vbadge-smart.v-true svg { stroke: #ffffff; }
-
-/* حالة غير موثق (رمادي باهت) */
-.vbadge-smart.v-false {
-  background: rgba(148, 163, 184, 0.15);
-  border: 1.5px solid rgba(148, 163, 184, 0.3);
-  box-shadow: none;
-}
-.vbadge-smart.v-false svg { stroke: rgba(148, 163, 184, 0.6); }
-
-h1 .vbadge-smart, .noon-showcase h2 .vbadge-smart { width: 26px; height: 26px; margin-inline-start: 10px; }
-h1 .vbadge-smart svg, .noon-showcase h2 .vbadge-smart svg { width: 15px; height: 15px; }
-
+/* علامة التوثيق: رمادية دائماً، وتتحول للأزرق عند التوثيق */
+.vbadge { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; margin-inline-start:6px; vertical-align:middle; flex-shrink:0; background:linear-gradient(135deg,#9ca3af 0%,#6b7280 100%); opacity:.8; transition:background .2s ease, box-shadow .2s ease, opacity .2s ease; }
+.vbadge svg { width:11px; height:11px; fill:none; stroke:#fff; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; }
+.vbadge.on { background:linear-gradient(135deg,#60a5fa 0%,#3b82f6 55%,#1d4ed8 100%); box-shadow:0 0 8px rgba(59,130,246,.65); opacity:1; }
+.vbadge.clickable { cursor:pointer; outline:2px dashed rgba(217,180,90,.7); outline-offset:2px; }
+.vbadge.busy { opacity:.5; pointer-events:none; }
+h1 .vbadge, .noon-showcase h2 .vbadge { width:22px; height:22px; }
 /* أزرار الاتصال/واتساب/الخريطة عند غياب البيانات */
 .act-off { background:rgba(148,163,184,.18) !important; color:#94a3b8 !important; border:1px dashed rgba(148,163,184,.45) !important; cursor:not-allowed; }
 
@@ -163,8 +143,8 @@ h1 .vbadge-smart svg, .noon-showcase h2 .vbadge-smart svg { width: 15px; height:
 .content-body { padding:14px 20px 45px; max-width:1160px; margin:0 auto; }
 .cards-grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(480px,1fr)); }
 @media (max-width:640px) { .cards-grid { grid-template-columns:1fr; } }
-.entity-card { background:var(--card); border:1px solid var(--border-soft); border-radius:22px; padding:16px; position:relative; overflow:hidden; cursor:pointer; transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease; }
-.entity-card:hover { transform:translateY(-3px); border-color:var(--border); box-shadow:0 16px 34px -12px rgba(0,0,0,.7); }
+.entity-card { background:var(--card); border:1px solid var(--border-soft); border-radius:22px; padding:16px; position:relative; overflow:hidden; cursor:pointer; transition:border-color .15s ease; content-visibility:auto; contain-intrinsic-size:auto 200px; }
+@media (hover:hover) { .entity-card:hover { border-color:var(--border); } }
 .entity-card.peds-dignified { background:linear-gradient(145deg,#1f1429 0%,#12172a 65%,#191122 100%); border-color:rgba(244,114,182,.28); }
 html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2f8 0%,#fff 100%); }
 .entity-card::before { content:''; position:absolute; top:0; right:0; left:0; height:4px; background:var(--cat-accent,var(--gold)); z-index:3; }
@@ -189,8 +169,8 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
 .noon-table td { padding:11px 14px; font-size:14px; font-weight:700; }
 
 /* ================= 12) القائمة الجانبية والنوافذ ================= */
-.drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); backdrop-filter:blur(4px); z-index:90; }
-.side-drawer { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:86vw; background:var(--surface); border-left:1px solid var(--border); z-index:100; padding:20px; display:flex; flex-direction:column; justify-content:space-between; overflow-y:auto; transform:translateX(100%); transition:transform .24s cubic-bezier(.16,1,.3,1); }
+.drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:90; }
+.side-drawer { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:86vw; background:var(--surface); border-left:1px solid var(--border); z-index:100; padding:20px; display:flex; flex-direction:column; justify-content:space-between; overflow-y:auto; transform:translateX(100%); transition:transform .22s cubic-bezier(.16,1,.3,1); will-change:transform; }
 html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-right:1px solid var(--border); transform:translateX(-100%); }
 .side-drawer.open { transform:translateX(0) !important; }
 .nav-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-radius:14px; font-weight:600; font-size:14px; color:var(--text); margin-bottom:6px; text-align:start; }
@@ -199,12 +179,12 @@ html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-righ
 .nav-btn:hover { background:rgba(255,255,255,.06); }
 .nav-btn.active { background:rgba(217,180,90,.15); color:var(--gold); border:1px solid var(--border); }
 .nav-btn.active .nav-icon-box { background:var(--gold); color:#050811; border-color:var(--gold); }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.78); backdrop-filter:blur(5px); z-index:120; display:flex; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:120; display:flex; align-items:center; justify-content:center; padding:16px; }
 .modal-box { width:100%; max-width:620px; max-height:92vh; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:22px; }
 .input-box { width:100%; background:rgba(255,255,255,.04); border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; font-size:14px; color:var(--text); outline:none; }
 html.light .input-box { background:rgba(0,0,0,.03); }
 .input-box:focus { border-color:var(--gold); }
-.toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:200; padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,.6); }
+.toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:200; padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.6); }
 </style>
 </head>
 <body>
@@ -589,13 +569,13 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     <input id="edMapUrl" placeholder="🗺️ رابط الموقع على خرائط جوجل (اختياري)" class="input-box">
 
     <!-- علامة التوثيق (تظهر للأدمن فقط) -->
-    <div id="verifyWrap" style="background:rgba(217,180,90,.08); padding:10px; border-radius:12px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+    <div id="verifyWrap" style="background:rgba(59,130,246,.08); padding:10px; border-radius:12px; border:1px solid rgba(59,130,246,.4); display:flex; align-items:center; justify-content:space-between; gap:10px;">
       <div>
-        <b style="font-size:13px; color:var(--gold);">✔ علامة التوثيق الرسمية:</b>
-        <p style="font-size:11px; color:var(--muted);">تُمنح تلقائياً عند التفويض، ويمكنك سحبها أو منحها هنا.</p>
+        <b style="font-size:13px; color:#60a5fa;">✔ علامة التوثيق (رمادية = غير موثق / زرقاء = موثق):</b>
+        <p style="font-size:11px; color:var(--muted);">تُمنح تلقائياً عند التفويض، ويمكنك منحها أو سحبها من هنا في أي وقت.</p>
       </div>
-      <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer;">
-        <input type="checkbox" id="edIsVerified" style="width:18px; height:18px;"><span>موثق ورسمي</span>
+      <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;">
+        <input type="checkbox" id="edIsVerified" style="width:18px; height:18px;"><span>موثق (أزرق)</span>
       </label>
     </div>
 
@@ -663,76 +643,78 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 </div>
 
 <div id="toast" class="toast-box gold-bg hidden"></div>
-<!-- ======================= نهاية الجزء الأول ======================= -->
-<!-- الجزء الثاني يبدأ من هنا بوسم <script> ويحتوي كل الأكواد البرمجية والتسريع -->
 
+<!-- ======================= نهاية الجزء الأول ======================= -->
+<!-- الجزء الثاني يبدأ من هنا بوسم <script> ويحتوي كل الأكواد البرمجية -->
 <script>
 'use strict';
 /* =====================================================================
-   Cryovion — الجزء الثاني: الأكواد البرمجية (السرعة، التوثيق، قواعد البيانات)
+   Cryovion — الجزء الثاني: كل الأكواد البرمجية (نسخة سريعة + توثيق بتحكم حقيقي)
    ===================================================================== */
 
-/* ============ 1) الإعدادات وقواعد البيانات ============ */
+/* ============ 1) الإعدادات ============ */
 const SUPABASE_URL = 'https://zthcfuxdidfosdidiahz.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4Qdm2dAJWiSdraP2sOaYeQ_ICCHukSG';
 const ADMIN_EMAIL = 'yossefhamdi760@gmail.com';
 const PHOTO_BUCKET = 'place-photos';
 const NO_DATA_MSG = 'لم يتم إضافة معلومات للخانة';
 const DAY_MS = 24 * 60 * 60 * 1000;
+const PAGE_SIZE = 24;
+const CACHE_KEY = 'cryovion_places_v1';
 const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-/* ============ 2) القواميس والبيانات الأساسية ============ */
+/* ============ 2) القواميس والبيانات الثابتة ============ */
 const I18N = {
   ar: {
     menu_btn: 'القائمة', nav_home: 'الدليل الطبي الذكي', nav_managed: 'إدارة صفحتي', nav_referrals: 'دعوة صديق ومكافأة النشر',
     nav_referrals_short: '✨ دعوة صديق', nav_account: 'تسجيل الدخول والحساب', nav_settings: 'الإعدادات واللغة', nav_info: 'التعاون الإعلاني والتواصل',
     login_title: 'تسجيل الدخول', login_sub: 'إدارة صفحتك / دعوة صديق', login_short: '🔐 دخول', slogan_1: 'صحتك أقرب', slogan_2: 'مما تظن',
-    search_ph: 'ابحث عن طبيب، تخصص، أو صيدلية...', stories_title: 'حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)',
+    search_ph: 'ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب)، أو صيدلية...', stories_title: 'حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)',
     dir_title: 'الدليل الطبي الموثق', reset_filter: 'إلغاء الفلتر وعرض الكل ✕', back_btn: 'رجوع ←',
-    managed_header: '🎛️ إدارة صفحتي وحالة الـ 24 ساعة', managed_sub: 'أضف صورتك، نشّط حالة الفتح، وانشر حالتك اليومية',
-    ref_header: '✨ دعوة صديق ومكافأة نشر الإعلانات', ref_sub: 'ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني',
-    acc_header: '🔐 الحساب وتسجيل الدخول', acc_sub: 'سجل دخولك عبر Google أو Facebook أو بالبريد', logout_btn: 'تسجيل الخروج',
-    tab_login: 'تسجيل دخول', tab_register: 'إنشاء حساب جديد', email_submit: 'دخول بالبريد الإلكتروني ✔', or_oauth: '— أو الدخول المباشر הסريع —',
-    settings_header: '⚙️ الإعدادات واللغة والمظهر', set_lang_title: '🌐 لغة المنصة', set_lang_sub: 'التبديل بين العربية والإنجليزية',
-    set_theme_title: '🌗 المظهر', set_theme_sub: 'تبديل إضاءة المنصة', set_font_title: '🔠 حجم الخط',
-    set_font_sub: 'تكبير النصوص', toggle_btn: 'تبديل 🌗', font_btn: 'تكبير / تصغير', info_header: 'ℹ️ التواصل وتفويض الصفحات',
-    cat_doctor: 'أطباء وعيادات', cat_pharmacy: 'صيدليات', cat_lab: 'معامل وأشعة', page_unit: 'صفحة'
+    managed_header: '🎛️ إدارة صفحتي وحالة الـ 24 ساعة', managed_sub: 'أضف صورتك في المربع الأيمن، نشّط حالة الفتح، سعر الكشف، وانشر حالتك اليومية',
+    ref_header: '✨ دعوة صديق ومكافأة نشر الإعلانات', ref_sub: 'ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي',
+    acc_header: '🔐 الحساب وتسجيل الدخول', acc_sub: 'سجل دخولك عبر Google أو Facebook أو بالبريد الإلكتروني مباشرة', logout_btn: 'تسجيل الخروج',
+    tab_login: 'تسجيل دخول', tab_register: 'إنشاء حساب جديد', email_submit: 'دخول بالبريد الإلكتروني ✔', or_oauth: '— أو الدخول المباشر السريع —',
+    settings_header: '⚙️ الإعدادات واللغة والمظهر', set_lang_title: '🌐 لغة المنصة (Language)', set_lang_sub: 'التبديل الفوري بين العربية والإنجليزية',
+    set_theme_title: '🌗 المظهر الداكن / الفاتح', set_theme_sub: 'تبديل إضاءة المنصة وحفظ اختيارك', set_font_title: '🔠 حجم الخط والوضوح',
+    set_font_sub: 'تكبير النصوص لقراءة مريحة', toggle_btn: 'تبديل 🌗', font_btn: 'تكبير / تصغير', info_header: 'ℹ️ التواصل وتفويض الصفحات',
+    cat_doctor: 'أطباء وعيادات', cat_pharmacy: 'صيدليات', cat_lab: 'معامل وأشعة', page_unit: 'صفحة', more_btn: 'عرض المزيد ↓'
   },
   en: {
-    menu_btn: 'Menu', nav_home: 'Smart Directory', nav_managed: 'Manage Page', nav_referrals: 'Invite & Free Ad',
-    nav_referrals_short: '✨ Invite', nav_account: 'Account & Sign In', nav_settings: 'Settings', nav_info: 'Contact',
-    login_title: 'Sign In', login_sub: 'Manage page / Invite', login_short: '🔐 Sign In', slogan_1: 'Health is Closer', slogan_2: 'Than You Think',
-    search_ph: 'Search doctor, specialty, or pharmacy...', stories_title: 'Daily Updates (Live for 24h)',
-    dir_title: 'Verified Medical Directory', reset_filter: 'Clear Filter ✕', back_btn: '← Back',
-    managed_header: '🎛️ Manage My Page', managed_sub: 'Upload photo, toggle open status, daily story',
-    ref_header: '✨ Invite Friends', ref_sub: 'Share to unlock a free verified listing',
+    menu_btn: 'Menu', nav_home: 'Smart Medical Directory', nav_managed: 'Manage My Page', nav_referrals: 'Invite Friends & Free Ad',
+    nav_referrals_short: '✨ Invite Friend', nav_account: 'Account & Sign In', nav_settings: 'Settings & Language', nav_info: 'Contact & Verification',
+    login_title: 'Sign In', login_sub: 'Manage page / Invite friends', login_short: '🔐 Sign In', slogan_1: 'Your Health is Closer', slogan_2: 'Than You Think',
+    search_ph: 'Search doctor, specialty (Pediatrics, Neuro, Dental), or pharmacy...', stories_title: 'Daily Updates & Status (Live for 24h)',
+    dir_title: 'Verified Medical Directory', reset_filter: 'Clear Filter & Show All ✕', back_btn: '← Back',
+    managed_header: '🎛️ Manage My Page & 24h Status', managed_sub: 'Upload photo, toggle open status, set consultation fee & daily story',
+    ref_header: '✨ Invite Friends & Get Free Listing', ref_sub: 'Share Cryovion with friends to unlock a free verified medical listing',
     acc_header: '🔐 Account & Sign In', acc_sub: 'Sign in with Google, Facebook, or Email', logout_btn: 'Sign Out',
-    tab_login: 'Sign In', tab_register: 'Create Account', email_submit: 'Sign In ✔', or_oauth: '— Or Quick Sign In —',
-    settings_header: '⚙️ Settings', set_lang_title: '🌐 Language', set_lang_sub: 'Switch Language',
-    set_theme_title: '🌗 Theme', set_theme_sub: 'Switch appearance', set_font_title: '🔠 Font Size',
-    set_font_sub: 'Enlarge text', toggle_btn: 'Switch 🌗', font_btn: 'Zoom', info_header: 'ℹ️ Contact',
-    cat_doctor: 'Doctors & Clinics', cat_pharmacy: 'Pharmacies', cat_lab: 'Labs & Scans', page_unit: 'Listings'
+    tab_login: 'Sign In', tab_register: 'Create Account', email_submit: 'Sign In with Email ✔', or_oauth: '— Or Quick Social Sign In —',
+    settings_header: '⚙️ Settings, Language & Theme', set_lang_title: '🌐 Platform Language', set_lang_sub: 'Switch instantly between Arabic & English',
+    set_theme_title: '🌗 Dark / Light Mode', set_theme_sub: 'Switch platform appearance', set_font_title: '🔠 Font Size & Accessibility',
+    set_font_sub: 'Enlarge text for easier reading', toggle_btn: 'Switch 🌗', font_btn: 'Zoom In / Out', info_header: 'ℹ️ Contact & Page Authorization',
+    cat_doctor: 'Doctors & Clinics', cat_pharmacy: 'Pharmacies', cat_lab: 'Labs & Scans', page_unit: 'Listings', more_btn: 'Show more ↓'
   }
 };
 
 const SPECS_META = {
   all:      { label: 'كل التخصصات', labelEn: 'All Specialties', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
-  peds:     { label: 'طب الأطفال', labelEn: 'Pediatrics', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
-  gastro:   { label: 'باطنة ومعدة', labelEn: 'Internal Med', icon: '🩺', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)', svg: '<path d="M9 3c0 4-4 5-4 10a7 7 0 0 0 14 0c0-3-2-5-5-5-2 0-3-2-3-5"/><path d="M11 13c0 2 1.5 3.5 3.5 3.5"/>' },
-  neuro:    { label: 'مخ وأعصاب', labelEn: 'Neurology', icon: '🧠', color: '#c084fc', bg: 'rgba(192,132,252,0.16)', svg: '<path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .4.05.8.15 1.2A4 4 0 0 0 3 11.5a4 4 0 0 0 2.6 3.7A4 4 0 0 0 9.5 21h1.5V2h-1.5Z"/><path d="M14.5 2A4.5 4.5 0 0 1 19 6.5c0 .4-.05.8-.15 1.2A4 4 0 0 1 21 11.5a4 4 0 0 1-2.6 3.7A4 4 0 0 1 14.5 21H13V2h1.5Z"/>' },
-  ortho:    { label: 'عظام ومفاصل', labelEn: 'Orthopedics', icon: '🦴', color: '#fbbf24', bg: 'rgba(251,191,36,0.16)', svg: '<path d="M17 4a3 3 0 0 0-3 3L7 14a3 3 0 1 0 3 3l7-7a3 3 0 0 0 0-6Z"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/>' },
-  obgyn:    { label: 'نساء وتوليد', labelEn: 'OB-GYN', icon: '🤰', color: '#fb7185', bg: 'rgba(251,113,133,0.16)', svg: '<circle cx="12" cy="9" r="6"/><path d="M12 15v7"/><path d="M9 19h6"/>' },
-  dental:   { label: 'أسنان', labelEn: 'Dentistry', icon: '🦷', color: '#2dd4bf', bg: 'rgba(45,212,191,0.16)', svg: '<path d="M7 3C4.5 3 3 5 3 8c0 3 1.5 5 2 8 .4 2.5 1.2 5 2.5 5 1 0 1.8-2 2.5-4h4c.7 2 1.5 4 2.5 4 1.3 0 2.1-2.5 2.5-5 .5-3 2-5 2-8 0-3-1.5-5-4-5-2 0-3.5 1-5 1S9 3 7 3Z"/>' },
-  eye:      { label: 'عيون ورمد', labelEn: 'Ophthalmology', icon: '👁️', color: '#60a5fa', bg: 'rgba(96,165,250,0.16)', svg: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3.5"/>' },
-  ent:      { label: 'أنف وأذن', labelEn: 'ENT', icon: '👂', color: '#a3e635', bg: 'rgba(163,230,53,0.16)', svg: '<path d="M6 10a6 6 0 1 1 12 0c0 4-3 6-4 9a2 2 0 0 1-4 0"/><path d="M10 10a2 2 0 1 1 4 0"/>' },
-  cardio:   { label: 'قلب وأوعية', labelEn: 'Cardiology', icon: '🫀', color: '#f87171', bg: 'rgba(248,113,113,0.16)', svg: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>' },
-  physio:   { label: 'علاج طبيعي', labelEn: 'Physiotherapy', icon: '🏃', color: '#34d399', bg: 'rgba(52,211,153,0.16)', svg: '<circle cx="12" cy="5" r="2.5"/><path d="m7 21 3-6 2-4 5 2"/><path d="m6 12 4-3 4 2"/>' },
+  peds:     { label: 'طب الأطفال وحديثي الولادة', labelEn: 'Pediatrics', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
+  gastro:   { label: 'باطنة ومعدة وجهاز هضمي', labelEn: 'Internal Medicine', icon: '🩺', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)', svg: '<path d="M9 3c0 4-4 5-4 10a7 7 0 0 0 14 0c0-3-2-5-5-5-2 0-3-2-3-5"/><path d="M11 13c0 2 1.5 3.5 3.5 3.5"/>' },
+  neuro:    { label: 'مخ وأعصاب وعمود فقري', labelEn: 'Neurology', icon: '🧠', color: '#c084fc', bg: 'rgba(192,132,252,0.16)', svg: '<path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .4.05.8.15 1.2A4 4 0 0 0 3 11.5a4 4 0 0 0 2.6 3.7A4 4 0 0 0 9.5 21h1.5V2h-1.5Z"/><path d="M14.5 2A4.5 4.5 0 0 1 19 6.5c0 .4-.05.8-.15 1.2A4 4 0 0 1 21 11.5a4 4 0 0 1-2.6 3.7A4 4 0 0 1 14.5 21H13V2h1.5Z"/>' },
+  ortho:    { label: 'جراحة العظام والمفاصل', labelEn: 'Orthopedics', icon: '🦴', color: '#fbbf24', bg: 'rgba(251,191,36,0.16)', svg: '<path d="M17 4a3 3 0 0 0-3 3L7 14a3 3 0 1 0 3 3l7-7a3 3 0 0 0 0-6Z"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/>' },
+  obgyn:    { label: 'نساء وتوليد وتأخر إنجاب', labelEn: 'OB-GYN', icon: '🤰', color: '#fb7185', bg: 'rgba(251,113,133,0.16)', svg: '<circle cx="12" cy="9" r="6"/><path d="M12 15v7"/><path d="M9 19h6"/>' },
+  dental:   { label: 'طب وجراحة الفم والأسنان', labelEn: 'Dentistry', icon: '🦷', color: '#2dd4bf', bg: 'rgba(45,212,191,0.16)', svg: '<path d="M7 3C4.5 3 3 5 3 8c0 3 1.5 5 2 8 .4 2.5 1.2 5 2.5 5 1 0 1.8-2 2.5-4h4c.7 2 1.5 4 2.5 4 1.3 0 2.1-2.5 2.5-5 .5-3 2-5 2-8 0-3-1.5-5-4-5-2 0-3.5 1-5 1S9 3 7 3Z"/>' },
+  eye:      { label: 'طب وجراحة العيون والرمد', labelEn: 'Ophthalmology', icon: '👁️', color: '#60a5fa', bg: 'rgba(96,165,250,0.16)', svg: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3.5"/>' },
+  ent:      { label: 'أنف وأذن وحنجرة', labelEn: 'ENT', icon: '👂', color: '#a3e635', bg: 'rgba(163,230,53,0.16)', svg: '<path d="M6 10a6 6 0 1 1 12 0c0 4-3 6-4 9a2 2 0 0 1-4 0"/><path d="M10 10a2 2 0 1 1 4 0"/>' },
+  cardio:   { label: 'قلب وأوعية دموية', labelEn: 'Cardiology', icon: '🫀', color: '#f87171', bg: 'rgba(248,113,113,0.16)', svg: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>' },
+  physio:   { label: 'علاج طبيعي وتأهيل', labelEn: 'Physiotherapy', icon: '🏃', color: '#34d399', bg: 'rgba(52,211,153,0.16)', svg: '<circle cx="12" cy="5" r="2.5"/><path d="m7 21 3-6 2-4 5 2"/><path d="m6 12 4-3 4 2"/>' },
   surgery:  { label: 'الجراحة', labelEn: 'Surgery', icon: '⚕️', color: '#f97316', bg: 'rgba(249,115,22,0.16)' },
-  nutrition:{ label: 'التغذية', labelEn: 'Nutrition', icon: '🥗', color: '#84cc16', bg: 'rgba(132,204,22,0.16)' },
+  nutrition:{ label: 'التغذية والتخسيس', labelEn: 'Nutrition & Slimming', icon: '🥗', color: '#84cc16', bg: 'rgba(132,204,22,0.16)' },
   cosmetic: { label: 'التجميل', labelEn: 'Cosmetic', icon: '💄', color: '#ec4899', bg: 'rgba(236,72,153,0.16)' },
   laser:    { label: 'الليزر', labelEn: 'Laser', icon: '🔆', color: '#facc15', bg: 'rgba(250,204,21,0.16)' },
-  pharmacy: { label: 'صيدلية', labelEn: 'Pharmacy', icon: '💊', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'تحاليل وأشعة', labelEn: 'Lab', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
+  pharmacy: { label: 'صيدلية ودواء', labelEn: 'Pharmacy', icon: '💊', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+  lab:      { label: 'تحاليل وأشعة', labelEn: 'Lab & Radiology', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
 const SPEC_BAR_ORDER = ['all','peds','gastro','obgyn','neuro','ortho','surgery','dental','eye','ent','cardio','physio','nutrition','cosmetic','laser','pharmacy','lab'];
 
@@ -746,27 +728,39 @@ const ICON = {
   pharmacy: '<g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="currentColor" fill-opacity=".4" stroke="none"/><path d="M12 8v8"/></g>',
   lab: '<path fill="currentColor" fill-opacity=".4" stroke="none" d="M7.5 15h9l2.6 4.2A1.5 1.5 0 0 1 17.8 21H6.2a1.5 1.5 0 0 1-1.3-1.8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M10 3v6l-5.2 9.2A2 2 0 0 0 6.6 21h10.8a2 2 0 0 0 1.8-2.8L14 9V3"/>'
 };
-
 const BAD_WORDS = ['نصاب','حرامي','فاشل','غبي','زباله','قذر','وسخ','كلب','حمار','كذاب','شرموط','عرص','خول'];
+const BAD_NORM = BAD_WORDS.map(w => w.replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase());
+const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-/* ============ 3) الشارة الذكية (أزرق فخم للموثق ورمادي لغير الموثق) ============ */
-function getSmartBadge(isVerified) {
-  const css = isVerified ? 'v-true' : 'v-false';
-  const txt = isVerified ? 'موثق ورسمي' : 'غير موثق';
-  return `<span class="vbadge-new ${css}" title="${txt}"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
-}
+/* بيانات احتياطية تظهر فقط إذا تعذّر الاتصال بقاعدة البيانات (أو لتعبئتها أول مرة) */
+const nowTs = Date.now();
+const DEFAULT_DIRECTORY = [
+  { id: 'v-kaouthar-1', cat: 'doctor', spec_key: 'neuro', name: 'د. كوثر ناصر', spec: 'أخصائية نفسية إكلينيكية (اضطرابات وعصبية)',
+    bio: 'علاج الاضطرابات النفسية والانفعالية، مشاكل التركيز والذاكرة، علاج الوسواس القهري والقلق والتأهيل النفسي.', bio_ts: nowTs,
+    hours: 'يومياً بالحجز المسبق', lamp_mode: 'open', addr: 'مستشفى زمزم التخصصي - شبرا الخيمة', phone: '01555083804', whatsapp: '01555083804',
+    fee: 'يُحدد بالعيادة', map_url: '', is_verified: true, photo_url: '', ref_count: 0, updated_date: '2026-11-08' },
+  { id: 'd-samir-1', cat: 'doctor', spec_key: 'peds', name: 'د. سمير محمد البهنسي', spec: 'أخصائي الأطفال وحديثي الولادة',
+    bio: 'تطعيمات إضافية وجهاز قياس الصفراء عن طريق الجلد (بدون ألم).', bio_ts: nowTs, hours: 'يومياً من 11 صباحاً حتى 6 مساءً', lamp_mode: 'open',
+    addr: 'الكوم الأحمر: شارع البوسطة - أمام صيدلية د/ علياء', phone: '01107204057', whatsapp: '01107204057', fee: 'كشف أطفال وحديثي ولادة',
+    map_url: '', is_verified: true, photo_url: '', ref_count: 0, updated_date: '2026-11-08' },
+  { id: 'v-ph-1', cat: 'pharmacy', spec_key: 'pharmacy', name: 'صيدلية الأمل', spec: 'صيدلية عامة وتركيبات دوائية',
+    bio: 'صرف الأدوية والمستلزمات الطبية وقياس الضغط والسكر.', bio_ts: nowTs, hours: '24 ساعة', lamp_mode: 'open', addr: 'أمام المستشفى العام مباشرة',
+    phone: null, whatsapp: null, fee: '', map_url: '', is_verified: false, ref_count: 0, updated_date: '2026-11-08' }
+];
 
-/* ============ 4) أدوات مساعدة وتسريع ============ */
+/* ============ 3) أدوات مساعدة ============ */
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim().toLowerCase();
-const containsDefamation = txt => BAD_WORDS.some(w => norm(txt).includes(norm(w)));
+const containsDefamation = txt => { const n = norm(txt); return BAD_NORM.some(w => n.includes(w)); };
 const ico = (p, sz = 22) => `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${p}</svg>`;
 const orb = (k, sz = 40) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz * 0.58))}</span>`;
 const star = on => `<span style="color:${on ? '#D9B45A' : '#475569'}; font-size:15px;">★</span>`;
 const stars = r => [1, 2, 3, 4, 5].map(i => star(i <= Math.round(r))).join('');
-const byId = id => places.find(x => x.id === id);
+const byId = id => placeMap.get(id);
 const t12 = t => { const p = t.split(':'); let h = +p[0]; const s = h >= 12 ? 'م' : 'ص'; h = h % 12 || 12; return h + (p[1] === '00' ? '' : ':' + p[1]) + ' ' + s; };
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
 function toast(m) {
   const t = $('toast'); if (!t) return;
@@ -775,19 +769,29 @@ function toast(m) {
 }
 function formatWaNumber(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
-  return (digits.startsWith('01') && digits.length === 11) ? '2' + digits : digits;
+  if (!digits) return '';
+  if (digits.startsWith('01') && digits.length === 11) return '2' + digits;
+  return digits;
 }
 
-/* ============ 5) الحالة العامة ============ */
-let places = [], refCache = [], activeCat = null, activeSpec = 'all', query = '';
+/* علامة التوثيق: رمادية = غير موثق، زرقاء = موثق. للأدمن تكون قابلة للضغط للتبديل */
+function badge(d, interactive) {
+  const on = !!d.is_verified, can = !!interactive && adminUnlocked;
+  return `<span class="vbadge${on ? ' on' : ''}${can ? ' clickable' : ''}" role="img" aria-label="${on ? 'صفحة موثقة رسمياً' : 'صفحة غير موثقة'}" title="${on ? 'موثق (أزرق)' : 'غير موثق (رمادي)'}${can ? ' — اضغط للتبديل' : ''}"${can ? ` data-badge-id="${esc(d.id)}"` : ''}>${CHECK_SVG}</span>`;
+}
+
+/* ============ 4) الحالة العامة ============ */
+let places = [], placeMap = new Map(), refCache = [], activeCat = null, activeSpec = 'all', query = '';
 let currentLang = localStorage.getItem('cryovion_lang') || 'ar';
 let isRegisterMode = false, selectedRole = 'مستخدم';
-let savedHomeScrollY = 0, currentViewName = 'home';
-let adminUnlocked = false;
+let savedHomeScrollY = 0, currentViewName = 'home', currentPlaceId = null;
+let adminUnlocked = false, verifiedEmail = null;
 let activeReviewPlaceId = null, pickedStars = 5;
-let posterTimer = null, writeQueue = Promise.resolve(), logoClicks = 0, logoTimer = null;
+let writeQueue = Promise.resolve(), logoClicks = 0, logoTimer = null;
+let shownLimit = PAGE_SIZE, homeDirty = false, loadSeq = 0, lastUid = undefined;
+let ttsId = null, voices = [];
 
-/* ============ 6) حالة الدوام والمواعيد ============ */
+/* ============ 5) حالة الدوام (النقطة المضيئة) ============ */
 function getAvailabilityStatus(d) {
   const en = currentLang === 'en';
   const st = (state, color, ar, e) => ({ state, color, label: en ? e : ar });
@@ -804,23 +808,20 @@ function getAvailabilityStatus(d) {
       return isOpen ? st('online', 'var(--emerald)', 'مفتوح الآن', 'Open Now') : st('offline', 'var(--rose)', 'مغلق الآن', 'Closed Now');
     }
   }
-  return st('unknown', 'var(--muted)', 'غير معروف', 'Not Configured');
+  return st('unknown', 'var(--muted)', 'لم تُفعل من المُفوض', 'Not Configured');
 }
-
-/* تحديث ذكي للحالة (لا يُعيد رسم الصفحة إلا إذا تغيرت حالة فتح العيادة فعلياً لتخفيف اللاج) */
-function smartRecompute() {
-  let changed = false;
+/* لا يعيد الرسم إلا إذا تغيّرت حالة مكان فعلاً */
+function recomputeAvailability(force) {
+  let changed = !!force;
   places.forEach(p => {
     const a = getAvailabilityStatus(p);
-    if (p.avail_state !== a.state) {
-      p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color;
-      changed = true;
-    }
+    if (p.avail_state !== a.state || p.avail_label !== a.label) changed = true;
+    p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color;
   });
-  if (changed && currentViewName === 'home') render();
+  if (changed) { render(); renderPostersCarousel(); }
 }
 
-/* ============ 7) الإعدادات واللغة ============ */
+/* ============ 6) اللغة ============ */
 function applyLanguage() {
   const dict = I18N[currentLang] || I18N.ar;
   document.documentElement.lang = currentLang;
@@ -828,26 +829,19 @@ function applyLanguage() {
   $('langLabel').textContent = currentLang === 'en' ? 'عربي' : 'EN';
   $('search').placeholder = dict.search_ph;
   document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (dict[k]) el.textContent = dict[k]; });
-  render();
+  buildFilters();
+  recomputeAvailability(true);
+  refreshUserUI();
 }
 function toggleLanguage() {
   currentLang = currentLang === 'ar' ? 'en' : 'ar';
   localStorage.setItem('cryovion_lang', currentLang);
-  applyLanguage(); toast(currentLang === 'en' ? '🌐 Switched to English' : '🌐 تم التبديل إلى العربية');
-}
-let big = localStorage.getItem('cryovion_big_font') === 'true';
-if (big) document.documentElement.style.fontSize = '18px';
-function toggleBig() {
-  big = !big; localStorage.setItem('cryovion_big_font', String(big));
-  document.documentElement.style.fontSize = big ? '18px' : '16px'; toast(big ? '🔠 تم التكبير' : '🔠 الحجم الطبيعي');
-}
-if (localStorage.getItem('cryovion_theme') === 'light') document.documentElement.classList.add('light');
-function toggleTheme() {
-  const L = document.documentElement.classList.toggle('light');
-  localStorage.setItem('cryovion_theme', L ? 'light' : 'dark'); toast(L ? '☀️ مظهر فاتح' : '🌙 مظهر داكن');
+  applyLanguage();
+  if (currentViewName === 'placePage' && currentPlaceId) renderPlacePageDOM(currentPlaceId);
+  toast(currentLang === 'en' ? '🌐 Switched to English' : '🌐 تم التبديل إلى اللغة العربية');
 }
 
-/* ============ 8) التنقل بين الشاشات ============ */
+/* ============ 7) التنقل بين الشاشات ============ */
 function switchViewDOM(viewName, restoreScroll = false) {
   adminUnlocked = isUserMasterAdmin(getCurrentUser());
   if (viewName === 'admin' && !adminUnlocked) viewName = 'home';
@@ -857,7 +851,9 @@ function switchViewDOM(viewName, restoreScroll = false) {
   document.querySelectorAll('.spa-view').forEach(v => v.classList.add('hidden'));
   const target = $('view-' + viewName); if (target) target.classList.remove('hidden');
   document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === viewName));
-  closeSideDrawer(); $('searchSuggest').classList.add('hidden');
+  closeSideDrawer();
+  $('searchSuggest').classList.add('hidden');
+  if (viewName === 'home' && homeDirty) { homeDirty = false; render(); }
   if (viewName === 'myManaged') renderManagedAds();
   if (viewName === 'referrals') renderReferralsHub();
   if (viewName === 'admin') renderAdminList();
@@ -866,38 +862,65 @@ function switchViewDOM(viewName, restoreScroll = false) {
 }
 function navigateApp(viewName) {
   if (currentViewName === 'home' && viewName !== 'home') savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-  history.pushState({ view: viewName }, '', ''); switchViewDOM(viewName, viewName === 'home');
+  history.pushState({ view: viewName }, '', '');
+  switchViewDOM(viewName, viewName === 'home');
 }
-function goBackSmart() { if (history.state && history.state.view && history.state.view !== 'home') history.back(); else switchViewDOM('home', true); }
-function goHomeLogo() { activeCat = null; activeSpec = 'all'; query = ''; $('search').value = ''; $('searchSuggest').classList.add('hidden'); savedHomeScrollY = 0; switchViewDOM('home', false); render(); }
-function openPlacePage(id) { if (currentViewName === 'home') savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0; renderPlacePageDOM(id); history.pushState({ view: 'placePage', placeId: id }, '', ''); switchViewDOM('placePage', false); }
-window.addEventListener('popstate', e => { const st = e.state; if (!st || st.view === 'home') switchViewDOM('home', true); else if (st.view === 'placePage' && st.placeId) { renderPlacePageDOM(st.placeId); switchViewDOM('placePage', false); } else switchViewDOM(st.view, false); });
+function goBackSmart() {
+  if (history.state && history.state.view && history.state.view !== 'home') history.back();
+  else switchViewDOM('home', true);
+}
+function goHomeLogo() {
+  activeCat = null; activeSpec = 'all'; query = ''; shownLimit = PAGE_SIZE;
+  $('search').value = ''; $('searchSuggest').classList.add('hidden');
+  savedHomeScrollY = 0; switchViewDOM('home', false); render();
+}
+function openPlacePage(id) {
+  if (!byId(id)) return;
+  if (currentViewName === 'home') savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  renderPlacePageDOM(id);
+  history.pushState({ view: 'placePage', placeId: id }, '', '');
+  switchViewDOM('placePage', false);
+}
+window.addEventListener('popstate', e => {
+  const st = e.state;
+  if (!st || st.view === 'home') switchViewDOM('home', true);
+  else if (st.view === 'placePage' && st.placeId) { renderPlacePageDOM(st.placeId); switchViewDOM('placePage', false); }
+  else switchViewDOM(st.view, false);
+});
 function openSideDrawer() { $('drawerBackdrop').classList.remove('hidden'); $('sideDrawer').classList.add('open'); }
 function closeSideDrawer() { $('drawerBackdrop').classList.add('hidden'); $('sideDrawer').classList.remove('open'); }
 
-/* ============ 9) المستخدم والصلاحيات ============ */
+/* ============ 8) المستخدم والصلاحيات ============ */
 function getCurrentUser() { try { return JSON.parse(localStorage.getItem('cryovion_user') || 'null'); } catch { return null; } }
 function setCurrentUser(u) {
-  if (u) { if (!u.ref_code) u.ref_code = 'u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10); localStorage.setItem('cryovion_user', JSON.stringify(u)); }
-  else localStorage.removeItem('cryovion_user');
+  if (u) {
+    if (!u.ref_code) u.ref_code = 'u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10);
+    localStorage.setItem('cryovion_user', JSON.stringify(u));
+  } else localStorage.removeItem('cryovion_user');
   refreshUserUI();
 }
-function isUserMasterAdmin(u) { return !!(u && u.email && u.email.trim().toLowerCase() === ADMIN_EMAIL); }
+/* الأدمن = إيميل المشرف + جلسة Google حقيقية (لها uid) — والحماية الفعلية في قاعدة البيانات */
+function isUserMasterAdmin(u) {
+  if (!u || !u.email || u.email.trim().toLowerCase() !== ADMIN_EMAIL) return false;
+  return verifiedEmail === ADMIN_EMAIL || !!u.uid;
+}
 function refreshUserUI() {
-  const u = getCurrentUser(); adminUnlocked = isUserMasterAdmin(u);
+  const u = getCurrentUser(), isAdminUser = isUserMasterAdmin(u);
+  adminUnlocked = isAdminUser;
   const myAds = u ? places.filter(p => norm(p.owner_email) === norm(u.email)) : [];
   $('managedCountBadge').textContent = myAds.length;
   $('topManageShortcut').classList.toggle('hidden', myAds.length === 0);
-  ['dockAdminBtn', 'drawerAdminBtn', 'topAdminShortcut', 'accAdminShortcut'].forEach(id => $(id).classList.toggle('hidden', !adminUnlocked));
-  if (!adminUnlocked && currentViewName === 'admin') switchViewDOM('home', false);
+  ['dockAdminBtn', 'drawerAdminBtn', 'topAdminShortcut', 'accAdminShortcut'].forEach(id => $(id).classList.toggle('hidden', !isAdminUser));
+  if (!isAdminUser && currentViewName === 'admin') switchViewDOM('home', false);
 
   if (u) {
-    const n = u.name || u.email.split('@')[0];
-    $('drawerUserName').textContent = n; $('drawerUserRole').textContent = adminUnlocked ? `🛡️ مشرف (${u.email})` : `${u.email} (${u.role || 'عضو'})`;
-    $('headerUserBadge').textContent = adminUnlocked ? `🛡️ ${n}` : `👤 ${n}`;
+    const dispName = u.name || u.email.split('@')[0];
+    $('drawerUserName').textContent = dispName;
+    $('drawerUserRole').textContent = isAdminUser ? `🛡️ مشرف المنصة (${u.email})` : `${u.email} (${u.role || 'عضو'})`;
+    $('headerUserBadge').textContent = isAdminUser ? `🛡️ ${dispName}` : `👤 ${dispName}`;
     $('profileActiveBox').classList.remove('hidden'); $('authFormsWrap').classList.add('hidden');
-    $('profRoleTag').textContent = adminUnlocked ? '🛡️ مشرف عام' : 'حساب مفعل';
-    $('profNameDisp').textContent = n; $('profEmailDisp').textContent = u.email;
+    $('profRoleTag').textContent = isAdminUser ? '🛡️ حساب المشرف العام (Admin)' : `حساب ${u.role || 'مفعل'}`;
+    $('profNameDisp').textContent = dispName; $('profEmailDisp').textContent = u.email;
   } else {
     const dict = I18N[currentLang] || I18N.ar;
     $('drawerUserName').textContent = dict.login_title; $('drawerUserRole').textContent = dict.login_sub;
@@ -905,191 +928,403 @@ function refreshUserUI() {
     $('profileActiveBox').classList.add('hidden'); $('authFormsWrap').classList.remove('hidden');
   }
 }
+async function applySession(s) {
+  verifiedEmail = (s && s.user && s.user.email) ? s.user.email.toLowerCase() : null;
+  if (s && s.user) {
+    const email = s.user.email, md = s.user.user_metadata || {};
+    const name = md.full_name || md.name || email.split('@')[0];
+    setCurrentUser({ name, email, role: email.toLowerCase() === ADMIN_EMAIL ? 'مشرف' : 'عضو', uid: s.user.id, provider: 'google' });
+  } else refreshUserUI();
+}
 async function initSupabaseSession() {
   if (!db) return;
-  const apply = s => {
-    if (s && s.user) {
-      const e = s.user.email, md = s.user.user_metadata || {}, n = md.full_name || md.name || e.split('@')[0];
-      setCurrentUser({ name: n, email: e, role: e.toLowerCase() === ADMIN_EMAIL ? 'مشرف' : 'عضو', uid: s.user.id, provider: 'google' });
-    } else refreshUserUI();
-  };
-  try { const r = await db.auth.getSession(); apply(r.data.session); } catch {}
-  db.auth.onAuthStateChange((_e, s) => setTimeout(() => { apply(s); load(); }, 0));
+  try { const r = await db.auth.getSession(); lastUid = r.data.session ? r.data.session.user.id : null; await applySession(r.data.session); } catch {}
+  /* لا نعيد التحميل إلا عند تغيّر المستخدم فعلاً (وليس عند كل تجديد للتوكن) */
+  db.auth.onAuthStateChange((_e, s) => setTimeout(async () => {
+    const uid = s && s.user ? s.user.id : null;
+    if (uid === lastUid) return;
+    lastUid = uid; await applySession(s); load();
+  }, 0));
 }
 
-/* ============ 10) قاعدة البيانات (Supabase Backend) ============ */
+/* ============ 9) طبقة قاعدة البيانات (Supabase) ============ */
+const PLACE_COLS = 'id,cat,spec_key,name,spec,bio,bio_ts,photo_url,gallery,addr,hours,lamp_mode,sched,phone,whatsapp,fee,map_url,is_verified,ref_count,status,created_at,updated_at';
+const PLACE_KEYS = PLACE_COLS.split(',');
+const uploadedCache = {};
+const sess = () => db.auth.getSession().then(r => r.data.session);
+
 function compressImage(url) {
   return new Promise((res, rej) => {
-    const i = new Image(); i.onerror = rej;
+    const i = new Image();
     i.onload = () => {
       const k = Math.min(1, 900 / i.width), c = document.createElement('canvas');
-      c.width = i.width * k; c.height = i.height * k; c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+      c.width = i.width * k; c.height = i.height * k;
+      c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
       c.toBlob(b => b ? res(b) : rej(), 'image/jpeg', 0.82);
-    }; i.src = url;
+    };
+    i.onerror = rej; i.src = url;
   });
 }
 async function publishPhoto(src, uid) {
   if (!src || src.indexOf('data:') !== 0) return src;
-  const blob = await compressImage(src), path = uid + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+  if (uploadedCache[src]) return uploadedCache[src];
+  const blob = await compressImage(src);
+  const path = uid + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
   const r = await db.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: 'image/jpeg' });
   if (r.error) throw r.error;
-  return db.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  uploadedCache[src] = db.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  return uploadedCache[src];
 }
 async function dbWrite(it) {
-  const s = await db.auth.getSession().then(r => r.data.session);
-  if (!s) return toast('انتهت الجلسة، سجّل الدخول من جديد');
+  const s = await sess();
+  if (!s) { if (getCurrentUser()) toast('انتهت الجلسة، سجّل الدخول عبر Google من جديد'); return; }
   const admin = isUserMasterAdmin(getCurrentUser());
-  if (it.deleted) { if (!admin) return; await db.from('places').delete().eq('id', it.id); return; }
+  if (it.deleted) {
+    if (!admin) return;
+    const d = await db.from('places').delete().eq('id', it.id);
+    if (d.error) toast('تعذر الحذف');
+    return;
+  }
+  if (!admin && !byId(it.id)) { toast('إضافة الصفحات للأدمن فقط'); return; }
   const row = {
-    id: it.id, cat: it.cat, spec_key: it.spec_key, name: it.name, spec: it.spec || '', bio: it.bio || '', bio_ts: it.bio_ts || null,
-    photo_url: await publishPhoto(it.photo_url, s.user.id), gallery: await Promise.all((it.gallery || []).map(g => publishPhoto(g, s.user.id))),
+    id: it.id, cat: it.cat, spec_key: it.spec_key, name: it.name, spec: it.spec || '',
+    bio: it.bio || '', bio_ts: it.bio_ts || null, photo_url: await publishPhoto(it.photo_url, s.user.id),
+    gallery: await Promise.all((it.gallery || []).map(g => publishPhoto(g, s.user.id))),
     addr: it.addr || '', hours: it.hours || 'غير معروف', lamp_mode: it.lamp_mode || 'unknown', sched: it.sched || null,
     phone: it.phone || null, whatsapp: it.whatsapp || null, fee: it.fee || null, map_url: it.map_url || null
   };
   let res;
-  if (admin) { row.is_verified = !!it.is_verified; row.owner_email = it.owner_email ? it.owner_email.toLowerCase() : null; row.status = 'approved'; res = await db.from('places').upsert(row); }
-  else res = await db.from('places').update(row).eq('id', it.id);
-  if (res.error) toast('رُفض الحفظ: خطأ في الصلاحيات');
+  if (admin) {
+    row.is_verified = !!it.is_verified;
+    row.owner_email = it.owner_email ? it.owner_email.toLowerCase() : null;
+    row.ref_count = it.ref_count || 0;
+    row.status = 'approved';
+    res = await db.from('places').upsert(row);
+  } else res = await db.from('places').update(row).eq('id', it.id);
+  if (res.error) { console.error(res.error); toast('رُفض الحفظ: ليست لديك صلاحية على هذه الصفحة'); }
 }
 function savePlace(item) {
-  if (!db) return toast('الخدمة غير متاحة');
-  writeQueue = writeQueue.then(() => dbWrite(JSON.parse(JSON.stringify(item)))).catch(() => toast('تعذر الحفظ السحابي'));
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  const copy = JSON.parse(JSON.stringify(item));
+  writeQueue = writeQueue.then(() => dbWrite(copy)).catch(e => { console.error(e); toast('تعذر الحفظ في قاعدة البيانات'); });
 }
-async function load() {
-  try { await writeQueue; } catch {}
-  let rows = [], revs = [];
-  if (db) {
-    const r = await Promise.all([
-      db.from('places').select(PLACE_COLS).eq('status', 'approved').order('created_at', { ascending: false }),
-      db.from('reviews').select('*').order('created_at', { ascending: false }),
-      db.from('site_status').select('*').eq('id', 1).maybeSingle()
-    ]);
-    if (!r[0].error) rows = r[0].data || [];
-    revs = r[1].data || [];
-    if (r[2].data) localStorage.setItem('cryovion_dev_status', JSON.stringify({ text: r[2].data.text, ts: r[2].data.ts }));
-    else localStorage.removeItem('cryovion_dev_status');
-  }
-  if (!rows.length && isUserMasterAdmin(getCurrentUser())) {
-    rows = DEFAULT_DIRECTORY.map(x => ({ ...x }));
-    writeQueue = writeQueue.then(() => Promise.all(rows.map(x => dbWrite(x)))).catch(() => {});
-  }
+function saveReview(rv) {
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  writeQueue = writeQueue
+    .then(() => db.from('reviews').insert({ place_id: rv.place_id, author: rv.author, stars: rv.stars, body: rv.body }))
+    .then(r => { if (r && r.error) toast('تعذر نشر التقييم'); }).catch(() => {});
+}
+function saveRefRequest(rq) {
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  writeQueue = writeQueue.then(async () => {
+    const s = await sess(); if (!s) return;
+    const r = await db.from('ad_requests').insert({ user_id: s.user.id, user_name: rq.user_name, user_email: s.user.email, title: rq.title, type: rq.type, phone: rq.phone, description: rq.desc });
+    if (r.error) toast('تعذر إرسال الطلب');
+  }).catch(() => {});
+}
+const getRefRequests = () => refCache;
+function getDevStatus() { try { return JSON.parse(localStorage.getItem('cryovion_dev_status')); } catch { return null; } }
+
+/* ----- كاش محلي: يظهر المحتوى فوراً ثم يتحدّث من الإنترنت ----- */
+function saveCache() {
+  try {
+    const slim = places.map(p => { const o = {}; PLACE_KEYS.forEach(k => { o[k] = p[k]; }); return o; });
+    const json = JSON.stringify(slim);
+    if (json.length < 1500000) localStorage.setItem(CACHE_KEY, json);
+  } catch {}
+}
+function hydrateFromCache() {
+  try {
+    const rows = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (Array.isArray(rows) && rows.length) buildPlaces(rows, []);
+  } catch {}
+}
+function buildPlaces(rows, revs) {
+  const rmap = new Map();
+  (revs || []).forEach(x => {
+    let a = rmap.get(x.place_id); if (!a) { a = []; rmap.set(x.place_id, a); }
+    a.push({ author: x.author, stars: x.stars, body: x.body, date: x.created_at ? x.created_at.slice(0, 10) : '' });
+  });
   places = rows.map(d => {
-    const rv = revs.filter(x => x.place_id === d.id).map(x => ({ author: x.author, stars: x.stars, body: x.body, date: x.created_at ? x.created_at.slice(0, 10) : '' }));
-    const rated = rv.filter(x => x.stars > 0);
-    const o = { ...d, hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف', bio: d.bio || '', gallery: d.gallery || [], phone: d.phone || null, whatsapp: d.whatsapp || null, reviews: rv, n: rated.length, rate: rated.length ? Math.round(rated.reduce((a, x) => a + x.stars, 0) / rated.length * 10) / 10 : 5 };
+    const rv = rmap.get(d.id) || [], rated = rv.filter(x => x.stars > 0);
+    const o = {
+      ...d, hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف', bio: d.bio || '', gallery: d.gallery || [],
+      phone: d.phone || null, whatsapp: d.whatsapp || null, fee: d.fee || '', map_url: d.map_url || '',
+      reviews: rv, n: rated.length,
+      rate: rated.length ? Math.round(rated.reduce((a, x) => a + x.stars, 0) / rated.length * 10) / 10 : 5,
+      updated_date: d.updated_at ? d.updated_at.slice(0, 10) : (d.updated_date || '')
+    };
+    o._n = norm(`${o.name} ${o.spec} ${o.addr}`);
+    o._s = o._n + ' ' + norm(o.bio);
     const a = getAvailabilityStatus(o); o.avail_state = a.state; o.avail_label = a.label; o.avail_color = a.color;
     return o;
   });
-  if (db && await db.auth.getSession().then(r => r.data.session)) {
-    const m = await db.rpc('my_places_meta');
-    (m.data || []).forEach(x => { const p = byId(x.id); if (p) p.owner_email = x.owner_email; });
-  }
-  if (db && isUserMasterAdmin(getCurrentUser())) {
-    const rq = await db.from('ad_requests').select('*').order('created_at', { ascending: false });
-    refCache = (rq.data || []).map(x => ({ ...x, desc: x.description, refs: '—' }));
-  }
-  refreshUserUI(); render(); renderPostersCarousel(); if (currentViewName === 'admin') renderAdminList();
+  placeMap = new Map(places.map(p => [p.id, p]));
 }
 
-/* ============ 11) العرض (Cards, Posters, Action Buttons) ============ */
+async function load() {
+  const my = ++loadSeq;
+  try { await writeQueue; } catch {}
+  let rows = [], revs = [], failed = !db, metaRows = [], reqRows = [];
+  if (db) {
+    const s = await sess().catch(() => null);
+    const admin = isUserMasterAdmin(getCurrentUser());
+    const jobs = [
+      db.from('places').select(PLACE_COLS).eq('status', 'approved').order('created_at', { ascending: false }),
+      db.from('reviews').select('place_id,author,stars,body,created_at').order('created_at', { ascending: false }).limit(1500),
+      db.from('site_status').select('*').eq('id', 1).maybeSingle(),
+      s ? db.rpc('my_places_meta') : Promise.resolve({ data: [] }),
+      (s && admin) ? db.from('ad_requests').select('*').order('created_at', { ascending: false }) : Promise.resolve({ data: [] })
+    ];
+    const r = await Promise.all(jobs.map(j => Promise.resolve(j).catch(e => ({ error: e, data: null }))));
+    if (my !== loadSeq) return;           /* وصل طلب أحدث؛ تجاهل هذه النتيجة القديمة */
+    if (r[0].error) { failed = true; console.error(r[0].error); } else rows = r[0].data || [];
+    revs = r[1].data || [];
+    if (r[2].data) localStorage.setItem('cryovion_dev_status', JSON.stringify({ text: r[2].data.text, ts: r[2].data.ts }));
+    else if (!r[2].error) localStorage.removeItem('cryovion_dev_status');
+    metaRows = r[3].data || []; reqRows = r[4].data || [];
+  }
+  if (failed) rows = DEFAULT_DIRECTORY.map(x => ({ ...x }));
+  else if (!rows.length && isUserMasterAdmin(getCurrentUser())) {
+    rows = DEFAULT_DIRECTORY.map(x => ({ ...x }));
+    writeQueue = writeQueue.then(() => Promise.all(rows.map(x => dbWrite(x)))).catch(() => {});
+  }
+
+  buildPlaces(rows, revs);
+  metaRows.forEach(x => { const p = byId(x.id); if (p) p.owner_email = x.owner_email; });
+  refCache = reqRows.map(x => ({ ...x, desc: x.description, refs: '—' }));
+  if (!failed && rows.length) saveCache();
+
+  refreshUserUI(); buildFilters(); render(); renderPostersCarousel();
+  if (currentViewName === 'admin') renderAdminList();
+  if (currentViewName === 'placePage' && currentPlaceId && byId(currentPlaceId)) renderPlacePageDOM(currentPlaceId);
+}
+
+/* ----- التحكم الحقيقي بعلامة التوثيق (رمادي ⇄ أزرق) ----- */
+const verifyBusy = new Set();
+function repaintVerified(id) {
+  render();
+  if (currentViewName === 'placePage' && currentPlaceId === id) renderPlacePageDOM(id);
+  if (currentViewName === 'admin') renderAdminList();
+}
+async function setVerified(id, val) {
+  const p = byId(id); if (!p) return;
+  if (!isUserMasterAdmin(getCurrentUser())) return toast('التحكم بعلامة التوثيق للأدمن فقط');
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  if (verifyBusy.has(id)) return;
+  const next = typeof val === 'boolean' ? val : !p.is_verified, prev = !!p.is_verified;
+  verifyBusy.add(id);
+  p.is_verified = next; repaintVerified(id);          /* تغيير فوري على الشاشة */
+  try {
+    try { await writeQueue; } catch {}
+    const s = await sess();
+    if (!s) throw new Error('no-session');
+    const r = await db.from('places').update({ is_verified: next }).eq('id', id).select('id');
+    if (r.error) throw r.error;
+    if (!r.data || !r.data.length) throw new Error('rls-blocked');
+    saveCache();
+    toast(next ? '🔵 تم التوثيق — العلامة الآن زرقاء' : '⚪ تم سحب التوثيق — العلامة الآن رمادية');
+  } catch (err) {
+    console.error(err);
+    p.is_verified = prev; repaintVerified(id);          /* تراجع لأن قاعدة البيانات رفضت */
+    toast(err && err.message === 'no-session' ? 'انتهت الجلسة، سجّل الدخول عبر Google من جديد'
+        : err && err.message === 'rls-blocked' ? '⛔ رفضت قاعدة البيانات التعديل: فعّل سياسة تحديث is_verified للأدمن'
+        : 'تعذر حفظ التوثيق، حاول مرة أخرى');
+  } finally { verifyBusy.delete(id); }
+}
+const toggleVerify = id => setVerified(id);
+
+/* ============ 10) الأزرار: اتصال / واتساب / خريطة ============ */
 function actions(d, mode) {
   const pg = mode === 'page', wa = formatWaNumber(d.whatsapp || d.phone);
-  let mu = (d.map_url || '').trim(); if (mu && !/^https?:\/\//i.test(mu)) mu = 'https://' + mu;
-  const base = pg ? 'padding:13px; border-radius:14px; text-align:center; display:block; font-weight:700; font-size:13px;' : 'padding:5px 11px; border-radius:9px; font-size:11.5px; font-weight:700;';
-  const one = (ok, href, blank, css, label) => ok ? `<a href="${esc(href)}"${blank ? ' target="_blank" rel="noopener"' : ''} onclick="event.stopPropagation()" style="${base}${css}">${label}</a>` : `<button type="button" data-off="1" class="act-off" style="${base}">${label}</button>`;
-  return one(!!d.phone, 'tel:' + d.phone, false, 'background:var(--emerald); color:#fff;', pg ? '📞 اتصال مباشر' : '📞 اتصل') + one(!!wa, 'https://wa.me/' + wa, true, 'background:var(--whatsapp); color:#fff;', pg ? '💬 مراسلة واتساب' : '💬 واتساب') + (pg ? one(!!mu, mu, true, 'background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);', '🗺️ الموقع على الخريطة') : '');
+  let mu = (d.map_url || '').trim();
+  if (mu && !/^https?:\/\//i.test(mu)) mu = 'https://' + mu;
+  const base = pg ? 'padding:13px; border-radius:14px; text-align:center; display:block; font-weight:700; font-size:13px;'
+                  : 'padding:5px 11px; border-radius:9px; font-size:11.5px; font-weight:700;';
+  const one = (ok, href, blank, css, label) => ok
+    ? `<a href="${esc(href)}"${blank ? ' target="_blank" rel="noopener"' : ''} onclick="event.stopPropagation()" style="${base}${css}">${label}</a>`
+    : `<button type="button" data-off="1" class="act-off" style="${base}">${label}</button>`;
+  return one(!!d.phone, 'tel:' + d.phone, false, 'background:var(--emerald); color:#fff;', pg ? '📞 اتصال مباشر' : '📞 اتصل')
+    + one(!!wa, 'https://wa.me/' + wa, true, 'background:var(--whatsapp); color:#fff;', pg ? '💬 مراسلة واتساب' : '💬 واتساب')
+    + (pg ? one(!!mu, mu, true, 'background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);', '🗺️ الموقع على الخريطة') : '');
 }
-function renderCats() {
+
+/* ============ 11) العرض: الأقسام والتخصصات والشريط والبطاقات ============ */
+/* الأزرار تُبنى مرة واحدة، وعند كل بحث نغيّر الألوان فقط (بدون إعادة بناء) */
+function buildFilters() {
   const dict = I18N[currentLang] || I18N.ar;
-  $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => `<button data-cat="${k}" class="cat-orb-pill ${activeCat === k ? 'active' : ''}">${orb(k, 40)}<div style="text-align:start;"><span style="font-size:14px; font-weight:700; display:block; line-height:1.2;">${currentLang === 'en' ? c.labelEn : c.label}</span><span style="font-size:11px; color:var(--gold);">${places.filter(d => d.cat === k).length} ${dict.page_unit}</span></div></button>`).join('');
+  $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => {
+    const n = places.reduce((a, d) => a + (d.cat === k ? 1 : 0), 0);
+    return `<button data-cat="${k}" class="cat-orb-pill">${orb(k, 40)}
+      <div style="text-align:start;"><span style="font-size:14px; font-weight:700; display:block; line-height:1.2;">${currentLang === 'en' ? c.labelEn : c.label}</span>
+      <span style="font-size:11px; color:var(--gold);">${n} ${dict.page_unit}</span></div></button>`;
+  }).join('');
+  $('specsBar').innerHTML = SPEC_BAR_ORDER.map(k => {
+    const s = SPECS_META[k]; if (!s) return '';
+    return `<button data-spec="${k}" class="spec-chip"><span style="font-size:15px;">${s.icon}</span><span>${currentLang === 'en' ? s.labelEn : s.label}</span></button>`;
+  }).join('');
+  paintFilters();
 }
-function renderSpecsBar() {
-  $('specsBar').innerHTML = SPEC_BAR_ORDER.map(k => { const s = SPECS_META[k]; return s ? `<button data-spec="${k}" class="spec-chip ${activeSpec === k ? 'active' : ''}"><span style="font-size:15px;">${s.icon}</span><span>${currentLang === 'en' ? s.labelEn : s.label}</span></button>` : ''; }).join('');
+function paintFilters() {
+  $('cats').querySelectorAll('[data-cat]').forEach(b => b.classList.toggle('active', b.dataset.cat === activeCat));
+  $('specsBar').querySelectorAll('[data-spec]').forEach(b => b.classList.toggle('active', b.dataset.spec === activeSpec));
 }
 function renderPostersCarousel() {
   const track = $('posterTrack'); if (!track) return;
-  const now = Date.now(), dev = getDevStatus(); let html = '';
-  if (dev && now - dev.ts <= DAY_MS) html += `<div class="poster-card" style="border-color:var(--gold);"><div class="poster-top-quarter"><div style="display:flex; align-items:center; gap:7px;"><span class="brand-mark gold-bg">C</span><span class="brand-text">Cryovion</span></div><span class="badge-pill gold-bg" style="font-size:10px;">✔ تحديث</span></div><div class="poster-bio-body">${esc(dev.text)}</div></div>`;
+  const now = Date.now(), dev = getDevStatus();
+  let html = '';
+  if (dev && now - dev.ts <= DAY_MS) {
+    html += `<div class="poster-card" style="border-color:var(--gold); cursor:default;"><div class="poster-top-quarter">
+      <div style="display:flex; align-items:center; gap:7px;"><span class="brand-mark gold-bg" style="width:28px; height:28px; border-radius:8px; font-size:14px;">C</span><span class="brand-text font-display" style="font-size:18px;">Cryovion</span></div>
+      <span class="badge-pill gold-bg" style="font-size:10px; padding:2px 9px;">✔ تحديث رسمي</span></div>
+      <div class="poster-bio-body">${esc(dev.text)}</div></div>`;
+  }
   places.forEach(d => {
     if (!d.bio || (d.bio_ts && now - d.bio_ts > DAY_MS)) return;
-    const sp = SPECS_META[d.spec_key] || SPECS_META.gastro, thumb = d.photo_url ? `<img src="${esc(d.photo_url)}" class="poster-mini-thumb">` : `<span class="poster-mini-thumb t-${d.cat}">${sp.icon}</span>`;
-    html += `<div data-act="openPage" data-id="${d.id}" class="poster-card"><div class="poster-top-quarter"><div style="display:flex; align-items:center; gap:7px; min-width:0;">${thumb}<span style="font-size:13px; font-weight:700; color:#fff;">${esc(d.name)}</span></div><span style="display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; color:${d.avail_color};"><span class="status-dot ${d.avail_state}"></span><span>${esc(d.avail_label)}</span></span></div><div class="poster-bio-body">${esc(d.bio)}</div></div>`;
+    const sp = SPECS_META[d.spec_key] || SPECS_META.gastro, wa = formatWaNumber(d.whatsapp || d.phone);
+    const thumb = d.photo_url ? `<img src="${esc(d.photo_url)}" class="poster-mini-thumb" alt="" loading="lazy" decoding="async">` : `<span class="poster-mini-thumb t-${d.cat}">${sp.icon}</span>`;
+    const foot = d.phone ? `<div style="display:flex; gap:6px; padding-top:6px;"><a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">📞 ${esc(d.phone)}</a>${wa ? `<a href="https://wa.me/${wa}" target="_blank" rel="noopener" style="background:var(--whatsapp); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">💬</a>` : ''}</div>` : '';
+    html += `<div data-act="openPage" data-id="${d.id}" class="poster-card"><div class="poster-top-quarter">
+      <div style="display:flex; align-items:center; gap:7px; min-width:0;">${thumb}<span style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(d.name)}</span></div>
+      <span style="display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; color:${d.avail_color}; flex-shrink:0;"><span class="status-dot ${d.avail_state}"></span><span>${esc(d.avail_label)}</span></span></div>
+      <div class="poster-bio-body">${esc(d.bio)}</div>${foot}</div>`;
   });
   track.innerHTML = html;
-  clearInterval(posterTimer); posterTimer = setInterval(() => { const mx = track.scrollWidth - track.clientWidth; if (Math.abs(track.scrollLeft) >= mx - 20) track.scrollTo({ left: 0, behavior: 'smooth' }); else track.scrollBy({ left: -354, behavior: 'smooth' }); }, 4200);
+}
+/* التمرير التلقائي: يعمل فقط والصفحة ظاهرة وفي الرئيسية */
+const posterStep = () => document.documentElement.dir === 'rtl' ? -354 : 354;
+function posterAutoplay() {
+  if (document.hidden || currentViewName !== 'home') return;
+  const track = $('posterTrack'); if (!track || track.children.length < 2) return;
+  const mx = track.scrollWidth - track.clientWidth;
+  if (Math.abs(track.scrollLeft) >= mx - 20) track.scrollTo({ left: 0, behavior: 'smooth' });
+  else track.scrollBy({ left: posterStep(), behavior: 'smooth' });
 }
 function card(d) {
-  const c = CATS[d.cat] || CATS.doctor, sp = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro, peds = d.cat === 'doctor' && d.spec_key === 'peds';
-  const wm = (d.cat === 'doctor' && sp.svg) ? `<svg class="doctor-watermark" style="--spec-color:${sp.color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">${sp.svg}</svg>` : '';
-  const ph = d.phone ? esc(d.phone) : '<span style="color:var(--muted); font-size:11.5px;">الرقم غير متوفر</span>';
-  const img = d.photo_url ? `<img src="${esc(d.photo_url)}" loading="lazy">` : `<div style="text-align:center; padding:8px;"><div style="font-size:36px; margin-bottom:4px;">${sp.icon}</div><span style="font-size:10.5px; color:var(--muted); font-weight:700;">${currentLang === 'en' ? c.labelEn : c.label}</span></div>`;
-  return `<article data-act="openPage" data-id="${d.id}" class="entity-card ${peds ? 'peds-dignified' : ''}" style="--cat-accent:${peds ? '#f472b6' : c.accent};">${wm}<div class="id-card-layout"><div class="id-card-right-photo">${img}</div><div class="id-card-left-info"><div><div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;"><h3 style="font-size:17.5px; font-weight:700; line-height:1.3;"><span>${esc(d.name)}</span>${getSmartBadge(d.is_verified)}</h3><span class="top-left-activity"><span class="status-dot ${d.avail_state}"></span><span style="color:${d.avail_color};">${esc(d.avail_label)}</span></span></div><div style="margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;"><span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; border:1px solid ${sp.color}44;">${sp.icon} ${esc(d.spec)}</span><span style="font-size:11.5px; color:var(--gold);">★ ${d.rate || 5} (${d.n})</span></div><div style="margin-top:9px; font-size:12.5px; color:var(--muted); display:grid; gap:3px;"><p>📍 <b style="color:var(--text);">العنوان:</b> ${esc(d.addr)}</p><p>🕒 <b style="color:var(--text);">المواعيد:</b> ${esc(d.hours || 'غير معروف')}</p>${d.fee ? `<p>💰 <b style="color:var(--gold);">سعر الكشف:</b> <span style="color:var(--text); font-weight:700;">${esc(d.fee)}</span></p>` : ''}<p>📞 <b style="color:var(--text);">الهاتف:</b> ${ph}</p></div></div><div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;"><span style="font-size:11.5px; color:var(--gold); font-weight:700;">عرض التفاصيل ←</span><div style="display:flex; gap:6px;">${actions(d, 'card')}</div></div></div></div></article>`;
+  const c = CATS[d.cat] || CATS.doctor;
+  const spMeta = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro;
+  const isPeds = d.cat === 'doctor' && d.spec_key === 'peds';
+  const watermark = (d.cat === 'doctor' && spMeta.svg) ? `<svg class="doctor-watermark" style="--spec-color:${spMeta.color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">${spMeta.svg}</svg>` : '';
+  const phoneDisplay = d.phone ? esc(d.phone) : '<span style="color:var(--muted); font-size:11.5px;">الرقم قيد التأكيد والتدقيق</span>';
+  const verifyText = d.is_verified
+    ? '<span style="color:#60a5fa; font-size:11.5px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>'
+    : '<span style="color:var(--muted); font-size:11px;" title="جاري جمع وتدقيق البيانات">⏳ قيد التدقيق</span>';
+  const photo = d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" loading="lazy" decoding="async">`
+    : `<div style="text-align:center; padding:8px;"><div style="font-size:36px; margin-bottom:4px;">${spMeta.icon}</div><span style="font-size:10.5px; color:var(--muted); font-weight:700; display:block;">${currentLang === 'en' ? c.labelEn : c.label}</span></div>`;
+  return `<article data-act="openPage" data-id="${d.id}" class="entity-card ${isPeds ? 'peds-dignified' : ''}" style="--cat-accent:${isPeds ? '#f472b6' : c.accent};">
+    ${watermark}
+    <div class="id-card-layout">
+      <div class="id-card-right-photo">${photo}</div>
+      <div class="id-card-left-info">
+        <div>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+            <h3 style="font-size:17.5px; font-weight:700; line-height:1.3;"><span>${esc(d.name)}</span>${badge(d, true)}</h3>
+            <span class="top-left-activity"><span class="status-dot ${d.avail_state}"></span><span style="color:${d.avail_color};">${esc(d.avail_label)}</span></span>
+          </div>
+          <div style="margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color}; border:1px solid ${spMeta.color}44;">${spMeta.icon} ${esc(d.spec)}</span>
+            ${verifyText}
+            <span style="font-size:11.5px; color:var(--gold);">★ ${d.rate || 5} (${d.n})</span>
+          </div>
+          <div style="margin-top:9px; font-size:12.5px; color:var(--muted); display:grid; gap:3px;">
+            <p>📍 <b style="color:var(--text);">العنوان:</b> ${esc(d.addr)}</p>
+            <p>🕒 <b style="color:var(--text);">المواعيد:</b> ${esc(d.hours || 'غير معروف')}</p>
+            ${d.fee ? `<p>💰 <b style="color:var(--gold);">سعر الكشف:</b> <span style="color:var(--text); font-weight:700;">${esc(d.fee)}</span></p>` : ''}
+            <p>📞 <b style="color:var(--text);">الهاتف:</b> ${phoneDisplay}</p>
+          </div>
+        </div>
+        <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+          <span style="font-size:11.5px; color:var(--gold); font-weight:700;">عرض التفاصيل والتقييمات ←</span>
+          <div style="display:flex; gap:6px;">${actions(d, 'card')}</div>
+        </div>
+      </div>
+    </div>
+  </article>`;
 }
+/* عرض 24 بطاقة فقط في كل مرة ثم زر "عرض المزيد" (هذا أكبر تحسين للسرعة) */
 function render() {
-  const q = norm(query);
-  const res = places.filter(d => (!activeCat || d.cat === activeCat) && (activeSpec === 'all' || d.spec_key === activeSpec) && (!q || norm(`${d.name} ${d.spec} ${d.addr} ${d.bio}`).includes(q)));
-  $('list').innerHTML = res.map(card).join('');
+  if (currentViewName !== 'home') { homeDirty = true; return; }
+  const q = norm(query), dict = I18N[currentLang] || I18N.ar;
+  const res = places.filter(d => (!activeCat || d.cat === activeCat) && (activeSpec === 'all' || d.spec_key === activeSpec) && (!q || d._s.includes(q)));
+  const shown = res.slice(0, shownLimit);
+  let html = shown.map(card).join('');
+  if (res.length > shown.length) html += `<button type="button" data-act="more" class="gold-bg" style="grid-column:1/-1; padding:12px; border-radius:14px; font-size:13.5px;">${dict.more_btn} (${res.length - shown.length})</button>`;
+  $('list').innerHTML = html;
   $('totalCountBadge').textContent = res.length;
-  $('empty').textContent = currentLang === 'en' ? 'No matching results found.' : 'لا توجد نتائج.'; $('empty').classList.toggle('hidden', res.length > 0);
-  $('listTitle').textContent = activeSpec !== 'all' ? (currentLang === 'en' ? SPECS_META[activeSpec].labelEn : SPECS_META[activeSpec].label) : (activeCat ? (currentLang === 'en' ? CATS[activeCat].labelEn : CATS[activeCat].label) : (I18N[currentLang] || I18N.ar).dir_title);
+  $('empty').textContent = currentLang === 'en' ? 'No matching results found.' : 'لا توجد نتائج مطابقة لهذا الفلتر.';
+  $('empty').classList.toggle('hidden', res.length > 0);
+  $('listTitle').textContent = activeSpec !== 'all' ? (currentLang === 'en' ? SPECS_META[activeSpec].labelEn : SPECS_META[activeSpec].label)
+    : (activeCat ? (currentLang === 'en' ? CATS[activeCat].labelEn : CATS[activeCat].label) : dict.dir_title);
   $('showAll').classList.toggle('hidden', !activeCat && activeSpec === 'all');
-  renderCats(); renderSpecsBar();
+  paintFilters();
 }
 
-/* البحث الذكي السريع (Debounced) */
-let searchTimeout;
-$('search').addEventListener('input', e => {
-  query = e.target.value; const raw = query.trim(), q = norm(raw), box = $('searchSuggest');
-  if (!q) box.classList.add('hidden');
-  else {
-    const matches = places.filter(d => norm(`${d.name} ${d.spec} ${d.addr}`).includes(q)).slice(0, 6);
-    box.innerHTML = matches.length ? matches.map(m => {
-      const sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
-      return `<div class="auto-item" data-suggest-id="${m.id}"><div style="display:flex; align-items:center; gap:10px; min-width:0;">${orb(m.cat, 34)}<div style="min-width:0;"><p style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;"><span>${esc(m.name)}</span><span class="status-dot ${m.avail_state}"></span></p><p style="font-size:11px; color:${sp.color};">${esc(m.spec)} • 📍 ${esc(m.addr)}</p></div></div><span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.icon} ${currentLang === 'en' ? sp.labelEn : sp.label}</span></div>`;
-    }).join('') : `<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق لـ "${esc(raw)}"</div>`;
-    box.classList.remove('hidden');
-  }
-  if (currentViewName !== 'home') switchViewDOM('home', false);
-  clearTimeout(searchTimeout); searchTimeout = setTimeout(render, 200); // سرعة استجابة فائقة!
-});
-
-/* ============ 12) صفحة المكان والقراءة الصوتية ============ */
-let ttsId = null, voices = []; const hasTTS = 'speechSynthesis' in window;
-if (hasTTS) { const ld = () => { voices = speechSynthesis.getVoices(); }; ld(); speechSynthesis.addEventListener('voiceschanged', ld); }
+/* ============ 12) القراءة الصوتية + صفحة المكان + التقييم ============ */
+const hasTTS = 'speechSynthesis' in window;
+function loadVoices() { if (hasTTS) voices = speechSynthesis.getVoices(); }
+if (hasTTS) { loadVoices(); speechSynthesis.addEventListener('voiceschanged', loadVoices); }
+function bestVoice() {
+  const sc = v => { const n = v.name.toLowerCase(), l = v.lang.toLowerCase().replace('_', '-'); let s = 0;
+    if (/enhanced|premium|natural|neural|online/.test(n)) s += 10; if (/google/.test(n)) s += 6;
+    if (l === 'ar-eg') s += 2; else if (l === 'ar-sa') s += 1; return s; };
+  return voices.filter(v => v.lang.toLowerCase().startsWith('ar')).sort((a, b) => sc(b) - sc(a))[0] || null;
+}
+function paintTTS(on) {
+  const b = $('ttsBtn'); if (!b) return;
+  b.innerHTML = on ? '⏹️ إيقاف الصوت' : '🔊 استماع للبيانات';
+  b.style.background = on ? 'rgba(244,63,94,0.18)' : 'rgba(16,185,129,0.15)';
+  b.style.color = on ? 'var(--rose)' : 'var(--emerald)';
+}
 function mountTTS(id) {
-  const host = $('placePageContent'), old = $('ttsBtn'); if (!host) return; if (old) old.remove();
-  const b = document.createElement('button'); b.id = 'ttsBtn'; b.type = 'button';
+  const host = $('placePageContent'); if (!host) return;
+  const old = $('ttsBtn'); if (old) old.remove();
+  const b = document.createElement('button');
+  b.id = 'ttsBtn'; b.type = 'button';
   b.style.cssText = 'padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:6px; margin:0 0 12px; width:100%; justify-content:center;';
-  const paint = on => { b.innerHTML = on ? '⏹️ إيقاف الصوت' : '🔊 استماع للبيانات'; b.style.background = on ? 'rgba(244,63,94,0.18)' : 'rgba(16,185,129,0.15)'; b.style.color = on ? 'var(--rose)' : 'var(--emerald)'; };
   b.onclick = () => {
     if (!hasTTS) return toast('المتصفح لا يدعم القراءة الصوتية');
-    if (speechSynthesis.speaking) { speechSynthesis.cancel(); ttsId = null; paint(false); return; }
+    if (speechSynthesis.speaking) { speechSynthesis.cancel(); ttsId = null; paintTTS(false); return; }
     const p = byId(id); if (!p) return;
-    const u = new SpeechSynthesisUtterance('مرحباً بك في ' + p.name + '. ' + (p.spec ? 'التخصص: ' + p.spec + '. ' : '') + (p.hours ? 'المواعيد: ' + p.hours : ''));
+    const u = new SpeechSynthesisUtterance('مرحباً بك في ' + p.name + '. ' + (p.spec ? 'التخصص: ' + p.spec + '. ' : '') + (p.bio ? p.bio + '. ' : '') + (p.hours ? 'مواعيد العمل: ' + p.hours + '. ' : ''));
     u.lang = 'ar-SA'; u.rate = 0.9;
-    const v = voices.filter(x => x.lang.toLowerCase().startsWith('ar')).sort((a,b) => (b.name.includes('Google')?1:0) - (a.name.includes('Google')?1:0))[0];
-    if (v) u.voice = v;
-    u.onstart = () => { ttsId = id; paint(true); }; u.onend = u.onerror = () => { ttsId = null; paint(false); };
+    const v = bestVoice(); if (v) { u.voice = v; u.lang = v.lang; }
+    u.onstart = () => { ttsId = id; paintTTS(true); };
+    u.onend = u.onerror = () => { ttsId = null; paintTTS(false); };
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   };
-  host.insertBefore(b, host.firstChild); paint(hasTTS && ttsId === id && speechSynthesis.speaking);
+  host.insertBefore(b, host.firstChild);
+  paintTTS(hasTTS && ttsId === id && speechSynthesis.speaking);
 }
 function renderPlacePageDOM(id) {
   const d = byId(id); if (!d) return;
+  currentPlaceId = id;
   const c = CATS[d.cat] || CATS.doctor, spMeta = SPECS_META[d.spec_key] || SPECS_META.gastro, u = getCurrentUser();
   const canManage = adminUnlocked || (u && d.owner_email && norm(u.email) === norm(d.owner_email));
-  const revHtml = d.reviews.length ? d.reviews.map(r => `<div class="entity-card" style="padding:12px 16px; border-color:var(--border-soft);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"><strong style="font-size:13.5px; color:var(--gold);">👤 ${esc(r.author || 'زائر')}</strong><span>${stars(r.stars || 5)}</span></div><p style="font-size:13px; color:var(--text);">${esc(r.body)}</p><span style="font-size:10.5px; color:var(--muted);">${esc(r.date || '')}</span></div>`).join('') : '<p style="font-size:13px; color:var(--muted); text-align:center; padding:18px;">لا توجد تعليقات بعد.</p>';
-  
+  const phoneRow = d.phone ? `📞 ${esc(d.phone)}` : '<span style="color:var(--muted);">الرقم قيد التأكيد والتدقيق</span>';
+  const verifyPage = (d.is_verified ? '<span style="color:#60a5fa; font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>' : '<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>')
+    + (adminUnlocked ? ` <button type="button" data-badge-id="${esc(d.id)}" class="badge-pill" style="margin-inline-start:8px; background:${d.is_verified ? 'rgba(148,163,184,.2)' : 'rgba(59,130,246,.2)'}; color:${d.is_verified ? 'var(--muted)' : '#60a5fa'}; border:1px solid ${d.is_verified ? 'var(--border-soft)' : 'rgba(59,130,246,.5)'};">${d.is_verified ? '⚪ سحب التوثيق' : '🔵 منح التوثيق'}</button>` : '');
+  const reviewsHtml = d.reviews.length ? d.reviews.map(r => `
+    <div class="entity-card" style="padding:12px 16px; border-color:var(--border-soft);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"><strong style="font-size:13.5px; color:var(--gold);">👤 ${esc(r.author || 'زائر')}</strong><span>${stars(r.stars || 5)}</span></div>
+      <p style="font-size:13px; color:var(--text);">${esc(r.body)}</p><span style="font-size:10.5px; color:var(--muted);">${esc(r.date || '')}</span></div>`).join('')
+    : '<p style="font-size:13px; color:var(--muted); text-align:center; padding:18px;">لا توجد تعليقات بعد. كن أول من يشارك تجربته!</p>';
+  const galleryHtml = d.gallery.length > 1 ? '<div style="display:flex; gap:8px; overflow-x:auto; margin-top:18px;">' + d.gallery.map(s => `<img src="${esc(s)}" alt="" loading="lazy" decoding="async" style="width:110px; height:110px; object-fit:cover; border-radius:12px; border:1px solid var(--border);">`).join('') + '</div>' : '';
+
   $('placePageContent').innerHTML = `
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
-      <div style="font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px;"><span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة</span><span>/</span><span>${c.label}</span><span>/</span><span style="color:var(--text); font-weight:700;">${esc(d.name)}</span></div>
-      <div style="display:flex; gap:8px;">${canManage ? `<button onclick="openEditorModal('${d.id}')" class="gold-bg" style="padding:8px 14px; border-radius:10px; font-size:12px;">✏️ تعديل</button>` : ''}<button onclick="goBackSmart()" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">← رجوع</button></div>
+      <div style="font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px;">
+        <span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة للدليل</span><span>/</span><span>${c.label}</span><span>/</span>
+        <span style="color:var(--text); font-weight:700;">${esc(d.name)}</span></div>
+      <div style="display:flex; gap:8px;">
+        ${canManage ? `<button onclick="openEditorModal('${d.id}')" class="gold-bg" style="padding:8px 14px; border-radius:10px; font-size:12px;">✏️ تعديل بيانات الصفحة</button>` : ''}
+        <button onclick="goBackSmart()" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12px;">← رجوع</button>
+      </div>
     </div>
     <div class="noon-hero-grid">
       <div class="noon-showcase">
-        ${d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" style="width:100%; height:230px; object-fit:cover; border-radius:16px; margin-bottom:10px;">` : `<div style="font-size:58px; margin-bottom:10px;">${spMeta.icon}</div>`}
+        ${d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" decoding="async" style="width:100%; height:230px; object-fit:cover; border-radius:16px; margin-bottom:10px;">` : `<div style="font-size:58px; margin-bottom:10px;">${spMeta.icon}</div>`}
         <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color};">${spMeta.icon} ${esc(d.spec)}</span>
-        <h2 class="font-display" style="font-size:22px; margin-top:8px; color:#fff;">${esc(d.name)}${getSmartBadge(d.is_verified)}</h2>
+        <h2 class="font-display" style="font-size:22px; margin-top:8px; color:#fff;">${esc(d.name)}${badge(d, true)}</h2>
         <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">"${esc(d.bio || 'صحتك أقرب مما تظن')}"</p>
       </div>
       <div>
@@ -1097,113 +1332,460 @@ function renderPlacePageDOM(id) {
           <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color}; font-size:13px;">${spMeta.icon} ${esc(d.spec)}</span>
           <span class="top-left-activity"><span class="status-dot ${d.avail_state}"></span><span style="color:${d.avail_color};">${esc(d.avail_label)}</span></span>
         </div>
-        <h1 class="font-display" style="font-size:26px; margin-top:8px;">${esc(d.name)}${getSmartBadge(d.is_verified)}</h1>
-        <div style="margin-top:4px; display:flex; align-items:center; gap:10px;"><span>${stars(d.rate || 5)}</span><span style="font-size:12.5px; color:var(--gold); font-weight:700;">${d.rate || 5} / 5 (${d.n} تقييم)</span><button onclick="openReviewModal('${d.id}')" style="background:rgba(217,180,90,0.15); color:var(--gold); border:1px solid var(--border); padding:3px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">+ أضف تقييمك</button></div>
+        <h1 class="font-display" style="font-size:26px; margin-top:8px;">${esc(d.name)}${badge(d, true)}</h1>
+        <div style="margin-top:4px; display:flex; align-items:center; gap:10px;">
+          <span>${stars(d.rate || 5)}</span><span style="font-size:12.5px; color:var(--gold); font-weight:700;">${d.rate || 5} / 5 (${d.n} تقييم)</span>
+          <button onclick="openReviewModal('${d.id}')" style="background:rgba(217,180,90,0.15); color:var(--gold); border:1px solid var(--border); padding:3px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">+ أضف تقييمك</button>
+        </div>
         <table class="noon-table">
+          <tr><th>حالة التوثيق</th><td>${verifyPage}</td></tr>
           <tr><th>التخصص الدقيق</th><td style="color:${spMeta.color};">${esc(d.spec)}</td></tr>
           ${d.cat === 'doctor' ? `<tr><th>💰 سعر الكشف</th><td style="color:var(--gold);">${esc(d.fee || 'يُحدد بالعيادة')}</td></tr>` : ''}
           <tr><th>📍 العنوان المؤكد</th><td>${esc(d.addr)}</td></tr>
           <tr><th>🕒 مواعيد الفتح</th><td>${esc(d.hours || 'غير معروف')}</td></tr>
-          <tr><th>📞 رقم الهاتف</th><td>${d.phone ? esc(d.phone) : 'غير متوفر'}</td></tr>
+          <tr><th>📞 رقم الهاتف</th><td>${phoneRow}</td></tr>
+          <tr><th>📅 آخر تحديث</th><td>${esc(d.updated_date || '2026-11-08')}</td></tr>
         </table>
         <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; font-weight:700; font-size:13px;">
           ${actions(d, 'page')}
-          <button data-act="share" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border); color:var(--gold); padding:13px; border-radius:14px;">✨ دعوة صديق</button>
+          <button data-act="share" data-id="${d.id}" style="background:var(--card); border:1px solid var(--border); color:var(--gold); padding:13px; border-radius:14px;">✨ دعوة صديق للمكان</button>
         </div>
       </div>
     </div>
+    ${galleryHtml}
     <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border-soft);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h3 class="font-display" style="font-size:18px; color:var(--gold);">💬 تقييمات الزوار (${d.n})</h3><button onclick="openReviewModal('${d.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">⭐ إضافة تقييم</button></div>
-      <div style="display:grid; gap:10px;">${revHtml}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 class="font-display" style="font-size:18px; color:var(--gold);">💬 تقييمات وتجارب الزوار (${d.n})</h3>
+        <button onclick="openReviewModal('${d.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">⭐ إضافة تقييم وتعليق</button>
+      </div>
+      <div style="display:grid; gap:10px;">${reviewsHtml}</div>
     </div>`;
   mountTTS(id);
 }
-function renderStarPicker() { $('starPick').innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" onclick="setPickedStars(${n})" style="font-size:28px; color:${n <= pickedStars ? '#D9B45A' : '#475569'};">★</button>`).join(''); }
+function renderStarPicker() {
+  $('starPick').innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" onclick="setPickedStars(${n})" style="font-size:28px; color:${n <= pickedStars ? '#D9B45A' : '#475569'};">★</button>`).join('');
+}
 function setPickedStars(n) { pickedStars = n; renderStarPicker(); }
-function openReviewModal(id) { activeReviewPlaceId = id; pickedStars = 5; renderStarPicker(); $('revAuthor').value = ''; $('revBody').value = ''; $('reviewModal').classList.remove('hidden'); }
+function openReviewModal(id) {
+  activeReviewPlaceId = id; pickedStars = 5; renderStarPicker();
+  $('revAuthor').value = ''; $('revBody').value = ''; $('reviewModal').classList.remove('hidden');
+}
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
-/* ============ 13) إدارة صفحتي ودعوة صديق والإدارة ============ */
+/* ============ 13) إدارة صفحتي + دعوة صديق + غرفة الإدارة ============ */
 function renderManagedAds() {
   const u = getCurrentUser(), box = $('managedListBox');
-  if (!u) { box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px;"><p style="color:var(--muted); margin-bottom:12px;">سجل دخولك لعرض الصفحات المفوضة لك.</p><button onclick="navigateApp('account')" class="gold-bg" style="padding:10px 20px; border-radius:12px;">تسجيل الدخول</button></div>`; return; }
+  if (!u) {
+    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px;"><p style="color:var(--muted); margin-bottom:12px;">سجل دخولك ببريدك الإلكتروني لعرض الصفحات المفوضة لك.</p><button onclick="navigateApp('account')" class="gold-bg" style="padding:10px 20px; border-radius:12px;">تسجيل الدخول</button></div>`;
+    return;
+  }
   const myAds = places.filter(p => norm(p.owner_email) === norm(u.email));
-  if (!myAds.length) { box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px; color:var(--muted);">لا توجد صفحة مرتبطة ببريدك حالياً.</div>`; return; }
+  if (!myAds.length) {
+    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px; color:var(--muted);">لا توجد صفحة مرتبطة ببريدك (<b style="color:var(--gold);">${esc(u.email)}</b>) حالياً.<br>يمكنك استخدام ميزة <button onclick="navigateApp('referrals')" style="color:var(--gold); text-decoration:underline; font-weight:700;">✨ دعوة صديق</button> لنشر إعلانك مجاناً!</div>`;
+    return;
+  }
+  const baseUrl = window.location.href.split('?')[0];
   box.innerHTML = myAds.map(p => {
-    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px;">
+    const refLink = `${baseUrl}?ref=${p.id}`, count = p.ref_count || 0, pct = Math.min(100, count);
+    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px; cursor:default;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div><span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔ صفحة مفوضة لحسابك</span><h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}</h3></div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;"><button onclick="quickToggleLamp('${p.id}')" style="background:rgba(255,255,255,0.06); border:1px solid var(--emerald); color:var(--emerald); padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700;"><span class="status-dot ${p.avail_state}"></span> تبديل حالة الدوام (${esc(p.avail_label)})</button><button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">📷 تعديل البيانات</button></div>
+        <div><span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔ صفحة مفوضة لحسابك</span><h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}${badge(p, false)}</h3></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button onclick="quickToggleLamp('${p.id}')" style="background:rgba(255,255,255,0.06); border:1px solid var(--emerald); color:var(--emerald); padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700;"><span class="status-dot ${p.avail_state}"></span> تبديل حالة الدوام (${esc(p.avail_label)})</button>
+          <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">📷 رفع صورة / تعديل البيانات</button>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:14px; border:1px solid var(--border-soft);">
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; margin-bottom:6px;"><span style="color:var(--gold);">✨ عداد دعوة صديق الخاص بصفحتك:</span><span style="color:var(--emerald);">${count} / 100 صديق</span></div>
+        <div style="height:9px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:10px;"><div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div></div>
+        <div style="display:flex; gap:8px;"><input readonly value="${esc(refLink)}" class="input-box" style="font-size:12px; padding:8px 10px;">
+        <button onclick="navigator.clipboard.writeText('${esc(refLink)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 14px; border-radius:10px; font-size:12px; white-space:nowrap;">نسخ الرابط</button></div>
       </div>
       <div style="background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:8px;">
         <b style="font-size:13px; color:var(--gold);">📢 انشر حالتك اليومية (تظهر 24 ساعة)</b>
         <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="مثال: متاح كشف الليلة حتى 9 مساءً...">${esc(p.bio || '')}</textarea>
-        <div style="display:flex; gap:8px;"><button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة ✔</button><button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">حذف</button></div>
-      </div></div>`;
+        <div style="display:flex; gap:8px;">
+          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة ✔</button>
+          <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">حذف</button>
+        </div>
+      </div>
+    </div>`;
   }).join('');
 }
 async function quickToggleLamp(id) {
   const p = byId(id); if (!p) return;
-  const nx = ['auto', 'open', 'closed', 'unknown'][(['auto', 'open', 'closed', 'unknown'].indexOf(p.lamp_mode) + 1) % 4];
-  savePlace({ ...p, lamp_mode: nx }); await load(); renderManagedAds(); toast({ auto: '⏱️ تلقائي', open: '🟢 مفتوح', closed: '🔴 مغلق', unknown: '⚪ غير معروف' }[nx]);
+  const order = ['auto', 'open', 'closed', 'unknown'], nx = order[(order.indexOf(p.lamp_mode) + 1) % 4];
+  savePlace({ ...p, lamp_mode: nx });
+  await load(); renderManagedAds();
+  toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ غير معروف' }[nx]);
 }
-function renderReferralsHub() {
-  const u = getCurrentUser(), box = $('referralsDashboardBox');
-  if (!u) { box.innerHTML = `<div class="entity-card" style="text-align:center; padding:28px;"><h3 style="font-size:18px; color:var(--gold); margin-bottom:8px;">✨ سجل دخولك للمشاركة</h3><button onclick="navigateApp('account')" class="gold-bg" style="padding:11px 22px; border-radius:12px;">تسجيل الدخول ←</button></div>`; return; }
-  const refCode = u.ref_code || ('u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10));
-  const totalRefs = (JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}')[refCode] || 0) + places.filter(p => norm(p.owner_email) === norm(u.email)).reduce((a, i) => a + (i.ref_count || 0), 0);
-  const myRefUrl = `${window.location.href.split('?')[0]}?ref=${refCode}`;
-  box.innerHTML = `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px;"><div style="display:flex; justify-content:space-between; align-items:center;"><div><span class="badge-pill" style="background:rgba(217,180,90,0.2); color:var(--gold);">✨ دعوة صديق</span><h3 style="font-size:19px; margin-top:4px;">مرحباً ${esc(u.name)}</h3></div><div style="text-align:center; background:rgba(16,185,129,0.12); border:1px solid var(--emerald); padding:8px 16px; border-radius:14px;"><span style="font-size:22px; font-weight:700; color:var(--emerald); display:block; line-height:1.1;">${totalRefs}</span><span style="font-size:11px; color:var(--muted);">صديق</span></div></div><div style="display:flex; gap:8px;"><input readonly value="${esc(myRefUrl)}" class="input-box"><button onclick="navigator.clipboard.writeText('${esc(myRefUrl)}'); toast('تم النسخ')" class="gold-bg" style="padding:0 18px; border-radius:12px;">نسخ</button></div></div>`;
-}
-function renderAdminList() {
-  if (!adminUnlocked) return;
-  $('adminAllPlacesList').innerHTML = places.map(p => `<div class="entity-card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-    <div><strong style="font-size:15px;">${esc(p.name)}</strong><p style="font-size:12px; color:var(--muted); margin-top:2px;">المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b></p></div>
-    <div style="display:flex; gap:6px;"><button onclick="toggleVerify('${p.id}')" style="background:rgba(217,180,90,0.2); color:var(--gold); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">${p.is_verified ? 'سحب التوثيق' : 'منح التوثيق'}</button><button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:7px 14px; border-radius:9px; font-size:12px;">✏️ تعديل</button></div>
-  </div>`).join('');
-}
-function toggleVerify(id) {
-  const p = byId(id); if (p && adminUnlocked) { savePlace({ ...p, is_verified: !p.is_verified }); load().then(() => { renderAdminList(); toast(p.is_verified ? 'سحب' : 'مُنح'); }); }
+function saveDailyStatus(id, text) {
+  const q = byId(id); if (!q) return;
+  if (containsDefamation(text)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
+  savePlace({ ...q, bio: text, bio_ts: Date.now() });
+  load().then(() => { renderManagedAds(); toast(text ? '✔ تم نشر حالتك' : 'تم حذف الحالة'); });
 }
 
-/* ============ 14) نافذة التعديل وإرسال البيانات ============ */
+function renderReferralsHub() {
+  const u = getCurrentUser(), box = $('referralsDashboardBox'), baseUrl = window.location.href.split('?')[0];
+  if (!u) {
+    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:28px;"><h3 style="font-size:18px; color:var(--gold); margin-bottom:8px;">✨ شارك المنصة عبر ميزة دعوة صديق</h3><p style="font-size:13px; color:var(--muted); margin-bottom:14px;">سجل دخولك بحساب مجاني للحصول على رابط دعوة الأصدقاء الخاص بك.</p><button onclick="navigateApp('account')" class="gold-bg" style="padding:11px 22px; border-radius:12px;">تسجيل الدخول الآن ←</button></div>`;
+    return;
+  }
+  const uMap = JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}');
+  const myCode = u.ref_code || ('u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10));
+  const myAds = places.filter(p => norm(p.owner_email) === norm(u.email));
+  const totalRefs = (uMap[myCode] || 0) + myAds.reduce((a, i) => a + (i.ref_count || 0), 0), pct = Math.min(100, totalRefs);
+  const myRefUrl = myAds.length ? `${baseUrl}?ref=${myAds[0].id}` : `${baseUrl}?ref=${myCode}`;
+  box.innerHTML = `
+    <div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px; cursor:default;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div><span class="badge-pill" style="background:rgba(217,180,90,0.2); color:var(--gold);">✨ دعوة صديق</span><h3 style="font-size:19px; margin-top:4px;">مرحباً ${esc(u.name)}</h3></div>
+        <div style="text-align:center; background:rgba(16,185,129,0.12); border:1px solid var(--emerald); padding:8px 16px; border-radius:14px;"><span style="font-size:22px; font-weight:700; color:var(--emerald); display:block; line-height:1.1;">${totalRefs}</span><span style="font-size:11px; color:var(--muted);">صديق مدعو</span></div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); line-height:1.6;">قم بدعوة أصدقائك عبر الرابط التالي؛ وعند دعوة 100 شخص حقيقي يمكنك طلب وضع إعلان لنشاطك الطبي أو التجميلي مجاناً:</p>
+      <div><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>التقدم نحو مكافأة الـ 100 صديق:</span><b style="color:var(--gold);">${totalRefs} / 100</b></div>
+      <div style="height:10px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden;"><div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div></div></div>
+      <div style="display:flex; gap:8px;"><input readonly value="${esc(myRefUrl)}" class="input-box" style="font-size:12.5px;">
+      <button onclick="navigator.clipboard.writeText('${esc(myRefUrl)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 18px; border-radius:12px; font-size:13px; white-space:nowrap;">✨ نسخ الرابط 📋</button></div>
+    </div>
+    <form id="refAdRequestForm" class="entity-card" style="display:grid; gap:10px; cursor:default;">
+      <h4 style="font-size:16px; color:var(--gold);">📢 طلب نشر إعلان لنشاطك المسموح به</h4>
+      <input id="rqTitle" required placeholder="اسم النشاط أو العيادة *" class="input-box">
+      <input id="rqType" required placeholder="نوع النشاط *" class="input-box">
+      <input id="rqPhone" required placeholder="رقم الهاتف أو الواتساب *" class="input-box">
+      <textarea id="rqDesc" required rows="2" placeholder="تفاصيل الإعلان والعنوان وسعر الكشف..." class="input-box"></textarea>
+      <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">إرسال الطلب للإدارة (${totalRefs} صديق) ✔</button>
+    </form>`;
+  $('refAdRequestForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const desc = $('rqDesc').value.trim();
+    if (containsDefamation(desc)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
+    saveRefRequest({ user_name: u.name, user_email: u.email, refs: totalRefs, title: $('rqTitle').value.trim(), type: $('rqType').value.trim(), phone: $('rqPhone').value.trim(), desc });
+    e.target.reset(); toast('✔ تم إرسال طلبك إلى الإدارة بنجاح!');
+  });
+}
+
+function renderAdminList() {
+  const reqs = getRefRequests();
+  $('adminRefReqCount').textContent = reqs.length;
+  $('adminRefRequestsList').innerHTML = reqs.length ? reqs.map(r => `
+    <div class="entity-card" style="border-color:var(--emerald); padding:12px 16px; cursor:default;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gold);"><span>المرسل: ${esc(r.user_name)} (${esc(r.user_email)})</span><b style="color:var(--emerald);">الدعوات: ${r.refs}</b></div>
+      <h4 style="font-size:16px; margin-top:4px;">${esc(r.title)} — <span style="font-size:13px; color:var(--gold);">${esc(r.type)}</span></h4>
+      <p style="font-size:13px; color:var(--muted); margin-top:4px;">${esc(r.desc)} | هاتف: ${esc(r.phone)}</p></div>`).join('')
+    : '<div class="entity-card" style="text-align:center; padding:16px; color:var(--muted); cursor:default;">لا توجد طلبات جديدة.</div>';
+  $('adminTotalPlaces').textContent = places.length;
+  $('adminAllPlacesList').innerHTML = places.map(p => `
+    <div class="entity-card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; cursor:default;">
+      <div>
+        <span style="font-size:11px; color:var(--gold); font-weight:700;">[${(SPECS_META[p.spec_key] || SPECS_META.gastro).label}]</span>
+        <strong style="font-size:15px; margin-right:6px;">${esc(p.name)}</strong>${badge(p, true)}
+        <p style="font-size:12px; color:var(--muted); margin-top:2px;">موثق: <b style="color:${p.is_verified ? '#60a5fa' : 'var(--muted)'};">${p.is_verified ? 'نعم 🔵' : 'لا ⚪ (قيد التدقيق)'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b></p>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button onclick="setVerified('${p.id}')" style="background:${p.is_verified ? 'rgba(148,163,184,0.2)' : 'rgba(59,130,246,0.22)'}; color:${p.is_verified ? 'var(--muted)' : '#60a5fa'}; padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">${p.is_verified ? '⚪ سحب التوثيق' : '🔵 منح التوثيق'}</button>
+        <button onclick="delegatePage('${p.id}')" style="background:rgba(16,185,129,0.2); color:var(--emerald); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">🔑 تفويض</button>
+        <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:7px 14px; border-radius:9px; font-size:12px;">✏️ تعديل / تفويض</button>
+        <button onclick="deleteAd('${p.id}')" style="background:rgba(244,63,94,0.2); color:var(--rose); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">🗑 حذف</button>
+      </div>
+    </div>`).join('');
+}
+/* التفويض يمنح علامة التوثيق (الزرقاء) تلقائياً، وإلغاؤه يسحبها (ويمكن للأدمن تعديلها يدوياً بعد ذلك) */
+function delegatePage(id) {
+  const p = byId(id); if (!p || !adminUnlocked) return;
+  let em = prompt('اكتب إيميل صاحب الصفحة لتفويضه بالتحكم الكامل في "' + p.name + '" (اتركه فارغاً لإلغاء التفويض):', p.owner_email || '');
+  if (em === null) return;
+  em = em.trim().toLowerCase();
+  if (em && em.indexOf('@') < 0) return toast('إيميل غير صحيح');
+  savePlace({ ...p, owner_email: em, is_verified: !!em });
+  load().then(() => {
+    renderAdminList();
+    if (!em) return toast('تم إلغاء التفويض وسحب علامة التوثيق');
+    const msg = 'تم تفويض إيميلك (' + em + ') للتحكم الكامل بصفحة "' + p.name + '" على Cryovion. سجّل الدخول بهذا الإيميل من ' + location.origin + ' ثم افتح "إدارة صفحتي".';
+    try { navigator.clipboard.writeText(msg); } catch {}
+    toast('✔ تم التفويض ومنح علامة التوثيق، ونُسخت رسالة الدعوة');
+  });
+}
+async function deleteAd(id) {
+  if (!adminUnlocked) return toast('الحذف للأدمن فقط');
+  if (!confirm('حذف هذه الصفحة نهائياً؟')) return;
+  savePlace({ id, deleted: true });
+  await load(); renderAdminList(); toast('تم الحذف');
+}
+
+/* ============ 14) نافذة التعديل + أدوات متفرقة ============ */
 function openEditorModal(id) {
+  adminUnlocked = isUserMasterAdmin(getCurrentUser());
   const ex = id ? byId(id) : null, s = (ex && ex.sched) || {};
-  $('edId').value = ex ? ex.id : ''; $('edCat').value = ex ? ex.cat : 'doctor'; $('edSpecKey').value = ex ? (ex.spec_key || 'gastro') : 'gastro';
-  $('edName').value = ex ? ex.name : ''; $('edSpec').value = ex ? ex.spec : ''; $('edBio').value = ex ? (ex.bio || '') : '';
-  $('edPhotoUrl').value = ex ? (ex.photo_url || '') : ''; $('edAddr').value = ex ? ex.addr : ''; $('edFee').value = ex ? ex.fee || '' : '';
-  $('edMapUrl').value = ex ? ex.map_url || '' : '';
-  
-  // سر المربع الفارغ:
-  $('edIsVerified').checked = ex ? (ex.is_verified === true) : false;
-  $('edIsVerified').disabled = !adminUnlocked;
-  $('verifyWrap').classList.toggle('hidden', !adminUnlocked);
-  
-  $('edLampMode').value = ex ? (ex.lamp_mode || 'unknown') : 'auto'; $('edHours').value = ex && ex.hours !== 'غير معروف' ? ex.hours : '';
+  $('edId').value = ex ? ex.id : '';
+  $('edCat').value = ex ? ex.cat : 'doctor';
+  $('edSpecKey').value = ex ? (ex.spec_key || 'gastro') : 'gastro';
+  $('edName').value = ex ? ex.name : ''; $('edSpec').value = ex ? ex.spec : '';
+  $('edBio').value = ex ? (ex.bio || '') : '';
+  $('edPhotoUrl').value = ex ? (ex.photo_url || '') : '';
+  $('edAddr').value = ex ? ex.addr : '';
+  $('edFee').value = ex && ex.fee ? ex.fee : '';
+  $('edMapUrl').value = ex && ex.map_url ? ex.map_url : '';
+  $('edIsVerified').checked = ex ? !!ex.is_verified : true;
+  $('edLampMode').value = ex ? (ex.lamp_mode || 'unknown') : 'auto';
+  $('edHours').value = ex && ex.hours !== 'غير معروف' ? ex.hours : '';
   $('edFrom').value = s.from || ''; $('edTo').value = s.to || ''; $('edH24').checked = !!s.h24;
   document.querySelectorAll('.offd').forEach(c => { c.checked = (s.off || []).includes(+c.value); });
-  $('edPhone').value = ex ? ex.phone || '' : ''; $('edWhatsapp').value = ex ? ex.whatsapp || '' : '';
-  $('edOwnerEmail').value = ex ? ex.owner_email || '' : ''; $('edRefCount').value = ex ? ex.ref_count || 0 : 0;
-  $('edGalleryData').value = JSON.stringify(ex ? ex.gallery || [] : []); $('edGalleryPreview').innerHTML = '';
+  $('edPhone').value = ex && ex.phone ? ex.phone : '';
+  $('edWhatsapp').value = ex && ex.whatsapp ? ex.whatsapp : (ex && ex.phone ? ex.phone : '');
+  $('edOwnerEmail').value = ex && ex.owner_email ? ex.owner_email : '';
+  $('edRefCount').value = ex ? (ex.ref_count || 0) : 0;
+  const gal = ex ? (ex.gallery || []) : [];
+  $('edGalleryData').value = JSON.stringify(gal);
+  $('edGalleryPreview').innerHTML = gal.map(g => `<img src="${esc(g)}" alt="" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`).join('');
   $('ownerAssignWrap').classList.toggle('hidden', !adminUnlocked);
-  $('editorTitle').textContent = ex ? `تحديث: ${ex.name}` : 'إضافة جديدة';
+  $('verifyWrap').classList.toggle('hidden', !adminUnlocked);
+  $('editorTitle').textContent = ex ? `تحديث بيانات: ${ex.name}` : 'إضافة صفحة / منشأة جديدة';
   $('editorModal').classList.remove('hidden');
 }
 function closeEditorModal() { $('editorModal').classList.add('hidden'); }
+
+async function share(id) {
+  const d = byId(id); if (!d) return;
+  const shareUrl = `${window.location.href.split('?')[0]}?ref=${d.id}`;
+  const text = `✨ دعوة صديق لزيارة صفحة: ${d.name} (${d.spec})\n📍 العنوان: ${d.addr}\n${shareUrl}`;
+  try {
+    if (navigator.share) await navigator.share({ title: d.name, text, url: shareUrl });
+    else { await navigator.clipboard.writeText(text); toast('تم نسخ رابط دعوة صديق 📋'); }
+  } catch {}
+}
+function checkIncomingReferral() {
+  const refId = new URLSearchParams(window.location.search).get('ref');
+  if (!refId) return;
+  const visitedKey = 'cryovion_visited_' + refId;
+  if (!localStorage.getItem(visitedKey)) {
+    localStorage.setItem(visitedKey, 'true');
+    if (refId.startsWith('u-')) {
+      const uMap = JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}');
+      uMap[refId] = (uMap[refId] || 0) + 1;
+      localStorage.setItem('cryovion_user_refs', JSON.stringify(uMap));
+    } else {
+      const cur = byId(refId);
+      if (cur && adminUnlocked) savePlace({ ...cur, ref_count: (cur.ref_count || 0) + 1 });
+    }
+    toast('👋 أهلاً بك في منصة Cryovion الطبية!');
+  }
+  if (!refId.startsWith('u-')) setTimeout(() => openPlacePage(refId), 300);
+}
+function listenVoiceSearch() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast('البحث بالصوت غير مدعوم في هذا المتصفح');
+  const r = new SR(), m = $('mic'); r.lang = currentLang === 'en' ? 'en-US' : 'ar-EG';
+  r.onstart = () => { m.style.boxShadow = '0 0 0 6px rgba(217,180,90,.5)'; }; r.onend = () => { m.style.boxShadow = ''; };
+  r.onerror = () => toast('لم أسمعك، حاول مرة أخرى');
+  r.onresult = e => { $('search').value = e.results[0][0].transcript; $('search').dispatchEvent(new Event('input')); };
+  r.start();
+}
+
+/* ============ 15) ربط الأحداث ============ */
+/* التنقل: الشريط الأيمن + القائمة الجانبية (يعمل باللمس والنقر بدون تكرار) */
+let lastNavTap = 0;
+function onNavTap(e) {
+  const b = e.target.closest('[data-nav]'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const t = Date.now(); if (t - lastNavTap < 450) return;
+  lastNavTap = t; navigateApp(b.dataset.nav);
+}
+[document.querySelector('.right-icon-dock'), $('sideDrawer')].forEach(box => {
+  box.style.touchAction = 'manipulation';
+  ['pointerup', 'click'].forEach(ev => box.addEventListener(ev, onNavTap, true));
+});
+$('openDrawer').addEventListener('click', openSideDrawer);
+$('closeDrawer').addEventListener('click', closeSideDrawer);
+$('drawerBackdrop').addEventListener('click', closeSideDrawer);
+$('editorModal').addEventListener('click', e => { if (e.target === $('editorModal')) closeEditorModal(); });
+$('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
+document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditorModal(); closeReviewModal(); closeSideDrawer(); } });
+
+/* الشعار: العودة للرئيسية، و7 نقرات سريعة لفتح غرفة الإدارة (للأدمن فقط) */
+$('brandLogo').addEventListener('click', () => {
+  logoClicks++; clearTimeout(logoTimer); logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
+  if (logoClicks >= 7) {
+    logoClicks = 0;
+    if (isUserMasterAdmin(getCurrentUser())) { navigateApp('admin'); toast('🛡️ مرحباً بك في غرفة تحكم الإدارة'); }
+  } else if (currentViewName !== 'home') goHomeLogo();
+});
+
+/* اللغة والخط والمظهر */
+$('langSwitchBtn').addEventListener('click', toggleLanguage);
+$('settingsLangBtn').addEventListener('click', toggleLanguage);
+let big = localStorage.getItem('cryovion_big_font') === 'true';
+if (big) document.documentElement.style.fontSize = '18px';
+function toggleBig() {
+  big = !big; localStorage.setItem('cryovion_big_font', String(big));
+  document.documentElement.style.fontSize = big ? '18px' : '16px';
+  toast(big ? '🔠 تم تكبير الخط' : '🔠 الحجم الطبيعي');
+}
+$('bigText').addEventListener('click', toggleBig);
+$('settingsBigTextBtn').addEventListener('click', toggleBig);
+if (localStorage.getItem('cryovion_theme') === 'light') document.documentElement.classList.add('light');
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('cryovion_theme', isLight ? 'light' : 'dark');
+  toast(isLight ? '☀️ تم تفعيل المظهر الفاتح' : '🌙 تم تفعيل المظهر الداكن');
+}
+$('themeToggleBtn').addEventListener('click', toggleTheme);
+$('quickThemeBtn').addEventListener('click', toggleTheme);
+
+/* تسجيل الدخول */
+$('tabLoginBtn').addEventListener('click', () => {
+  isRegisterMode = false; $('registerExtraFields').classList.add('hidden');
+  $('tabLoginBtn').className = 'gold-bg'; $('tabRegisterBtn').className = ''; $('tabRegisterBtn').style.background = 'rgba(255,255,255,0.05)';
+  $('authSubmitBtn').textContent = 'دخول بالبريد الإلكتروني ✔';
+});
+$('tabRegisterBtn').addEventListener('click', () => {
+  isRegisterMode = true; $('registerExtraFields').classList.remove('hidden');
+  $('tabRegisterBtn').className = 'gold-bg'; $('tabLoginBtn').className = ''; $('tabLoginBtn').style.background = 'rgba(255,255,255,0.05)';
+  $('authSubmitBtn').textContent = 'إنشاء الحساب وتفعيله ✔';
+});
+document.querySelectorAll('.role-btn').forEach(b => b.addEventListener('click', () => {
+  selectedRole = b.dataset.role;
+  document.querySelectorAll('.role-btn').forEach(x => { const on = x.dataset.role === selectedRole; x.style.borderColor = on ? 'var(--gold)' : 'var(--border-soft)'; x.style.background = on ? 'rgba(217,180,90,0.15)' : 'transparent'; });
+}));
+$('accountForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = $('accEmail').value.trim().toLowerCase(), name = ($('accName').value || '').trim() || email.split('@')[0];
+  setCurrentUser({ name, email, role: selectedRole, provider: 'email' });
+  toast(`مرحباً بك ${name}! تم تسجيل الدخول`);
+});
+$('googleDirectBtn').addEventListener('click', async () => {
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  const res = await db.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+  if (res.error) toast('تعذر الدخول عبر Google');
+});
+$('facebookDirectBtn').addEventListener('click', () => {
+  const fb = prompt('تسجيل الدخول بحساب Facebook\nأدخل اسم حسابك أو بريدك الإلكتروني:');
+  if (fb && fb.trim()) {
+    const clean = fb.trim().toLowerCase(), emailFmt = clean.includes('@') ? clean : `${clean.replace(/\s+/g, '.')}@facebook.user`;
+    setCurrentUser({ name: fb.trim().split('@')[0], email: emailFmt, role: selectedRole, provider: 'facebook' });
+    toast('✔ تم تسجيل الدخول عبر Facebook بنجاح');
+  }
+});
+$('logoutBtn').addEventListener('click', async () => {
+  if (db) { try { await db.auth.signOut(); } catch {} }
+  verifiedEmail = null; lastUid = null; setCurrentUser(null); toast('تم تسجيل الخروج');
+  load();
+});
+
+/* البحث (مع تأخير بسيط لعدم إعادة الرسم عند كل حرف) والأقسام والتخصصات والشريط */
+const runSearch = debounce(() => {
+  const raw = query.trim(), q = norm(raw), box = $('searchSuggest');
+  if (!q) box.classList.add('hidden');
+  else {
+    const matches = [];
+    for (let i = 0; i < places.length && matches.length < 6; i++) if (places[i]._n.includes(q)) matches.push(places[i]);
+    box.innerHTML = matches.length ? matches.map(m => {
+      const sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
+      return `<div class="auto-item" data-suggest-id="${m.id}"><div style="display:flex; align-items:center; gap:10px; min-width:0;">${orb(m.cat, 34)}
+        <div style="min-width:0;"><p style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;"><span>${esc(m.name)}</span><span class="status-dot ${m.avail_state}"></span></p>
+        <p style="font-size:11px; color:${sp.color};">${esc(m.spec)} • 📍 ${esc(m.addr)}</p></div></div>
+        <span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.icon} ${currentLang === 'en' ? sp.labelEn : sp.label}</span></div>`;
+    }).join('') : `<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق لـ "${esc(raw)}"</div>`;
+    box.classList.remove('hidden');
+  }
+  if (currentViewName !== 'home') switchViewDOM('home', false);
+  shownLimit = PAGE_SIZE; render();
+}, 140);
+$('search').addEventListener('input', e => { query = e.target.value; runSearch(); });
+$('searchSuggest').addEventListener('click', e => { const i = e.target.closest('[data-suggest-id]'); if (!i) return; $('searchSuggest').classList.add('hidden'); openPlacePage(i.dataset.suggestId); });
+$('mic').addEventListener('click', listenVoiceSearch);
+$('cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (!b) return; activeCat = activeCat === b.dataset.cat ? null : b.dataset.cat; shownLimit = PAGE_SIZE; render(); });
+$('specsBar').addEventListener('click', e => {
+  const b = e.target.closest('[data-spec]'); if (!b) return;
+  activeSpec = activeSpec === b.dataset.spec ? 'all' : b.dataset.spec;
+  if (activeSpec !== 'all' && !['pharmacy', 'lab'].includes(activeSpec)) activeCat = 'doctor';
+  shownLimit = PAGE_SIZE; render();
+});
+$('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'all'; shownLimit = PAGE_SIZE; render(); });
+$('slidePrev').addEventListener('click', () => $('posterTrack').scrollBy({ left: -posterStep(), behavior: 'smooth' }));
+$('slideNext').addEventListener('click', () => $('posterTrack').scrollBy({ left: posterStep(), behavior: 'smooth' }));
+
+/* النقرات العامة: علامة التوثيق / فتح الصفحة / مشاركة / عرض المزيد / الأزرار الرمادية */
+document.addEventListener('click', e => {
+  const bd = e.target.closest('[data-badge-id]');
+  if (bd) { e.preventDefault(); e.stopPropagation(); setVerified(bd.dataset.badgeId); return; }
+  const off = e.target.closest('[data-off]');
+  if (off) { e.preventDefault(); e.stopPropagation(); toast(NO_DATA_MSG); return; }
+  if (e.target.closest('a')) return;
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = b.dataset.id, a = b.dataset.act;
+  if (a === 'share') { e.stopPropagation(); share(id); }
+  else if (a === 'more') { shownLimit += PAGE_SIZE; render(); }
+  else if (a === 'openPage') openPlacePage(id);
+}, true);
+
+/* التقييم */
+$('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = $('revBody').value.trim();
+  if (containsDefamation(body)) return toast('🚫 التعليق يحتوي على كلمات غير لائقة');
+  const u = getCurrentUser(), author = $('revAuthor').value.trim() || (u ? u.name : 'زائر');
+  saveReview({ place_id: activeReviewPlaceId, author, stars: pickedStars, body });
+  closeReviewModal(); await load();
+  if (currentViewName === 'placePage') renderPlacePageDOM(activeReviewPlaceId);
+  toast('✔ شكراً لك! تم نشر تقييمك بنجاح');
+});
+
+/* إدارة صفحتي: نشر/حذف الحالة اليومية */
+$('managedListBox').addEventListener('click', e => {
+  const b = e.target.closest('[data-qs]'); if (!b) return;
+  if (b.dataset.qs === 'del') return saveDailyStatus(b.dataset.id, '');
+  const t = $('managedListBox').querySelector(`[data-qs-text="${b.dataset.id}"]`).value.trim();
+  if (!t) return toast('اكتب الحالة أولاً');
+  saveDailyStatus(b.dataset.id, t);
+});
+
+/* حالة Cryovion الرسمية */
+$('devPub').addEventListener('click', () => {
+  const t = $('devText').value.trim(); if (!t) return toast('اكتب نص الحالة أولاً');
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: t, ts: Date.now() }))
+    .then(r => { if (r && r.error) toast('رُفض النشر: للأدمن فقط'); else toast('✔ تم نشر حالة Cryovion'); return load(); }).catch(() => {});
+});
+$('devDel').addEventListener('click', () => {
+  if (!db) return toast('الخدمة غير متاحة حالياً');
+  $('devText').value = '';
+  writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1)).then(() => { toast('تم حذف الحالة'); return load(); }).catch(() => {});
+});
+
+/* نافذة التعديل: رفع الصور + التوثيق التلقائي + الحفظ */
+$('edGalleryFiles').addEventListener('change', e => {
+  const files = Array.from(e.target.files); if (!files.length) return;
+  Promise.all(files.map(f => new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.onerror = () => res(null); r.readAsDataURL(f); })))
+    .then(list => {
+      const gallery = list.filter(Boolean); if (!gallery.length) return;
+      $('edPhotoUrl').value = gallery[0];
+      $('edGalleryData').value = JSON.stringify(gallery);
+      $('edGalleryPreview').innerHTML = gallery.map(g => `<img src="${g}" alt="" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`).join('');
+      toast(`📷 تم إرفاق ${gallery.length} صور`);
+    });
+});
+$('edOwnerEmail').addEventListener('input', function () { $('edIsVerified').checked = this.value.indexOf('@') > 0; });
+
 $('editorForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const bio = $('edBio').value.trim(), name = $('edName').value.trim();
-  if (containsDefamation(bio) || containsDefamation(name)) return toast('🚫 يحتوي على عبارات مسيئة.');
+  adminUnlocked = isUserMasterAdmin(getCurrentUser());
+  const bioVal = $('edBio').value.trim(), nameVal = $('edName').value.trim();
+  if (containsDefamation(bioVal) || containsDefamation(nameVal)) return toast('🚫 النص يحتوي على عبارات مسيئة.');
   const id = $('edId').value || ('c-' + crypto.randomUUID().slice(0, 8)), ex = byId(id);
   const off = []; document.querySelectorAll('.offd').forEach(c => { if (c.checked) off.push(+c.value); });
   const sched = { from: $('edFrom').value, to: $('edTo').value, h24: $('edH24').checked, off };
   let hours = $('edHours').value.trim();
   if (!hours) { if (sched.h24) hours = '24 ساعة'; else if (sched.from && sched.to) hours = 'من ' + t12(sched.from) + ' إلى ' + t12(sched.to); }
   const item = {
-    id, cat: $('edCat').value, spec_key: $('edSpecKey').value, name, spec: $('edSpec').value.trim(), bio, bio_ts: Date.now(),
-    photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'), addr: $('edAddr').value.trim(),
-    fee: $('edFee').value.trim(), map_url: $('edMapUrl').value.trim(), is_verified: adminUnlocked ? $('edIsVerified').checked : !!(ex && ex.is_verified),
-    lamp_mode: $('edLampMode').value, sched, hours, phone: $('edPhone').value.trim() || null, whatsapp: $('edWhatsapp').value.trim() || $('edPhone').value.trim() || null,
+    id, cat: $('edCat').value, spec_key: $('edSpecKey').value, name: nameVal, spec: $('edSpec').value.trim(),
+    bio: bioVal, bio_ts: Date.now(), photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'),
+    addr: $('edAddr').value.trim() || 'غير معروف', fee: $('edFee').value.trim(), map_url: $('edMapUrl').value.trim(),
+    is_verified: adminUnlocked ? $('edIsVerified').checked : !!(ex && ex.is_verified),
+    lamp_mode: $('edLampMode').value, sched, hours,
+    phone: $('edPhone').value.trim() || null, whatsapp: $('edWhatsapp').value.trim() || $('edPhone').value.trim() || null,
     owner_email: adminUnlocked ? $('edOwnerEmail').value.trim().toLowerCase() : (ex ? ex.owner_email : ''),
     ref_count: adminUnlocked ? (parseInt($('edRefCount').value, 10) || 0) : (ex ? (ex.ref_count || 0) : 0),
     status: 'approved', updated_date: new Date().toISOString().split('T')[0]
@@ -1212,42 +1794,17 @@ $('editorForm').addEventListener('submit', async e => {
   if (currentViewName === 'placePage') renderPlacePageDOM(id);
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'myManaged') renderManagedAds();
-  toast('✔ تم حفظ التعديلات!');
+  toast('✔ تم حفظ ونشر التعديلات فوراً!');
 });
 
-/* ============ 15) ربط الأحداث وتشغيل المنصة ============ */
-let lastNavTap = 0;
-function onNavTap(e) { const b = e.target.closest('[data-nav]'); if (!b) return; e.preventDefault(); e.stopPropagation(); const t = Date.now(); if (t - lastNavTap < 450) return; lastNavTap = t; navigateApp(b.dataset.nav); }
-[document.querySelector('.right-icon-dock'), $('sideDrawer')].forEach(b => { if (b) { b.style.touchAction = 'manipulation'; ['pointerup', 'click'].forEach(ev => b.addEventListener(ev, onNavTap, true)); } });
-$('openDrawer').addEventListener('click', openSideDrawer); $('closeDrawer').addEventListener('click', closeSideDrawer); $('drawerBackdrop').addEventListener('click', closeSideDrawer);
-document.addEventListener('click', e => {
-  const off = e.target.closest('[data-off]'); if (off) { e.preventDefault(); e.stopPropagation(); toast(NO_DATA_MSG); return; }
-  if (e.target.closest('a')) return;
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  if (b.dataset.act === 'share') { e.stopPropagation(); async function sh() { const d = byId(b.dataset.id); if(!d)return; const u = `${window.location.href.split('?')[0]}?ref=${d.id}`, t = `✨ دعوة صديق: ${d.name}\n📍 ${d.addr}\n${u}`; try{ if(navigator.share) await navigator.share({title:d.name, text:t, url:u}); else { await navigator.clipboard.writeText(t); toast('تم نسخ الرابط'); } }catch{} } sh(); }
-  else if (b.dataset.act === 'openPage') openPlacePage(b.dataset.id);
-}, true);
-$('reviewForm').addEventListener('submit', async e => {
-  e.preventDefault(); const body = $('revBody').value.trim(); if (containsDefamation(body)) return toast('🚫 كلمات غير لائقة');
-  const u = getCurrentUser(); saveReview({ place_id: activeReviewPlaceId, author: $('revAuthor').value.trim() || (u ? u.name : 'زائر'), stars: pickedStars, body });
-  closeReviewModal(); await load(); if (currentViewName === 'placePage') renderPlacePageDOM(activeReviewPlaceId); toast('✔ نُشر تقييمك');
-});
-$('managedListBox').addEventListener('click', e => {
-  const b = e.target.closest('[data-qs]'); if (!b) return;
-  if (b.dataset.qs === 'del') { const q = byId(b.dataset.id); if (q) { savePlace({ ...q, bio: '', bio_ts: null }); load().then(()=>renderManagedAds()); } return; }
-  const t = $('managedListBox').querySelector(`[data-qs-text="${b.dataset.id}"]`).value.trim(); if (!t) return toast('اكتب الحالة');
-  const q = byId(b.dataset.id); if (q) { savePlace({ ...q, bio: t, bio_ts: Date.now() }); load().then(()=>renderManagedAds()); toast('نُشرت'); }
-});
-$('edGalleryFiles').addEventListener('change', e => {
-  const files = Array.from(e.target.files); if (!files.length) return;
-  const pBox = $('edGalleryPreview'), gal = []; pBox.innerHTML = '';
-  files.forEach(f => { const r = new FileReader(); r.onload = ev => { gal.push(ev.target.result); if(gal.length===1)$('edPhotoUrl').value=ev.target.result; pBox.innerHTML+=`<img src="${ev.target.result}" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`; $('edGalleryData').value=JSON.stringify(gal); }; r.readAsDataURL(f); });
-});
-setInterval(smartRecompute, 60000); // تحديث ذكي للوقت لا يعيد رسم الصفحة بلا داعي
+/* ============ 16) التشغيل ============ */
+setInterval(() => { if (!document.hidden) recomputeAvailability(); }, 60000);
+setInterval(posterAutoplay, 4500);
 history.replaceState({ view: 'home' }, '', '');
-applyLanguage();
-initSupabaseSession();
-
+hydrateFromCache();      /* عرض فوري من الكاش المحلي */
+applyLanguage();         /* نصوص + أزرار + رسم أولي */
+renderPostersCarousel();
+initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
 </script>
 </body>
 </html>
