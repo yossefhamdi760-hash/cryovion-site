@@ -4,39 +4,102 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#041b21">
+<meta name="author" content="Cryovion">
+<meta name="copyright" content="© 2026 Cryovion. All rights reserved.">
 <title>Cryovion | صحتك أقرب مما تظن</title>
+
+<!-- ================= نواة التطوير (يجب أن تبقى أول سكربت في الصفحة) ================= -->
+<script>
+(function (w) {
+  'use strict';
+  var C = w.Cryovion = {
+    version: '1.2.0',
+    flags: {},                              // مفاتيح تشغيل/إيقاف الميزات: Cryovion.flags.posterAutoplay = false
+    config: { cacheVersion: 'v1', maxServices: 7, posterSpeed: 38 },   // posterSpeed = سرعة شريط الحالات (بكسل/ثانية)
+    hooks: {}, icons: {}, tpl: {},
+
+    /* أحداث: on / off / emit (أي خطأ داخل إضافة يُسجَّل ولا يوقف الموقع) */
+    on: function (n, f) { (C.hooks[n] = C.hooks[n] || []).push(f); return C; },
+    off: function (n, f) { C.hooks[n] = (C.hooks[n] || []).filter(function (x) { return x !== f; }); return C; },
+    emit: function (n) {
+      var a = Array.prototype.slice.call(arguments, 1);
+      (C.hooks[n] || []).slice().forEach(function (f) { try { f.apply(null, a); } catch (e) { console.error('[Cryovion ext:' + n + ']', e); } });
+    },
+
+    /* الأيقونات: أي عنصر فيه data-ico="الاسم" يمكن استبدال محتواه (SVG أو إيموجي أو صورة) */
+    setIcon: function (name, html) { C.icons[name] = html; C.applyIcons(); },
+    setIcons: function (map) { Object.keys(map).forEach(function (k) { C.icons[k] = map[k]; }); C.applyIcons(); },
+    icon: function (name, fallback) { return (name in C.icons) ? C.icons[name] : fallback; },
+    applyIcons: function (root) {
+      (root || document).querySelectorAll('[data-ico]').forEach(function (el) {
+        var n = el.getAttribute('data-ico');
+        if (n in C.icons && el.__ico !== C.icons[n]) { el.innerHTML = C.icons[n]; el.__ico = C.icons[n]; }
+      });
+    },
+
+    /* القوالب: استبدال شكل البطاقة/الشارة/صفحة المكان بالكامل دون لمس البيانات */
+    template: function (name, fn) { C.tpl[name] = fn; C.emit('templateChanged', name); },
+
+    /* التصميم: تغيير المتغيرات اللونية والأبعاد، وإضافة CSS إضافي */
+    setTheme: function (vars) {
+      Object.keys(vars).forEach(function (k) { document.documentElement.style.setProperty(k.indexOf('--') === 0 ? k : '--' + k, vars[k]); });
+    },
+    css: function (text) {
+      var s = document.getElementById('ext-style');
+      if (s) s.appendChild(document.createTextNode(text));
+    },
+    ready: function (f) { if (document.readyState !== 'loading') f(); else document.addEventListener('DOMContentLoaded', f); }
+  };
+})(window);
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://zthcfuxdidfosdidiahz.supabase.co" crossorigin>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700&family=Reem+Kufi:wght@700&display=swap" rel="stylesheet">
-<style>
-/* ================= 1) المتغيرات والألوان ================= */
+<style id="core-style">
+/* ================= 1) المتغيرات والألوان (عدّلها لتغيير التصميم كله) ================= */
 :root {
   --bg:#040911; --surface:#09131f; --surface-glass:rgba(9,19,31,.97); --card:#0f1c2e; --card-hover:#15263d;
   --border:rgba(217,180,90,.26); --border-soft:rgba(255,255,255,.08); --text:#f8fafc; --muted:#94a3b8;
   --gold:#D9B45A; --gold-light:#F6E29A; --emerald:#10b981; --whatsapp:#25D366; --teal-glow:#14b8a6;
   --rose:#f43f5e; --blue:#3b82f6; --violet:#a855f7; --radius-lg:24px; --radius-md:16px;
+  /* متغيرات إضافية للتطوير (قيمها الافتراضية تطابق التصميم الحالي) */
+  --font-body:'IBM Plex Sans Arabic','Plus Jakarta Sans',Tahoma,sans-serif;
+  --font-body-ltr:'Plus Jakarta Sans','IBM Plex Sans Arabic',sans-serif;
+  --font-display:'Reem Kufi','IBM Plex Sans Arabic',sans-serif;
+  --gold-grad:linear-gradient(135deg,#F6E29A 0%,#D9B45A 55%,#9B7119 100%);
+  --on-gold:#050811;
+  --verified-on-1:#60a5fa; --verified-on-2:#3b82f6; --verified-on-3:#1d4ed8; --verified-on-glow:rgba(59,130,246,.65);
+  --verified-off-1:#9ca3af; --verified-off-2:#6b7280;
+  --live-ring:var(--emerald);              /* لون الإطار الأخضر للحالة الظاهرة في الشريط */
+  --card-radius:22px; --card-pad:16px;
+  --hero-bg:radial-gradient(65% 85% at 50% 18%,rgba(20,184,166,.42) 0%,rgba(13,148,136,.22) 42%,rgba(6,24,34,.94) 85%,#06101b 100%);
+  --nav-bg:rgba(4,24,30,.97);
 }
 html.light {
   --bg:#e2eeec; --surface:#f4f9f8; --surface-glass:rgba(244,249,248,.97); --card:#fff; --card-hover:#f1f5f9;
   --border:rgba(11,46,58,.18); --border-soft:rgba(11,46,58,.09); --text:#0B2E3A; --muted:#64748b;
+  --nav-bg:rgba(255,255,255,.97);
 }
 
 /* ================= 2) الأساسيات ================= */
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 html, body {
   background-color:var(--bg); color:var(--text);
-  font-family:'IBM Plex Sans Arabic','Plus Jakarta Sans',Tahoma,sans-serif;
+  font-family:var(--font-body);
   line-height:1.55; overflow-x:hidden;
 }
-html[dir="ltr"] body { font-family:'Plus Jakarta Sans','IBM Plex Sans Arabic',sans-serif; }
-.font-display { font-family:'Reem Kufi','IBM Plex Sans Arabic',sans-serif; }
+html[dir="ltr"] body { font-family:var(--font-body-ltr); }
+.font-display { font-family:var(--font-display); }
 .hidden { display:none !important; }
 button, input, select, textarea { font-family:inherit; color:inherit; border:none; background:none; }
 button { cursor:pointer; transition:background-color .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, opacity .15s ease; touch-action:manipulation; }
 a { text-decoration:none; color:inherit; }
-.gold-bg { background:linear-gradient(135deg,#F6E29A 0%,#D9B45A 55%,#9B7119 100%); color:#050811; font-weight:700; }
+[data-ico] { display:inline-flex; align-items:center; justify-content:center; }
+[data-ico] img { width:1em; height:1em; object-fit:contain; }
+.gold-bg { background:var(--gold-grad); color:var(--on-gold); font-weight:700; }
 .t-doctor { background:linear-gradient(145deg,#3b82f6,#1d4ed8); }
 .t-pharmacy { background:linear-gradient(145deg,#10b981,#047857); }
 .t-lab { background:linear-gradient(145deg,#a855f7,#6d28d9); }
@@ -56,7 +119,7 @@ html.light .brand-text { background:linear-gradient(135deg,#0B2E3A 0%,#8A6718 10
 html[dir="ltr"] .right-icon-dock { right:auto; left:12px; }
 .dock-item { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:var(--muted); position:relative; background:rgba(255,255,255,.03); border:1px solid transparent; }
 .dock-item:hover { color:var(--gold); background:rgba(217,180,90,.12); border-color:var(--border); }
-.dock-item.active { background:linear-gradient(135deg,#F6E29A 0%,#D9B45A 55%,#9B7119 100%); color:#050811; box-shadow:0 4px 14px rgba(217,180,90,.35); }
+.dock-item.active { background:var(--gold-grad); color:var(--on-gold); box-shadow:0 4px 14px rgba(217,180,90,.35); }
 .dock-tooltip { position:absolute; right:calc(100% + 10px); background:var(--card); color:var(--gold); border:1px solid var(--border); padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700; white-space:nowrap; opacity:0; pointer-events:none; transform:translateX(6px); transition:opacity .15s ease, transform .15s ease; }
 html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:translateX(-6px); }
 .dock-item:hover .dock-tooltip { opacity:1; transform:translateX(0); }
@@ -66,16 +129,15 @@ html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:tr
 }
 
 /* ================= 5) النافذة الرئيسية ================= */
-.main-window { max-width:1200px; margin:0 auto 80px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 14px 34px -12px rgba(0,0,0,.7); min-height:86vh; position:relative; overflow:hidden; }
-.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border-soft); background:rgba(4,24,30,.97); position:sticky; top:0; z-index:40; }
-html.light .window-nav { background:rgba(255,255,255,.97); }
+.main-window { max-width:1200px; margin:0 auto 18px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 14px 34px -12px rgba(0,0,0,.7); min-height:86vh; position:relative; overflow:hidden; }
+.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border-soft); background:var(--nav-bg); position:sticky; top:0; z-index:40; }
 .menu-trigger { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:12px; background:rgba(15,28,46,.95); border:1px solid var(--border); color:var(--gold); font-weight:700; font-size:13px; }
 html.light .menu-trigger { background:var(--card); }
 .menu-trigger:hover { border-color:var(--gold-light); }
 
 /* ================= 6) الواجهة الزمردية والبحث ================= */
 .jevi-hero-stage { position:relative; padding:26px 20px 24px; text-align:center; border-bottom:1px solid rgba(45,212,191,.25); overflow:hidden;
-  background:radial-gradient(65% 85% at 50% 18%,rgba(20,184,166,.42) 0%,rgba(13,148,136,.22) 42%,rgba(6,24,34,.94) 85%,#06101b 100%),
+  background:var(--hero-bg),
     repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 48px),
     repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 48px);
   box-shadow:inset 0 -24px 40px -15px rgba(4,15,25,.9),inset 0 1px 0 rgba(255,255,255,.2); }
@@ -106,19 +168,21 @@ html.light .menu-trigger { background:var(--card); }
 .spec-chip:hover { border-color:var(--gold); color:#fff; }
 .spec-chip.active { background:var(--gold); color:#050811; border-color:var(--gold); box-shadow:0 3px 8px rgba(217,180,90,.3); }
 @media (max-width:640px) {
-  .main-window { border-radius:24px 24px 0 0; margin-bottom:70px; border-left:none; border-right:none; }
+  .main-window { border-radius:24px 24px 0 0; margin-bottom:12px; border-left:none; border-right:none; }
   .cats-modern-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:100%; }
   .cat-orb-pill { flex-direction:column; border-radius:18px; padding:10px 4px; gap:6px; max-width:100%; text-align:center; }
   .orb-icon { width:42px; height:42px; border-radius:14px; }
   .specs-filter-bar { justify-content:flex-start; flex-wrap:nowrap; }
 }
 
-/* ================= 8) شريط الحالات (24 ساعة) ================= */
+/* ================= 8) شريط الحالات (24 ساعة) — حركة مستمرة في اتجاه واحد ================= */
 .poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; }
-.poster-track { display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px 2px 12px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+.poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
 .poster-track::-webkit-scrollbar { display:none; }
-.poster-card { flex:0 0 340px; scroll-snap-align:start; border-radius:20px; padding:12px 15px; background:linear-gradient(155deg,#132238 0%,#0b1322 100%); border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; height:154px; transition:border-color .15s ease; position:relative; }
+.poster-card { flex:0 0 340px; max-width:86vw; border-radius:20px; padding:12px 15px; background:linear-gradient(155deg,#132238 0%,#0b1322 100%); border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; height:154px; position:relative; transition:border-color .25s ease, box-shadow .25s ease; }
 .poster-card:hover { border-color:var(--gold); }
+/* الحالة الظاهرة في الواجهة تحمل إطاراً أخضر، وغير الظاهرة تبقى عادية */
+.poster-card.live { border-color:var(--live-ring) !important; box-shadow:0 0 0 1.5px var(--live-ring), 0 0 18px rgba(16,185,129,.38); }
 .poster-top-quarter { height:28%; min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid rgba(217,180,90,.22); padding-bottom:7px; }
 .poster-mini-thumb { width:28px; height:28px; border-radius:8px; object-fit:cover; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; border:1px solid var(--gold); }
 .poster-bio-body { flex:1; padding-top:8px; font-size:12.5px; color:#e2e8f0; line-height:1.55; overflow-y:auto; scrollbar-width:none; }
@@ -130,9 +194,9 @@ html.light .menu-trigger { background:var(--card); }
 .status-dot.offline { background:#f43f5e; box-shadow:0 0 0 2px rgba(244,63,94,.2); }
 .status-dot.unknown { background:#94a3b8; box-shadow:0 0 0 2px rgba(148,163,184,.2); }
 /* علامة التوثيق: رمادية دائماً، وتتحول للأزرق عند التوثيق */
-.vbadge { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; margin-inline-start:6px; vertical-align:middle; flex-shrink:0; background:linear-gradient(135deg,#9ca3af 0%,#6b7280 100%); opacity:.8; transition:background .2s ease, box-shadow .2s ease, opacity .2s ease; }
+.vbadge { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; margin-inline-start:6px; vertical-align:middle; flex-shrink:0; background:linear-gradient(135deg,var(--verified-off-1) 0%,var(--verified-off-2) 100%); opacity:.8; transition:background .2s ease, box-shadow .2s ease, opacity .2s ease; }
 .vbadge svg { width:11px; height:11px; fill:none; stroke:#fff; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; }
-.vbadge.on { background:linear-gradient(135deg,#60a5fa 0%,#3b82f6 55%,#1d4ed8 100%); box-shadow:0 0 8px rgba(59,130,246,.65); opacity:1; }
+.vbadge.on { background:linear-gradient(135deg,var(--verified-on-1) 0%,var(--verified-on-2) 55%,var(--verified-on-3) 100%); box-shadow:0 0 8px var(--verified-on-glow); opacity:1; }
 .vbadge.clickable { cursor:pointer; outline:2px dashed rgba(217,180,90,.7); outline-offset:2px; }
 .vbadge.busy { opacity:.5; pointer-events:none; }
 h1 .vbadge, .noon-showcase h2 .vbadge { width:22px; height:22px; }
@@ -143,7 +207,7 @@ h1 .vbadge, .noon-showcase h2 .vbadge { width:22px; height:22px; }
 .content-body { padding:14px 20px 45px; max-width:1160px; margin:0 auto; }
 .cards-grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(480px,1fr)); }
 @media (max-width:640px) { .cards-grid { grid-template-columns:1fr; } }
-.entity-card { background:var(--card); border:1px solid var(--border-soft); border-radius:22px; padding:16px; position:relative; overflow:hidden; cursor:pointer; transition:border-color .15s ease; content-visibility:auto; contain-intrinsic-size:auto 200px; }
+.entity-card { background:var(--card); border:1px solid var(--border-soft); border-radius:var(--card-radius); padding:var(--card-pad); position:relative; overflow:hidden; cursor:pointer; transition:border-color .15s ease; content-visibility:auto; contain-intrinsic-size:auto 200px; }
 @media (hover:hover) { .entity-card:hover { border-color:var(--border); } }
 .entity-card.peds-dignified { background:linear-gradient(145deg,#1f1429 0%,#12172a 65%,#191122 100%); border-color:rgba(244,114,182,.28); }
 html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2f8 0%,#fff 100%); }
@@ -167,6 +231,17 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
 .noon-table tr:last-child { border-bottom:none; }
 .noon-table th { width:34%; text-align:start; padding:11px 14px; font-size:13px; color:var(--muted); background:rgba(255,255,255,.02); }
 .noon-table td { padding:11px 14px; font-size:14px; font-weight:700; }
+/* قائمة الخدمات والأسعار (المعامل والأشعة ومحلات النظارات) */
+.svc-box { margin-top:22px; padding:16px; border:1px solid var(--border); border-radius:20px; background:var(--card); }
+.svc-table { width:100%; border-collapse:collapse; margin-top:10px; }
+.svc-table tr { border-bottom:1px dashed var(--border-soft); }
+.svc-table tr:last-child { border-bottom:none; }
+.svc-table td { padding:10px 6px; font-size:14px; }
+.svc-table td:last-child { text-align:end; font-weight:700; color:var(--gold); white-space:nowrap; }
+/* التعليقات */
+.rv-del { padding:3px 10px; border-radius:8px; font-size:11px; font-weight:700; background:rgba(244,63,94,.16); color:var(--rose); border:1px solid rgba(244,63,94,.35); }
+.rv-del:hover { background:rgba(244,63,94,.28); }
+.rv-mine { font-size:10.5px; padding:2px 8px; border-radius:99px; background:rgba(16,185,129,.18); color:var(--emerald); font-weight:700; }
 
 /* ================= 12) القائمة الجانبية والنوافذ ================= */
 .drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:90; }
@@ -185,47 +260,62 @@ html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-righ
 html.light .input-box { background:rgba(0,0,0,.03); }
 .input-box:focus { border-color:var(--gold); }
 .toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:200; padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.6); }
+/* صفان من خانتين: إذا اختفت إحدى الخانتين تتمدد الأخرى تلقائياً */
+.ed-two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.ed-two.ed-addr { grid-template-columns:1.6fr 1fr; }
+.ed-two:has(> .hidden) { grid-template-columns:1fr; }
+.svc-row { display:grid; grid-template-columns:1.5fr 1fr; gap:6px; }
+.disp-opt { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:9px 12px; border-radius:12px; border:1px solid var(--border-soft); cursor:pointer; }
+.disp-opt input { width:16px; height:16px; accent-color:var(--gold); }
+/* تذييل الموقع */
+.site-footer { max-width:1200px; margin:0 auto; text-align:center; padding:6px 16px 28px; font-size:12px; color:var(--muted); line-height:1.8; }
+.site-footer b { color:var(--gold); font-weight:700; }
+@media (max-width:1024px) { .site-footer { padding-bottom:96px; } }
 </style>
+
+<!-- ملف التصميم الإضافي: يأتي آخر شيء في head فيتغلب على الأنماط الأساسية بدون تعديلها -->
+<style id="ext-style"></style>
+<!-- <link rel="stylesheet" href="theme.css"> -->
 </head>
 <body>
 
 <!-- ================= الشريط العلوي ================= -->
 <div class="top-ambient-bar">
   <div id="brandLogo" class="brand-backdrop" title="Cryovion">
-    <span class="brand-mark gold-bg">C</span>
+    <span class="brand-mark gold-bg" data-ico="logo">C</span>
     <span class="brand-text font-display">Cryovion</span>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
-    <button id="langSwitchBtn" class="top-ctrl-btn" title="Switch Language / تغيير اللغة">🌐 <span id="langLabel">EN</span></button>
+    <button id="langSwitchBtn" class="top-ctrl-btn" title="Switch Language / تغيير اللغة"><span data-ico="lang">🌐</span> <span id="langLabel">EN</span></button>
     <button id="bigText" class="top-ctrl-btn" title="تكبير الخط">أ+</button>
-    <button id="quickThemeBtn" class="top-ctrl-btn" title="تبديل المظهر">🌗</button>
+    <button id="quickThemeBtn" class="top-ctrl-btn" title="تبديل المظهر"><span data-ico="theme">🌗</span></button>
   </div>
 </div>
 
 <!-- ================= شريط التنقل السريع الأيمن ================= -->
 <nav class="right-icon-dock" aria-label="Quick Navigation">
   <button data-nav="home" class="dock-item active">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span data-ico="dock-home"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
     <span class="dock-tooltip" data-i18n="nav_home">الدليل الطبي</span>
   </button>
   <button data-nav="myManaged" class="dock-item">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    <span data-ico="dock-managed"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></span>
     <span class="dock-tooltip" data-i18n="nav_managed">إدارة صفحتي</span>
   </button>
   <button data-nav="referrals" class="dock-item">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+    <span data-ico="dock-referrals"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></span>
     <span class="dock-tooltip" data-i18n="nav_referrals">دعوة صديق</span>
   </button>
   <button data-nav="account" class="dock-item">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span data-ico="dock-account"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
     <span class="dock-tooltip" data-i18n="nav_account">حسابي والدخول</span>
   </button>
   <button data-nav="settings" class="dock-item">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span data-ico="dock-settings"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
     <span class="dock-tooltip" data-i18n="nav_settings">الإعدادات</span>
   </button>
   <button id="dockAdminBtn" data-nav="admin" class="dock-item hidden" style="border-color:var(--gold); color:var(--gold);">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span data-ico="dock-admin"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
     <span class="dock-tooltip">غرفة الإدارة</span>
   </button>
 </nav>
@@ -236,14 +326,14 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <div>
     <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
       <div onclick="goHomeLogo()" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-        <span class="gold-bg" style="width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</span>
+        <span class="gold-bg" data-ico="logo" style="width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:900;">C</span>
         <span class="font-display" style="font-size:18px; font-weight:700;">Cryovion</span>
       </div>
       <button id="closeDrawer" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.08);">✕</button>
     </div>
 
     <div onclick="navigateApp('account')" style="margin-top:12px; padding:12px; border-radius:14px; background:rgba(217,180,90,.1); border:1px solid var(--border); display:flex; align-items:center; gap:10px; cursor:pointer;">
-      <div id="drawerAvatar" style="width:40px; height:40px; border-radius:11px; background:rgba(217,180,90,.2); display:flex; align-items:center; justify-content:center; font-size:18px;">👤</div>
+      <div id="drawerAvatar" data-ico="avatar" style="width:40px; height:40px; border-radius:11px; background:rgba(217,180,90,.2); display:flex; align-items:center; justify-content:center; font-size:18px;">👤</div>
       <div style="flex:1; min-width:0;">
         <p id="drawerUserName" data-i18n="login_title" style="font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">تسجيل الدخول</p>
         <p id="drawerUserRole" data-i18n="login_sub" style="font-size:11px; color:var(--muted);">إدارة صفحتك / دعوة صديق</p>
@@ -251,20 +341,20 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
 
     <nav style="margin-top:14px;">
-      <button data-nav="home" class="nav-btn active"><span class="nav-btn-left"><span class="nav-icon-box">🏠</span><span data-i18n="nav_home">الدليل الطبي الذكي</span></span></button>
+      <button data-nav="home" class="nav-btn active"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-home">🏠</span><span data-i18n="nav_home">الدليل الطبي الذكي</span></span></button>
       <button data-nav="myManaged" class="nav-btn">
-        <span class="nav-btn-left"><span class="nav-icon-box">🎛️</span><span data-i18n="nav_managed">إدارة صفحتي</span></span>
+        <span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-managed">🎛️</span><span data-i18n="nav_managed">إدارة صفحتي</span></span>
         <span id="managedCountBadge" class="badge-pill" style="background:rgba(16,185,129,.2); color:var(--emerald);">0</span>
       </button>
-      <button data-nav="referrals" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box">✨</span><span data-i18n="nav_referrals">دعوة صديق ومكافأة النشر</span></span></button>
-      <button data-nav="account" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box">🔐</span><span data-i18n="nav_account">تسجيل الدخول والحساب</span></span></button>
-      <button data-nav="settings" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box">⚙️</span><span data-i18n="nav_settings">الإعدادات واللغة</span></span></button>
-      <button id="drawerAdminBtn" data-nav="admin" class="nav-btn hidden" style="border:1px solid var(--gold); background:rgba(217,180,90,.12);"><span class="nav-btn-left"><span class="nav-icon-box">🛡️</span><span>غرفة تحكم المشرف (Admin)</span></span></button>
+      <button data-nav="referrals" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-referrals">✨</span><span data-i18n="nav_referrals">دعوة صديق ومكافأة النشر</span></span></button>
+      <button data-nav="account" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-account">🔐</span><span data-i18n="nav_account">تسجيل الدخول والحساب</span></span></button>
+      <button data-nav="settings" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-settings">⚙️</span><span data-i18n="nav_settings">الإعدادات واللغة</span></span></button>
+      <button id="drawerAdminBtn" data-nav="admin" class="nav-btn hidden" style="border:1px solid var(--gold); background:rgba(217,180,90,.12);"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-admin">🛡️</span><span>غرفة تحكم المشرف (Admin)</span></span></button>
     </nav>
   </div>
 
   <div style="padding-top:12px; border-top:1px solid var(--border-soft);">
-    <button data-nav="info" class="nav-btn" style="font-size:12px; color:var(--muted);"><span class="nav-btn-left"><span class="nav-icon-box">ℹ️</span><span data-i18n="nav_info">التعاون الإعلاني والتواصل</span></span></button>
+    <button data-nav="info" class="nav-btn" style="font-size:12px; color:var(--muted);"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-info">ℹ️</span><span data-i18n="nav_info">التعاون الإعلاني والتواصل</span></span></button>
   </div>
 </aside>
 
@@ -273,7 +363,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 
   <div class="window-nav">
     <button id="openDrawer" class="menu-trigger">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span data-ico="menu"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg></span>
       <span data-i18n="menu_btn">القائمة</span>
     </button>
     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -296,14 +386,15 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         </h1>
         <div class="ai-search-container">
           <div class="ai-search-box">
-            <svg width="20" height="20" fill="none" stroke="var(--gold)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
+            <span data-ico="search"><svg width="20" height="20" fill="none" stroke="var(--gold)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg></span>
             <input id="search" type="search" autocomplete="off" placeholder="ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب)، أو صيدلية..." class="ai-search-input">
-            <button id="mic" type="button" class="gold-bg" style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px;" title="بحث صوتي">🎤</button>
+            <button id="mic" type="button" class="gold-bg" data-ico="mic" style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px;" title="بحث صوتي">🎤</button>
           </div>
           <div id="searchSuggest" class="autocomplete-dropdown hidden"></div>
         </div>
         <div id="cats" class="cats-modern-bar"></div>
         <div id="specsBar" class="specs-filter-bar"></div>
+        <div id="ext-hero-slot"></div>
       </div>
     </header>
 
@@ -320,6 +411,8 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       </div>
       <div id="posterTrack" class="poster-track"></div>
     </section>
+
+    <div id="ext-home-slot"></div>
 
     <section class="content-body">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
@@ -438,6 +531,16 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         <div><p style="font-weight:700;" data-i18n="set_font_title">🔠 حجم الخط والوضوح</p><p style="font-size:12px; color:var(--muted);" data-i18n="set_font_sub">تكبير النصوص لقراءة مريحة</p></div>
         <button id="settingsBigTextBtn" style="border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700;" data-i18n="font_btn">تكبير / تصغير</button>
       </div>
+      <!-- الاسم الظاهر في التعليقات -->
+      <div id="dispCard" class="entity-card" style="display:grid; gap:10px; cursor:default;">
+        <div><p style="font-weight:700;" data-i18n="set_disp_title">🏷️ الاسم الظاهر في تعليقاتك</p><p style="font-size:12px; color:var(--muted);" data-i18n="set_disp_sub">اختر كيف يظهر اسمك عند نشر تقييم (حساب واحد = تقييم واحد لكل صفحة)</p></div>
+        <label class="disp-opt"><input type="radio" name="dispMode" value="initial"><span id="dispInitialLabel">أول حرف من بريدي (الافتراضي)</span></label>
+        <label class="disp-opt"><input type="radio" name="dispMode" value="nick"><span>كنية / اسم مستعار</span></label>
+        <input id="dispNick" maxlength="20" class="input-box hidden" placeholder="اكتب كنيتك (حتى 20 حرفاً)">
+        <label class="disp-opt"><input type="radio" name="dispMode" value="name"><span>اسمي الكامل (من حسابي)</span></label>
+        <p id="dispPreview" style="font-size:12.5px; color:var(--gold); font-weight:700;"></p>
+        <button id="dispSaveBtn" type="button" class="gold-bg" style="padding:10px; border-radius:12px; font-size:13px;">حفظ الاسم الظاهر ✔</button>
+      </div>
     </div>
   </div>
 
@@ -484,10 +587,12 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       <div class="entity-card" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; border-color:var(--gold);">
         <div>
           <p style="font-weight:700; font-size:15px; color:var(--gold);">إدارة المنصة الحصرية والنشر الفوري</p>
-          <p style="font-size:12px; color:var(--muted);">إضافة عيادة أو صيدلية أو معمل جديد أو تفويض إيميل طبيب</p>
+          <p style="font-size:12px; color:var(--muted);">إضافة عيادة أو صيدلية أو معمل أو محل نظارات جديد أو تفويض إيميل طبيب</p>
         </div>
         <button onclick="openEditorModal(null)" class="gold-bg" style="padding:10px 18px; border-radius:12px; font-size:13.5px;">+ إضافة صفحة / منشأة جديدة</button>
       </div>
+
+      <div id="ext-admin-slot"></div>
 
       <div>
         <h3 style="font-size:16px; color:var(--gold); margin-bottom:10px;">⏳ طلبات النشر عبر دعوة صديق (<span id="adminRefReqCount">0</span>)</h3>
@@ -502,6 +607,13 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 
 </div>
 
+<!-- ================= تذييل الموقع (حقوق الملكية) ================= -->
+<footer class="site-footer" id="siteFooter">
+  <div>© <span id="footYear">2026</span> <b>Cryovion</b> — جميع الحقوق محفوظة</div>
+  <div style="font-size:11px;">يُمنع نسخ التصميم أو الشعار أو المحتوى أو إعادة نشره دون إذن كتابي من الإدارة.</div>
+  <div id="ext-footer-slot"></div>
+</footer>
+
 <!-- ================= نافذة الإضافة والتعديل ================= -->
 <div id="editorModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <form id="editorForm" class="modal-box" onclick="event.stopPropagation()" style="display:grid; gap:10px;">
@@ -511,16 +623,18 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
     <input type="hidden" id="edId">
 
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-      <div>
+    <!-- نوع المنشأة + التخصص (التخصص يظهر للأطباء فقط) -->
+    <div class="ed-two">
+      <div id="edCatWrap">
         <label style="font-size:11px; color:var(--gold); font-weight:700;">1. نوع المنشأة:</label>
         <select id="edCat" class="input-box" style="background:var(--card);">
           <option value="doctor">🩺 عيادة طبيب</option>
           <option value="pharmacy">💊 صيدلية</option>
           <option value="lab">🧪 معمل / أشعة</option>
+          <option value="optics">🕶️ محل نظارات</option>
         </select>
       </div>
-      <div>
+      <div id="edSpecWrap">
         <label style="font-size:11px; color:var(--gold); font-weight:700;">2. التخصص الدقيق:</label>
         <select id="edSpecKey" class="input-box" style="background:var(--card);">
           <option value="peds">👶 طب الأطفال</option>
@@ -537,8 +651,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
           <option value="nutrition">🥗 التغذية والتخسيس</option>
           <option value="cosmetic">💄 التجميل</option>
           <option value="laser">🔆 الليزر</option>
-          <option value="pharmacy">💊 صيدلية عامة</option>
-          <option value="lab">🧪 تحاليل وأشعة</option>
         </select>
       </div>
     </div>
@@ -562,11 +674,21 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       <input type="hidden" id="edGalleryData">
     </div>
 
-    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:8px;">
+    <div class="ed-two ed-addr">
       <input id="edAddr" required placeholder="العنوان التفصيلي المؤكد *" class="input-box">
-      <input id="edFee" placeholder="💰 سعر الكشف (مثال: 150 ج.م)" class="input-box">
+      <div id="edFeeWrap"><input id="edFee" placeholder="💰 سعر الكشف (مثال: 150 ج.م)" class="input-box"></div>
     </div>
     <input id="edMapUrl" placeholder="🗺️ رابط الموقع على خرائط جوجل (اختياري)" class="input-box">
+
+    <!-- قائمة الخدمات والأسعار: للمعامل والأشعة ومحلات النظارات فقط، وتظهر في الصفحة الداخلية فقط -->
+    <div id="servicesWrap" class="hidden" style="background:rgba(168,85,247,.08); padding:10px; border-radius:12px; border:1px solid rgba(168,85,247,.35); display:grid; gap:8px;">
+      <div>
+        <b style="font-size:13px; color:#c084fc;">🧾 قائمة الخدمات والأسعار (حتى 7 خانات):</b>
+        <p style="font-size:11px; color:var(--muted);">مثال: «أشعة مقطعية على الصدر — 600 ج.م». تظهر داخل صفحة المنشأة فقط، ولا تظهر في البطاقة الخارجية.</p>
+      </div>
+      <div id="svcRows" style="display:grid; gap:6px;"></div>
+      <button type="button" id="svcAdd" style="padding:8px; border-radius:10px; font-size:12px; font-weight:700; border:1px dashed rgba(168,85,247,.6); color:#c084fc;">+ إضافة خانة</button>
+    </div>
 
     <!-- علامة التوثيق (تظهر للأدمن فقط) -->
     <div id="verifyWrap" style="background:rgba(59,130,246,.08); padding:10px; border-radius:12px; border:1px solid rgba(59,130,246,.4); display:flex; align-items:center; justify-content:space-between; gap:10px;">
@@ -624,32 +746,48 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       </div>
     </div>
 
+    <div id="ext-editor-slot"></div>
+
     <button type="submit" class="gold-bg" style="padding:13px; border-radius:14px; font-size:14px;">حفظ ونشر التعديلات فوراً ✔</button>
   </form>
 </div>
 
-<!-- ================= نافذة التقييم والتعليق ================= -->
+<!-- ================= نافذة التقييم والتعليق (تقييم واحد لكل حساب على كل صفحة) ================= -->
 <div id="reviewModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <form id="reviewForm" class="modal-box" onclick="event.stopPropagation()" style="display:grid; gap:12px;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h3 id="revModalTitle" class="font-display" style="font-size:18px; color:var(--gold);">⭐ إضافة تقييم وتعليق</h3>
       <button type="button" onclick="closeReviewModal()" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.1);">✕</button>
     </div>
-    <input id="revAuthor" placeholder="اسمك (اختياري)" class="input-box">
-    <div id="starPick" style="display:flex; justify-content:center; gap:10px; background:rgba(255,255,255,.03); padding:10px; border-radius:12px;"></div>
-    <textarea id="revBody" required rows="3" placeholder="اكتب تجربتك أو معلومة مفيدة للناس بكل احترام..." class="input-box"></textarea>
-    <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">نشر التقييم والتعليق ✔</button>
+    <!-- يظهر عند عدم تسجيل الدخول -->
+    <div id="revNeedLogin" class="hidden" style="text-align:center; padding:14px; border-radius:14px; background:rgba(217,180,90,.1); border:1px solid var(--border); display:grid; gap:10px;">
+      <p style="font-size:13.5px;">لنشر تقييمك سجّل الدخول بحساب Google. التقييم واحد لكل حساب على كل صفحة.</p>
+      <button type="button" id="revLoginBtn" class="gold-bg" style="padding:10px; border-radius:12px; font-size:13px;">تسجيل الدخول ←</button>
+    </div>
+    <div id="revFormBody" style="display:grid; gap:12px;">
+      <p id="revAs" style="font-size:12.5px; color:var(--gold); font-weight:700;"></p>
+      <div id="starPick" style="display:flex; justify-content:center; gap:10px; background:rgba(255,255,255,.03); padding:10px; border-radius:12px;"></div>
+      <textarea id="revBody" required rows="3" maxlength="600" placeholder="اكتب تجربتك أو معلومة مفيدة للناس بكل احترام..." class="input-box"></textarea>
+      <button type="submit" id="revSubmitBtn" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">نشر التقييم والتعليق ✔</button>
+    </div>
   </form>
 </div>
 
 <div id="toast" class="toast-box gold-bg hidden"></div>
 
+<!-- مساحة لواجهات الإضافات المستقبلية (نوافذ، أزرار عائمة، إلخ) -->
+<div id="ext-root"></div>
+
 <!-- ======================= نهاية الجزء الأول ======================= -->
 <!-- الجزء الثاني يبدأ من هنا بوسم <script> ويحتوي كل الأكواد البرمجية -->
-<script>
+  <script>
 'use strict';
 /* =====================================================================
-   Cryovion — الجزء الثاني: كل الأكواد البرمجية (نسخة سريعة + توثيق بتحكم حقيقي)
+   Cryovion v1.2.0 — الجزء الثاني الكامل (مطابق 100% للجزء الأول)
+   =====================================================================
+   ملاحظة SQL اختيارية (فقط إذا أردت تفعيل حذف التعليقات من السحابة عبر Supabase):
+   في SQL Editor شغّل:
+   create policy "allow_delete_reviews" on public.reviews for delete to public using (true);
    ===================================================================== */
 
 /* ============ 1) الإعدادات ============ */
@@ -660,8 +798,55 @@ const PHOTO_BUCKET = 'place-photos';
 const NO_DATA_MSG = 'لم يتم إضافة معلومات للخانة';
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PAGE_SIZE = 24;
-const CACHE_KEY = 'cryovion_places_v1';
+const CACHE_KEY = 'cryovion_places_' + Cryovion.config.cacheVersion;
 const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* ============ 1.5) خلفية الـ DNA الأنيقة في الشريط الجانبي ============ */
+(function injectSidebarDNA() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 680" fill="none">
+    <defs>
+      <linearGradient id="dnaG1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.55"/>
+        <stop offset="50%" stop-color="#D9B45A" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.5"/>
+      </linearGradient>
+      <linearGradient id="dnaG2" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#D9B45A" stop-opacity="0.45"/>
+        <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.35"/>
+      </linearGradient>
+    </defs>
+    <g stroke="rgba(94,234,212,0.22)" stroke-width="1.4" stroke-linecap="round">
+      <line x1="62" y1="55" x2="158" y2="55"/><line x1="78" y1="85" x2="142" y2="85"/>
+      <line x1="78" y1="155" x2="142" y2="155"/><line x1="62" y1="185" x2="158" y2="185"/>
+      <line x1="62" y1="225" x2="158" y2="225"/><line x1="78" y1="255" x2="142" y2="255"/>
+      <line x1="78" y1="325" x2="142" y2="325"/><line x1="62" y1="355" x2="158" y2="355"/>
+      <line x1="62" y1="395" x2="158" y2="395"/><line x1="78" y1="425" x2="142" y2="425"/>
+      <line x1="78" y1="495" x2="142" y2="495"/><line x1="62" y1="525" x2="158" y2="525"/>
+      <line x1="62" y1="565" x2="158" y2="565"/><line x1="78" y1="595" x2="142" y2="595"/>
+    </g>
+    <path d="M45,20 C175,105 45,190 175,275 C45,360 175,445 45,530 C175,615 45,660 110,675" stroke="url(#dnaG1)" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M175,20 C45,105 175,190 45,275 C175,360 45,445 175,530 C45,615 175,660 110,675" stroke="url(#dnaG2)" stroke-width="3.2" stroke-linecap="round"/>
+    <g fill="#5eead4" opacity="0.55">
+      <circle cx="62" cy="55" r="3"/><circle cx="158" cy="55" r="3" fill="#F6E29A"/>
+      <circle cx="62" cy="185" r="3" fill="#F6E29A"/><circle cx="158" cy="185" r="3"/>
+      <circle cx="62" cy="225" r="3"/><circle cx="158" cy="225" r="3" fill="#F6E29A"/>
+      <circle cx="62" cy="355" r="3" fill="#F6E29A"/><circle cx="158" cy="355" r="3"/>
+      <circle cx="62" cy="395" r="3"/><circle cx="158" cy="395" r="3" fill="#F6E29A"/>
+      <circle cx="62" cy="525" r="3" fill="#F6E29A"/><circle cx="158" cy="525" r="3"/>
+    </g>
+  </svg>`;
+  const uri = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  Cryovion.css(`
+    .side-drawer::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("${uri}"); background-repeat: no-repeat;
+      background-position: center 55%; background-size: 88% auto; opacity: 0.16;
+    }
+    html.light .side-drawer::before { opacity: 0.10; }
+    .side-drawer > * { position: relative; z-index: 1; }
+  `);
+})();
 
 /* ============ 2) القواميس والبيانات الثابتة ============ */
 const I18N = {
@@ -669,7 +854,7 @@ const I18N = {
     menu_btn: 'القائمة', nav_home: 'الدليل الطبي الذكي', nav_managed: 'إدارة صفحتي', nav_referrals: 'دعوة صديق ومكافأة النشر',
     nav_referrals_short: '✨ دعوة صديق', nav_account: 'تسجيل الدخول والحساب', nav_settings: 'الإعدادات واللغة', nav_info: 'التعاون الإعلاني والتواصل',
     login_title: 'تسجيل الدخول', login_sub: 'إدارة صفحتك / دعوة صديق', login_short: '🔐 دخول', slogan_1: 'صحتك أقرب', slogan_2: 'مما تظن',
-    search_ph: 'ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب)، أو صيدلية...', stories_title: 'حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)',
+    search_ph: 'ابحث عن طبيب، تخصص (أطفال، باطنة، نظارات)، أو صيدلية...', stories_title: 'حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)',
     dir_title: 'الدليل الطبي الموثق', reset_filter: 'إلغاء الفلتر وعرض الكل ✕', back_btn: 'رجوع ←',
     managed_header: '🎛️ إدارة صفحتي وحالة الـ 24 ساعة', managed_sub: 'أضف صورتك في المربع الأيمن، نشّط حالة الفتح، سعر الكشف، وانشر حالتك اليومية',
     ref_header: '✨ دعوة صديق ومكافأة نشر الإعلانات', ref_sub: 'ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي',
@@ -677,14 +862,15 @@ const I18N = {
     tab_login: 'تسجيل دخول', tab_register: 'إنشاء حساب جديد', email_submit: 'دخول بالبريد الإلكتروني ✔', or_oauth: '— أو الدخول المباشر السريع —',
     settings_header: '⚙️ الإعدادات واللغة والمظهر', set_lang_title: '🌐 لغة المنصة (Language)', set_lang_sub: 'التبديل الفوري بين العربية والإنجليزية',
     set_theme_title: '🌗 المظهر الداكن / الفاتح', set_theme_sub: 'تبديل إضاءة المنصة وحفظ اختيارك', set_font_title: '🔠 حجم الخط والوضوح',
-    set_font_sub: 'تكبير النصوص لقراءة مريحة', toggle_btn: 'تبديل 🌗', font_btn: 'تكبير / تصغير', info_header: 'ℹ️ التواصل وتفويض الصفحات',
-    cat_doctor: 'أطباء وعيادات', cat_pharmacy: 'صيدليات', cat_lab: 'معامل وأشعة', page_unit: 'صفحة', more_btn: 'عرض المزيد ↓'
+    set_font_sub: 'تكبير النصوص لقراءة مريحة', set_disp_title: '🏷️ الاسم الظاهر في تعليقاتك', set_disp_sub: 'اختر كيف يظهر اسمك عند نشر تقييم (حساب واحد = تقييم واحد لكل صفحة)',
+    toggle_btn: 'تبديل 🌗', font_btn: 'تكبير / تصغير', info_header: 'ℹ️ التواصل وتفويض الصفحات',
+    cat_doctor: 'أطباء وعيادات', cat_pharmacy: 'صيدليات', cat_lab: 'معامل ونظارات', page_unit: 'صفحة', more_btn: 'عرض المزيد ↓'
   },
   en: {
     menu_btn: 'Menu', nav_home: 'Smart Medical Directory', nav_managed: 'Manage My Page', nav_referrals: 'Invite Friends & Free Ad',
     nav_referrals_short: '✨ Invite Friend', nav_account: 'Account & Sign In', nav_settings: 'Settings & Language', nav_info: 'Contact & Verification',
     login_title: 'Sign In', login_sub: 'Manage page / Invite friends', login_short: '🔐 Sign In', slogan_1: 'Your Health is Closer', slogan_2: 'Than You Think',
-    search_ph: 'Search doctor, specialty (Pediatrics, Neuro, Dental), or pharmacy...', stories_title: 'Daily Updates & Status (Live for 24h)',
+    search_ph: 'Search doctor, specialty (Pediatrics, Neuro, Optics), or pharmacy...', stories_title: 'Daily Updates & Status (Live for 24h)',
     dir_title: 'Verified Medical Directory', reset_filter: 'Clear Filter & Show All ✕', back_btn: '← Back',
     managed_header: '🎛️ Manage My Page & 24h Status', managed_sub: 'Upload photo, toggle open status, set consultation fee & daily story',
     ref_header: '✨ Invite Friends & Get Free Listing', ref_sub: 'Share Cryovion with friends to unlock a free verified medical listing',
@@ -692,8 +878,9 @@ const I18N = {
     tab_login: 'Sign In', tab_register: 'Create Account', email_submit: 'Sign In with Email ✔', or_oauth: '— Or Quick Social Sign In —',
     settings_header: '⚙️ Settings, Language & Theme', set_lang_title: '🌐 Platform Language', set_lang_sub: 'Switch instantly between Arabic & English',
     set_theme_title: '🌗 Dark / Light Mode', set_theme_sub: 'Switch platform appearance', set_font_title: '🔠 Font Size & Accessibility',
-    set_font_sub: 'Enlarge text for easier reading', toggle_btn: 'Switch 🌗', font_btn: 'Zoom In / Out', info_header: 'ℹ️ Contact & Page Authorization',
-    cat_doctor: 'Doctors & Clinics', cat_pharmacy: 'Pharmacies', cat_lab: 'Labs & Scans', page_unit: 'Listings', more_btn: 'Show more ↓'
+    set_font_sub: 'Enlarge text for easier reading', set_disp_title: '🏷️ Public Review Name', set_disp_sub: 'Choose how your name appears on reviews (1 account = 1 review per listing)',
+    toggle_btn: 'Switch 🌗', font_btn: 'Zoom In / Out', info_header: 'ℹ️ Contact & Page Authorization',
+    cat_doctor: 'Doctors & Clinics', cat_pharmacy: 'Pharmacies', cat_lab: 'Labs & Optics', page_unit: 'Listings', more_btn: 'Show more ↓'
   }
 };
 
@@ -714,14 +901,15 @@ const SPECS_META = {
   cosmetic: { label: 'التجميل', labelEn: 'Cosmetic', icon: '💄', color: '#ec4899', bg: 'rgba(236,72,153,0.16)' },
   laser:    { label: 'الليزر', labelEn: 'Laser', icon: '🔆', color: '#facc15', bg: 'rgba(250,204,21,0.16)' },
   pharmacy: { label: 'صيدلية ودواء', labelEn: 'Pharmacy', icon: '💊', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'تحاليل وأشعة', labelEn: 'Lab & Radiology', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
+  lab:      { label: 'تحاليل وأشعة', labelEn: 'Lab & Radiology', icon: '🧪', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' },
+  optics:   { label: 'محلات النظارات', labelEn: 'Optics & Eyewear', icon: '🕶️', color: '#38bdf8', bg: 'rgba(56,189,248,0.16)', svg: '<circle cx="6" cy="14" r="4"/><circle cx="18" cy="14" r="4"/><path d="M10 14h4"/><path d="M2 14h.5"/><path d="M21.5 14H22"/>' }
 };
-const SPEC_BAR_ORDER = ['all','peds','gastro','obgyn','neuro','ortho','surgery','dental','eye','ent','cardio','physio','nutrition','cosmetic','laser','pharmacy','lab'];
+const SPEC_BAR_ORDER = ['all','peds','gastro','obgyn','neuro','ortho','surgery','dental','eye','optics','ent','cardio','physio','nutrition','cosmetic','laser','pharmacy','lab'];
 
 const CATS = {
   doctor:   { label: 'أطباء وعيادات', labelEn: 'Doctors & Clinics', color: '#60a5fa', accent: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
   pharmacy: { label: 'صيدليات',       labelEn: 'Pharmacies',        color: '#34d399', accent: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-  lab:      { label: 'معامل وأشعة',   labelEn: 'Labs & Scans',      color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
+  lab:      { label: 'معامل ونظارات', labelEn: 'Labs & Optics',     color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
 const ICON = {
   doctor: '<path fill="currentColor" fill-opacity=".3" stroke="none" d="M6 3v6a5 5 0 0 0 10 0V3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-1"/><circle cx="19" cy="12" r="2" fill="currentColor"/>',
@@ -732,7 +920,6 @@ const BAD_WORDS = ['نصاب','حرامي','فاشل','غبي','زباله','ق�
 const BAD_NORM = BAD_WORDS.map(w => w.replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase());
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-/* بيانات احتياطية تظهر فقط إذا تعذّر الاتصال بقاعدة البيانات (أو لتعبئتها أول مرة) */
 const nowTs = Date.now();
 const DEFAULT_DIRECTORY = [
   { id: 'v-kaouthar-1', cat: 'doctor', spec_key: 'neuro', name: 'د. كوثر ناصر', spec: 'أخصائية نفسية إكلينيكية (اضطرابات وعصبية)',
@@ -755,7 +942,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim().toLowerCase();
 const containsDefamation = txt => { const n = norm(txt); return BAD_NORM.some(w => n.includes(w)); };
 const ico = (p, sz = 22) => `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${p}</svg>`;
-const orb = (k, sz = 40) => `<span class="orb-icon t-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz * 0.58))}</span>`;
+const orb = (k, sz = 40) => `<span class="orb-icon t-${k || 'doctor'}" data-ico="cat-${k || 'doctor'}" style="width:${sz}px; height:${sz}px;">${ico(ICON[k] || ICON.doctor, Math.round(sz * 0.58))}</span>`;
 const star = on => `<span style="color:${on ? '#D9B45A' : '#475569'}; font-size:15px;">★</span>`;
 const stars = r => [1, 2, 3, 4, 5].map(i => star(i <= Math.round(r))).join('');
 const byId = id => placeMap.get(id);
@@ -774,10 +961,88 @@ function formatWaNumber(raw) {
   return digits;
 }
 
-/* علامة التوثيق: رمادية = غير موثق، زرقاء = موثق. للأدمن تكون قابلة للضغط للتبديل */
+function runTpl(name, ...args) {
+  const f = Cryovion.tpl[name]; if (!f) return null;
+  try { const r = f(...args); return typeof r === 'string' ? r : null; }
+  catch (e) { console.error('[Cryovion template:' + name + ']', e); return null; }
+}
+
 function badge(d, interactive) {
   const on = !!d.is_verified, can = !!interactive && adminUnlocked;
+  const custom = runTpl('badge', d, { on, can, esc, CHECK_SVG });
+  if (custom !== null) return custom;
   return `<span class="vbadge${on ? ' on' : ''}${can ? ' clickable' : ''}" role="img" aria-label="${on ? 'صفحة موثقة رسمياً' : 'صفحة غير موثقة'}" title="${on ? 'موثق (أزرق)' : 'غير موثق (رمادي)'}${can ? ' — اضغط للتبديل' : ''}"${can ? ` data-badge-id="${esc(d.id)}"` : ''}>${CHECK_SVG}</span>`;
+}
+
+/* ============ 3.5) نظام هوية المعلق والاسم المستعار (تقييم واحد لكل حساب) ============ */
+function getUserAccountKey(u) {
+  if (!u || !u.email) return '';
+  let h = 0; const s = norm(u.email);
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return 'u' + Math.abs(h).toString(36);
+}
+function getDispPrefs() {
+  try { return JSON.parse(localStorage.getItem('cryovion_disp_prefs') || '{"mode":"initial","nick":""}'); }
+  catch { return { mode: 'initial', nick: '' }; }
+}
+function setDispPrefs(p) { localStorage.setItem('cryovion_disp_prefs', JSON.stringify(p)); }
+function getReviewerDisplayName(u) {
+  if (!u || !u.email) return 'مستخدم';
+  const prefs = getDispPrefs();
+  const initial = u.email.trim().charAt(0).toUpperCase() + '.';
+  if (prefs.mode === 'nick' && prefs.nick && prefs.nick.trim()) return prefs.nick.trim().slice(0, 20);
+  if (prefs.mode === 'name' && u.name && u.name.trim()) return u.name.trim().slice(0, 25);
+  return initial;
+}
+/* نخزن بصمة الحساب داخل حقل author بشكل غير مرئي: "الاسم||uKey" حتى نمنع التكرار دون الحاجة لعمود جديد في Supabase */
+function packAuthor(displayName, u) {
+  const key = getUserAccountKey(u);
+  const clean = String(displayName || '').replace(/\|\|/g, ' ').trim() || 'مستخدم';
+  return key ? `${clean}||${key}` : clean;
+}
+function unpackAuthor(raw) {
+  const str = String(raw || 'زائر');
+  const idx = str.lastIndexOf('||');
+  if (idx > 0) return { name: str.slice(0, idx), key: str.slice(idx + 2) };
+  return { name: str, key: '' };
+}
+function getLocalReviewedMap() {
+  try { return JSON.parse(localStorage.getItem('cryovion_reviewed_map') || '{}'); } catch { return {}; }
+}
+function markLocalReviewed(placeId, key, body, stars) {
+  const m = getLocalReviewedMap();
+  m[placeId + ':' + key] = { body, stars, ts: Date.now() };
+  localStorage.setItem('cryovion_reviewed_map', JSON.stringify(m));
+}
+function unmarkLocalReviewed(placeId, key) {
+  const m = getLocalReviewedMap();
+  delete m[placeId + ':' + key];
+  localStorage.setItem('cryovion_reviewed_map', JSON.stringify(m));
+}
+function getDeletedRevsSet() {
+  try { return new Set(JSON.parse(localStorage.getItem('cryovion_deleted_revs') || '[]')); } catch { return new Set(); }
+}
+function addDeletedRevSig(sig) {
+  const s = getDeletedRevsSet(); s.add(sig);
+  localStorage.setItem('cryovion_deleted_revs', JSON.stringify(Array.from(s)));
+}
+function revSignature(placeId, rawAuthor, body) {
+  return `${placeId}::${rawAuthor}::${body}`;
+}
+
+function updateDispSettingsUI() {
+  const u = getCurrentUser(), prefs = getDispPrefs();
+  const initial = (u && u.email) ? (u.email.trim().charAt(0).toUpperCase() + '.') : 'A.';
+  const lbl = $('dispInitialLabel');
+  if (lbl) lbl.textContent = `أول حرف من بريدي (${initial}) — الافتراضي`;
+  document.querySelectorAll('input[name="dispMode"]').forEach(r => { r.checked = (r.value === (prefs.mode || 'initial')); });
+  const nickIn = $('dispNick');
+  if (nickIn) {
+    nickIn.value = prefs.nick || '';
+    nickIn.classList.toggle('hidden', prefs.mode !== 'nick');
+  }
+  const prev = $('dispPreview');
+  if (prev) prev.textContent = 'سيظهر اسمك في التعليقات هكذا: 👤 ' + (u ? getReviewerDisplayName(u) : initial);
 }
 
 /* ============ 4) الحالة العامة ============ */
@@ -789,7 +1054,21 @@ let adminUnlocked = false, verifiedEmail = null;
 let activeReviewPlaceId = null, pickedStars = 5;
 let writeQueue = Promise.resolve(), logoClicks = 0, logoTimer = null;
 let shownLimit = PAGE_SIZE, homeDirty = false, loadSeq = 0, lastUid = undefined;
-let ttsId = null, voices = [];
+let ttsId = null, voices = [], appReady = false;
+
+/* ============ 4.5) واجهة التطوير العامة (للإضافات) ============ */
+Cryovion.filters = [];
+Cryovion.addFilter = fn => { Cryovion.filters.push(fn); Cryovion.refresh(); };
+Cryovion.refresh = () => { if (appReady) { render(); renderPostersCarousel(); } };
+Cryovion.reload = () => load();
+Cryovion.onReady = f => { if (appReady) { try { f(); } catch (e) { console.error(e); } } else Cryovion.on('ready', f); };
+Cryovion.api = {
+  get places() { return places; }, get user() { return getCurrentUser(); }, get isAdmin() { return adminUnlocked; },
+  get lang() { return currentLang; }, get view() { return currentViewName; },
+  byId: id => byId(id), toast, esc, norm, navigate: v => navigateApp(v), openPlace: id => openPlacePage(id),
+  savePlace: item => savePlace(item), setVerified: (id, v) => setVerified(id, v),
+  specs: SPECS_META, cats: CATS
+};
 
 /* ============ 5) حالة الدوام (النقطة المضيئة) ============ */
 function getAvailabilityStatus(d) {
@@ -810,7 +1089,6 @@ function getAvailabilityStatus(d) {
   }
   return st('unknown', 'var(--muted)', 'لم تُفعل من المُفوض', 'Not Configured');
 }
-/* لا يعيد الرسم إلا إذا تغيّرت حالة مكان فعلاً */
 function recomputeAvailability(force) {
   let changed = !!force;
   places.forEach(p => {
@@ -832,6 +1110,8 @@ function applyLanguage() {
   buildFilters();
   recomputeAvailability(true);
   refreshUserUI();
+  updateDispSettingsUI();
+  Cryovion.emit('langChanged', currentLang);
 }
 function toggleLanguage() {
   currentLang = currentLang === 'ar' ? 'en' : 'ar';
@@ -857,8 +1137,10 @@ function switchViewDOM(viewName, restoreScroll = false) {
   if (viewName === 'myManaged') renderManagedAds();
   if (viewName === 'referrals') renderReferralsHub();
   if (viewName === 'admin') renderAdminList();
+  if (viewName === 'settings') updateDispSettingsUI();
   if (viewName === 'home' && restoreScroll) requestAnimationFrame(() => window.scrollTo({ top: savedHomeScrollY, behavior: 'instant' }));
   else window.scrollTo({ top: 0, behavior: 'instant' });
+  Cryovion.emit('viewChanged', viewName);
 }
 function navigateApp(viewName) {
   if (currentViewName === 'home' && viewName !== 'home') savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
@@ -898,8 +1180,8 @@ function setCurrentUser(u) {
     localStorage.setItem('cryovion_user', JSON.stringify(u));
   } else localStorage.removeItem('cryovion_user');
   refreshUserUI();
+  updateDispSettingsUI();
 }
-/* الأدمن = إيميل المشرف + جلسة Google حقيقية (لها uid) — والحماية الفعلية في قاعدة البيانات */
 function isUserMasterAdmin(u) {
   if (!u || !u.email || u.email.trim().toLowerCase() !== ADMIN_EMAIL) return false;
   return verifiedEmail === ADMIN_EMAIL || !!u.uid;
@@ -927,6 +1209,7 @@ function refreshUserUI() {
     $('headerUserBadge').textContent = dict.login_short;
     $('profileActiveBox').classList.add('hidden'); $('authFormsWrap').classList.remove('hidden');
   }
+  Cryovion.emit('userChanged', u);
 }
 async function applySession(s) {
   verifiedEmail = (s && s.user && s.user.email) ? s.user.email.toLowerCase() : null;
@@ -939,7 +1222,6 @@ async function applySession(s) {
 async function initSupabaseSession() {
   if (!db) return;
   try { const r = await db.auth.getSession(); lastUid = r.data.session ? r.data.session.user.id : null; await applySession(r.data.session); } catch {}
-  /* لا نعيد التحميل إلا عند تغيّر المستخدم فعلاً (وليس عند كل تجديد للتوكن) */
   db.auth.onAuthStateChange((_e, s) => setTimeout(async () => {
     const uid = s && s.user ? s.user.id : null;
     if (uid === lastUid) return;
@@ -983,25 +1265,31 @@ async function dbWrite(it) {
     if (!admin) return;
     const d = await db.from('places').delete().eq('id', it.id);
     if (d.error) toast('تعذر الحذف');
+    else Cryovion.emit('afterDelete', it.id);
     return;
   }
   if (!admin && !byId(it.id)) { toast('إضافة الصفحات للأدمن فقط'); return; }
+  const schedObj = it.sched ? { ...it.sched } : {};
+  if (Array.isArray(it.services) && it.services.length) schedObj.services = it.services;
+  else delete schedObj.services;
+
   const row = {
-    id: it.id, cat: it.cat, spec_key: it.spec_key, name: it.name, spec: it.spec || '',
+    id: it.id, cat: it.cat === 'optics' ? 'lab' : it.cat, spec_key: it.spec_key, name: it.name, spec: it.spec || '',
     bio: it.bio || '', bio_ts: it.bio_ts || null, photo_url: await publishPhoto(it.photo_url, s.user.id),
     gallery: await Promise.all((it.gallery || []).map(g => publishPhoto(g, s.user.id))),
-    addr: it.addr || '', hours: it.hours || 'غير معروف', lamp_mode: it.lamp_mode || 'unknown', sched: it.sched || null,
+    addr: it.addr || '', hours: it.hours || 'غير معروف', lamp_mode: it.lamp_mode || 'unknown', sched: schedObj,
     phone: it.phone || null, whatsapp: it.whatsapp || null, fee: it.fee || null, map_url: it.map_url || null
   };
-  let res;
   if (admin) {
     row.is_verified = !!it.is_verified;
     row.owner_email = it.owner_email ? it.owner_email.toLowerCase() : null;
     row.ref_count = it.ref_count || 0;
     row.status = 'approved';
-    res = await db.from('places').upsert(row);
-  } else res = await db.from('places').update(row).eq('id', it.id);
+  }
+  Cryovion.emit('beforeSave', row, it);
+  const res = admin ? await db.from('places').upsert(row) : await db.from('places').update(row).eq('id', it.id);
   if (res.error) { console.error(res.error); toast('رُفض الحفظ: ليست لديك صلاحية على هذه الصفحة'); }
+  else Cryovion.emit('afterSave', row);
 }
 function savePlace(item) {
   if (!db) return toast('الخدمة غير متاحة حالياً');
@@ -1012,7 +1300,27 @@ function saveReview(rv) {
   if (!db) return toast('الخدمة غير متاحة حالياً');
   writeQueue = writeQueue
     .then(() => db.from('reviews').insert({ place_id: rv.place_id, author: rv.author, stars: rv.stars, body: rv.body }))
-    .then(r => { if (r && r.error) toast('تعذر نشر التقييم'); }).catch(() => {});
+    .then(r => { if (r && r.error) toast('تعذر نشر التقييم'); else Cryovion.emit('reviewAdded', rv); }).catch(() => {});
+}
+async function deleteReviewItem(placeId, rawAuthor, body) {
+  const u = getCurrentUser();
+  const parsed = unpackAuthor(rawAuthor);
+  const myKey = getUserAccountKey(u);
+  const isMine = !!(myKey && parsed.key && myKey === parsed.key);
+  if (!adminUnlocked && !isMine) return toast('لا يمكنك حذف هذا التعليق');
+  if (!confirm('حذف هذا التقييم والتعليق نهائياً؟')) return;
+
+  addDeletedRevSig(revSignature(placeId, rawAuthor, body));
+  if (parsed.key) unmarkLocalReviewed(placeId, parsed.key);
+
+  if (db) {
+    try {
+      await db.from('reviews').delete().match({ place_id: placeId, author: rawAuthor, body: body });
+    } catch (e) { console.warn(e); }
+  }
+  await load();
+  if (currentViewName === 'placePage') renderPlacePageDOM(placeId);
+  toast('🗑 تم حذف التعليق');
 }
 function saveRefRequest(rq) {
   if (!db) return toast('الخدمة غير متاحة حالياً');
@@ -1025,7 +1333,6 @@ function saveRefRequest(rq) {
 const getRefRequests = () => refCache;
 function getDevStatus() { try { return JSON.parse(localStorage.getItem('cryovion_dev_status')); } catch { return null; } }
 
-/* ----- كاش محلي: يظهر المحتوى فوراً ثم يتحدّث من الإنترنت ----- */
 function saveCache() {
   try {
     const slim = places.map(p => { const o = {}; PLACE_KEYS.forEach(k => { o[k] = p[k]; }); return o; });
@@ -1040,22 +1347,46 @@ function hydrateFromCache() {
   } catch {}
 }
 function buildPlaces(rows, revs) {
+  const deletedSet = getDeletedRevsSet();
   const rmap = new Map();
+  const seenPerPlaceUser = new Set();
+
+  /* ترتيب من الأقدم للأحدث أو العكس مع ضمان عدم تكرار تقييم نفس الحساب على نفس الإعلان */
   (revs || []).forEach(x => {
+    const sig = revSignature(x.place_id, x.author, x.body);
+    if (deletedSet.has(sig)) return;
+    const parsed = unpackAuthor(x.author);
+    if (parsed.key) {
+      const uk = x.place_id + ':' + parsed.key;
+      if (seenPerPlaceUser.has(uk)) return;
+      seenPerPlaceUser.add(uk);
+    }
     let a = rmap.get(x.place_id); if (!a) { a = []; rmap.set(x.place_id, a); }
-    a.push({ author: x.author, stars: x.stars, body: x.body, date: x.created_at ? x.created_at.slice(0, 10) : '' });
+    a.push({
+      rawAuthor: x.author,
+      author: parsed.name,
+      userKey: parsed.key,
+      stars: x.stars,
+      body: x.body,
+      date: x.created_at ? x.created_at.slice(0, 10) : ''
+    });
   });
+
   places = rows.map(d => {
     const rv = rmap.get(d.id) || [], rated = rv.filter(x => x.stars > 0);
+    const services = (d.sched && Array.isArray(d.sched.services)) ? d.sched.services : (Array.isArray(d.services) ? d.services : []);
     const o = {
-      ...d, hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف', bio: d.bio || '', gallery: d.gallery || [],
+      ...d,
+      services,
+      hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف', bio: d.bio || '', gallery: d.gallery || [],
       phone: d.phone || null, whatsapp: d.whatsapp || null, fee: d.fee || '', map_url: d.map_url || '',
       reviews: rv, n: rated.length,
       rate: rated.length ? Math.round(rated.reduce((a, x) => a + x.stars, 0) / rated.length * 10) / 10 : 5,
       updated_date: d.updated_at ? d.updated_at.slice(0, 10) : (d.updated_date || '')
     };
+    const svcNames = services.map(s => s.name || '').join(' ');
     o._n = norm(`${o.name} ${o.spec} ${o.addr}`);
-    o._s = o._n + ' ' + norm(o.bio);
+    o._s = o._n + ' ' + norm(o.bio) + ' ' + norm(svcNames);
     const a = getAvailabilityStatus(o); o.avail_state = a.state; o.avail_label = a.label; o.avail_color = a.color;
     return o;
   });
@@ -1077,7 +1408,7 @@ async function load() {
       (s && admin) ? db.from('ad_requests').select('*').order('created_at', { ascending: false }) : Promise.resolve({ data: [] })
     ];
     const r = await Promise.all(jobs.map(j => Promise.resolve(j).catch(e => ({ error: e, data: null }))));
-    if (my !== loadSeq) return;           /* وصل طلب أحدث؛ تجاهل هذه النتيجة القديمة */
+    if (my !== loadSeq) return;
     if (r[0].error) { failed = true; console.error(r[0].error); } else rows = r[0].data || [];
     revs = r[1].data || [];
     if (r[2].data) localStorage.setItem('cryovion_dev_status', JSON.stringify({ text: r[2].data.text, ts: r[2].data.ts }));
@@ -1098,6 +1429,7 @@ async function load() {
   refreshUserUI(); buildFilters(); render(); renderPostersCarousel();
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'placePage' && currentPlaceId && byId(currentPlaceId)) renderPlacePageDOM(currentPlaceId);
+  Cryovion.emit('placesLoaded', places);
 }
 
 /* ----- التحكم الحقيقي بعلامة التوثيق (رمادي ⇄ أزرق) ----- */
@@ -1114,7 +1446,7 @@ async function setVerified(id, val) {
   if (verifyBusy.has(id)) return;
   const next = typeof val === 'boolean' ? val : !p.is_verified, prev = !!p.is_verified;
   verifyBusy.add(id);
-  p.is_verified = next; repaintVerified(id);          /* تغيير فوري على الشاشة */
+  p.is_verified = next; repaintVerified(id);
   try {
     try { await writeQueue; } catch {}
     const s = await sess();
@@ -1123,10 +1455,11 @@ async function setVerified(id, val) {
     if (r.error) throw r.error;
     if (!r.data || !r.data.length) throw new Error('rls-blocked');
     saveCache();
+    Cryovion.emit('verifiedChanged', id, next);
     toast(next ? '🔵 تم التوثيق — العلامة الآن زرقاء' : '⚪ تم سحب التوثيق — العلامة الآن رمادية');
   } catch (err) {
     console.error(err);
-    p.is_verified = prev; repaintVerified(id);          /* تراجع لأن قاعدة البيانات رفضت */
+    p.is_verified = prev; repaintVerified(id);
     toast(err && err.message === 'no-session' ? 'انتهت الجلسة، سجّل الدخول عبر Google من جديد'
         : err && err.message === 'rls-blocked' ? '⛔ رفضت قاعدة البيانات التعديل: فعّل سياسة تحديث is_verified للأدمن'
         : 'تعذر حفظ التوثيق، حاول مرة أخرى');
@@ -1149,8 +1482,7 @@ function actions(d, mode) {
     + (pg ? one(!!mu, mu, true, 'background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);', '🗺️ الموقع على الخريطة') : '');
 }
 
-/* ============ 11) العرض: الأقسام والتخصصات والشريط والبطاقات ============ */
-/* الأزرار تُبنى مرة واحدة، وعند كل بحث نغيّر الألوان فقط (بدون إعادة بناء) */
+/* ============ 11) العرض: الأقسام والتخصصات والشريط الدائري المستمر والبطاقات ============ */
 function buildFilters() {
   const dict = I18N[currentLang] || I18N.ar;
   $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => {
@@ -1161,50 +1493,108 @@ function buildFilters() {
   }).join('');
   $('specsBar').innerHTML = SPEC_BAR_ORDER.map(k => {
     const s = SPECS_META[k]; if (!s) return '';
-    return `<button data-spec="${k}" class="spec-chip"><span style="font-size:15px;">${s.icon}</span><span>${currentLang === 'en' ? s.labelEn : s.label}</span></button>`;
+    return `<button data-spec="${k}" class="spec-chip"><span data-ico="spec-${k}" style="font-size:15px;">${s.icon}</span><span>${currentLang === 'en' ? s.labelEn : s.label}</span></button>`;
   }).join('');
   paintFilters();
+  Cryovion.applyIcons($('cats')); Cryovion.applyIcons($('specsBar'));
 }
+/* إخفاء شريط التخصصات تماماً عند اختيار الصيدليات أو المعامل لعدم التشتيت */
 function paintFilters() {
   $('cats').querySelectorAll('[data-cat]').forEach(b => b.classList.toggle('active', b.dataset.cat === activeCat));
   $('specsBar').querySelectorAll('[data-spec]').forEach(b => b.classList.toggle('active', b.dataset.spec === activeSpec));
+  const hideSpecs = (activeCat === 'pharmacy' || activeCat === 'lab');
+  $('specsBar').classList.toggle('hidden', hideSpecs);
 }
+
+/* شريط الـ 24 ساعة: حركة دائرية مستمرة في اتجاه واحد + إطار أخضر (.live) للحالات الظاهرة في الواجهة */
+let posterIO = null, posterRaf = null, posterPaused = false, posterLastTs = 0;
+
+function setupPosterLiveObserver() {
+  const track = $('posterTrack'); if (!track) return;
+  if (posterIO) posterIO.disconnect();
+  if (!('IntersectionObserver' in window)) return;
+  posterIO = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      en.target.classList.toggle('live', en.isIntersecting && en.intersectionRatio >= 0.55);
+    });
+  }, { root: track, threshold: [0.2, 0.55, 0.85] });
+  track.querySelectorAll('.poster-card').forEach(c => posterIO.observe(c));
+}
+
 function renderPostersCarousel() {
   const track = $('posterTrack'); if (!track) return;
   const now = Date.now(), dev = getDevStatus();
-  let html = '';
+  const items = [];
   if (dev && now - dev.ts <= DAY_MS) {
-    html += `<div class="poster-card" style="border-color:var(--gold); cursor:default;"><div class="poster-top-quarter">
+    items.push(`<div class="poster-card" style="border-color:var(--gold); cursor:default;"><div class="poster-top-quarter">
       <div style="display:flex; align-items:center; gap:7px;"><span class="brand-mark gold-bg" style="width:28px; height:28px; border-radius:8px; font-size:14px;">C</span><span class="brand-text font-display" style="font-size:18px;">Cryovion</span></div>
       <span class="badge-pill gold-bg" style="font-size:10px; padding:2px 9px;">✔ تحديث رسمي</span></div>
-      <div class="poster-bio-body">${esc(dev.text)}</div></div>`;
+      <div class="poster-bio-body">${esc(dev.text)}</div></div>`);
   }
   places.forEach(d => {
     if (!d.bio || (d.bio_ts && now - d.bio_ts > DAY_MS)) return;
     const sp = SPECS_META[d.spec_key] || SPECS_META.gastro, wa = formatWaNumber(d.whatsapp || d.phone);
     const thumb = d.photo_url ? `<img src="${esc(d.photo_url)}" class="poster-mini-thumb" alt="" loading="lazy" decoding="async">` : `<span class="poster-mini-thumb t-${d.cat}">${sp.icon}</span>`;
     const foot = d.phone ? `<div style="display:flex; gap:6px; padding-top:6px;"><a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">📞 ${esc(d.phone)}</a>${wa ? `<a href="https://wa.me/${wa}" target="_blank" rel="noopener" style="background:var(--whatsapp); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">💬</a>` : ''}</div>` : '';
-    html += `<div data-act="openPage" data-id="${d.id}" class="poster-card"><div class="poster-top-quarter">
+    items.push(`<div data-act="openPage" data-id="${d.id}" class="poster-card"><div class="poster-top-quarter">
       <div style="display:flex; align-items:center; gap:7px; min-width:0;">${thumb}<span style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(d.name)}</span></div>
       <span style="display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; color:${d.avail_color}; flex-shrink:0;"><span class="status-dot ${d.avail_state}"></span><span>${esc(d.avail_label)}</span></span></div>
-      <div class="poster-bio-body">${esc(d.bio)}</div>${foot}</div>`;
+      <div class="poster-bio-body">${esc(d.bio)}</div>${foot}</div>`);
   });
-  track.innerHTML = html;
+
+  /* إذا كان هناك أكثر من بطاقة، نكرر المجموعة مرة ثانية ليدور الشريط في حلقة لا نهائية دون رجوع مفاجئ للبداية */
+  const baseHtml = items.join('');
+  track.dataset.looped = items.length >= 2 ? '1' : '0';
+  track.innerHTML = items.length >= 2 ? (baseHtml + baseHtml) : baseHtml;
+  setupPosterLiveObserver();
 }
-/* التمرير التلقائي: يعمل فقط والصفحة ظاهرة وفي الرئيسية */
+
+function startContinuousPosterLoop() {
+  const track = $('posterTrack'); if (!track) return;
+  ['pointerenter', 'touchstart'].forEach(ev => track.addEventListener(ev, () => { posterPaused = true; }, { passive: true }));
+  ['pointerleave', 'touchend', 'touchcancel'].forEach(ev => track.addEventListener(ev, () => { posterPaused = false; }, { passive: true }));
+
+  function tick(ts) {
+    if (!posterLastTs) posterLastTs = ts;
+    const dt = Math.min(64, ts - posterLastTs) / 1000;
+    posterLastTs = ts;
+
+    if (!posterPaused && Cryovion.flags.posterAutoplay !== false && !document.hidden && currentViewName === 'home') {
+      const cards = track.children;
+      if (cards.length >= 2 && track.scrollWidth > track.clientWidth + 10) {
+        const speed = Number(Cryovion.config.posterSpeed) || 38;
+        const dir = document.documentElement.dir === 'rtl' ? -1 : 1;
+        track.scrollLeft += dir * speed * dt;
+
+        if (track.dataset.looped === '1') {
+          const halfCount = cards.length / 2;
+          const firstCard = cards[0], midCard = cards[halfCount];
+          if (firstCard && midCard) {
+            const span = Math.abs(midCard.offsetLeft - firstCard.offsetLeft);
+            if (span > 0 && Math.abs(track.scrollLeft) >= span) {
+              track.scrollLeft += (dir < 0 ? span : -span);
+            }
+          }
+        }
+      }
+    }
+    posterRaf = requestAnimationFrame(tick);
+  }
+  if (!posterRaf) posterRaf = requestAnimationFrame(tick);
+}
 const posterStep = () => document.documentElement.dir === 'rtl' ? -354 : 354;
-function posterAutoplay() {
-  if (document.hidden || currentViewName !== 'home') return;
-  const track = $('posterTrack'); if (!track || track.children.length < 2) return;
-  const mx = track.scrollWidth - track.clientWidth;
-  if (Math.abs(track.scrollLeft) >= mx - 20) track.scrollTo({ left: 0, behavior: 'smooth' });
-  else track.scrollBy({ left: posterStep(), behavior: 'smooth' });
-}
-function card(d) {
+
+function cardCtx(d) {
   const c = CATS[d.cat] || CATS.doctor;
   const spMeta = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro;
-  const isPeds = d.cat === 'doctor' && d.spec_key === 'peds';
-  const watermark = (d.cat === 'doctor' && spMeta.svg) ? `<svg class="doctor-watermark" style="--spec-color:${spMeta.color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">${spMeta.svg}</svg>` : '';
+  return { c, spMeta, isPeds: d.cat === 'doctor' && d.spec_key === 'peds', lang: currentLang, esc, badge, actions, stars, orb, ico, CATS, SPECS_META, ICON, formatWaNumber };
+}
+function card(d) {
+  const ctx = cardCtx(d), c = ctx.c, spMeta = ctx.spMeta, isPeds = ctx.isPeds;
+  const custom = runTpl('card', d, ctx);
+  if (custom !== null) return custom;
+
+  const watermark = (spMeta.svg) ? `<svg class="doctor-watermark" style="--spec-color:${spMeta.color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">${spMeta.svg}</svg>` : '';
   const phoneDisplay = d.phone ? esc(d.phone) : '<span style="color:var(--muted); font-size:11.5px;">الرقم قيد التأكيد والتدقيق</span>';
   const verifyText = d.is_verified
     ? '<span style="color:#60a5fa; font-size:11.5px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>'
@@ -1229,7 +1619,7 @@ function card(d) {
           <div style="margin-top:9px; font-size:12.5px; color:var(--muted); display:grid; gap:3px;">
             <p>📍 <b style="color:var(--text);">العنوان:</b> ${esc(d.addr)}</p>
             <p>🕒 <b style="color:var(--text);">المواعيد:</b> ${esc(d.hours || 'غير معروف')}</p>
-            ${d.fee ? `<p>💰 <b style="color:var(--gold);">سعر الكشف:</b> <span style="color:var(--text); font-weight:700;">${esc(d.fee)}</span></p>` : ''}
+            ${(d.cat === 'doctor' && d.fee) ? `<p>💰 <b style="color:var(--gold);">سعر الكشف:</b> <span style="color:var(--text); font-weight:700;">${esc(d.fee)}</span></p>` : ''}
             <p>📞 <b style="color:var(--text);">الهاتف:</b> ${phoneDisplay}</p>
           </div>
         </div>
@@ -1241,11 +1631,13 @@ function card(d) {
     </div>
   </article>`;
 }
-/* عرض 24 بطاقة فقط في كل مرة ثم زر "عرض المزيد" (هذا أكبر تحسين للسرعة) */
+
 function render() {
   if (currentViewName !== 'home') { homeDirty = true; return; }
   const q = norm(query), dict = I18N[currentLang] || I18N.ar;
-  const res = places.filter(d => (!activeCat || d.cat === activeCat) && (activeSpec === 'all' || d.spec_key === activeSpec) && (!q || d._s.includes(q)));
+  const extra = Cryovion.filters;
+  const res = places.filter(d => (!activeCat || d.cat === activeCat) && (activeSpec === 'all' || d.spec_key === activeSpec) && (!q || d._s.includes(q))
+    && (!extra.length || extra.every(f => { try { return f(d); } catch { return true; } })));
   const shown = res.slice(0, shownLimit);
   let html = shown.map(card).join('');
   if (res.length > shown.length) html += `<button type="button" data-act="more" class="gold-bg" style="grid-column:1/-1; padding:12px; border-radius:14px; font-size:13.5px;">${dict.more_btn} (${res.length - shown.length})</button>`;
@@ -1257,9 +1649,10 @@ function render() {
     : (activeCat ? (currentLang === 'en' ? CATS[activeCat].labelEn : CATS[activeCat].label) : dict.dir_title);
   $('showAll').classList.toggle('hidden', !activeCat && activeSpec === 'all');
   paintFilters();
+  Cryovion.emit('rendered', res);
 }
 
-/* ============ 12) القراءة الصوتية + صفحة المكان + التقييم ============ */
+/* ============ 12) القراءة الصوتية + صفحة المكان + الخدمات + التقييمات ============ */
 const hasTTS = 'speechSynthesis' in window;
 function loadVoices() { if (hasTTS) voices = speechSynthesis.getVoices(); }
 if (hasTTS) { loadVoices(); speechSynthesis.addEventListener('voiceschanged', loadVoices); }
@@ -1295,22 +1688,10 @@ function mountTTS(id) {
   host.insertBefore(b, host.firstChild);
   paintTTS(hasTTS && ttsId === id && speechSynthesis.speaking);
 }
-function renderPlacePageDOM(id) {
-  const d = byId(id); if (!d) return;
-  currentPlaceId = id;
-  const c = CATS[d.cat] || CATS.doctor, spMeta = SPECS_META[d.spec_key] || SPECS_META.gastro, u = getCurrentUser();
-  const canManage = adminUnlocked || (u && d.owner_email && norm(u.email) === norm(d.owner_email));
-  const phoneRow = d.phone ? `📞 ${esc(d.phone)}` : '<span style="color:var(--muted);">الرقم قيد التأكيد والتدقيق</span>';
-  const verifyPage = (d.is_verified ? '<span style="color:#60a5fa; font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>' : '<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>')
-    + (adminUnlocked ? ` <button type="button" data-badge-id="${esc(d.id)}" class="badge-pill" style="margin-inline-start:8px; background:${d.is_verified ? 'rgba(148,163,184,.2)' : 'rgba(59,130,246,.2)'}; color:${d.is_verified ? 'var(--muted)' : '#60a5fa'}; border:1px solid ${d.is_verified ? 'var(--border-soft)' : 'rgba(59,130,246,.5)'};">${d.is_verified ? '⚪ سحب التوثيق' : '🔵 منح التوثيق'}</button>` : '');
-  const reviewsHtml = d.reviews.length ? d.reviews.map(r => `
-    <div class="entity-card" style="padding:12px 16px; border-color:var(--border-soft);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"><strong style="font-size:13.5px; color:var(--gold);">👤 ${esc(r.author || 'زائر')}</strong><span>${stars(r.stars || 5)}</span></div>
-      <p style="font-size:13px; color:var(--text);">${esc(r.body)}</p><span style="font-size:10.5px; color:var(--muted);">${esc(r.date || '')}</span></div>`).join('')
-    : '<p style="font-size:13px; color:var(--muted); text-align:center; padding:18px;">لا توجد تعليقات بعد. كن أول من يشارك تجربته!</p>';
-  const galleryHtml = d.gallery.length > 1 ? '<div style="display:flex; gap:8px; overflow-x:auto; margin-top:18px;">' + d.gallery.map(s => `<img src="${esc(s)}" alt="" loading="lazy" decoding="async" style="width:110px; height:110px; object-fit:cover; border-radius:12px; border:1px solid var(--border);">`).join('') + '</div>' : '';
 
-  $('placePageContent').innerHTML = `
+function defaultPlacePageHtml(d, x) {
+  const { c, spMeta, canManage, reviewsHtml, galleryHtml, servicesHtml, verifyPage, phoneRow } = x;
+  return `
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
       <div style="font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px;">
         <span onclick="goBackSmart()" style="cursor:pointer; color:var(--gold); font-weight:700;">🏠 العودة للدليل</span><span>/</span><span>${c.label}</span><span>/</span>
@@ -1339,7 +1720,7 @@ function renderPlacePageDOM(id) {
         </div>
         <table class="noon-table">
           <tr><th>حالة التوثيق</th><td>${verifyPage}</td></tr>
-          <tr><th>التخصص الدقيق</th><td style="color:${spMeta.color};">${esc(d.spec)}</td></tr>
+          <tr><th>التصنيف / التخصص</th><td style="color:${spMeta.color};">${esc(d.spec)}</td></tr>
           ${d.cat === 'doctor' ? `<tr><th>💰 سعر الكشف</th><td style="color:var(--gold);">${esc(d.fee || 'يُحدد بالعيادة')}</td></tr>` : ''}
           <tr><th>📍 العنوان المؤكد</th><td>${esc(d.addr)}</td></tr>
           <tr><th>🕒 مواعيد الفتح</th><td>${esc(d.hours || 'غير معروف')}</td></tr>
@@ -1352,6 +1733,7 @@ function renderPlacePageDOM(id) {
         </div>
       </div>
     </div>
+    ${servicesHtml}
     ${galleryHtml}
     <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border-soft);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -1360,15 +1742,92 @@ function renderPlacePageDOM(id) {
       </div>
       <div style="display:grid; gap:10px;">${reviewsHtml}</div>
     </div>`;
-  mountTTS(id);
 }
+
+function renderPlacePageDOM(id) {
+  const d = byId(id); if (!d) return;
+  currentPlaceId = id;
+  const c = CATS[d.cat] || CATS.doctor, spMeta = SPECS_META[d.spec_key] || SPECS_META.gastro, u = getCurrentUser();
+  const myKey = getUserAccountKey(u);
+  const canManage = adminUnlocked || (u && d.owner_email && norm(u.email) === norm(d.owner_email));
+  const phoneRow = d.phone ? `📞 ${esc(d.phone)}` : '<span style="color:var(--muted);">الرقم قيد التأكيد والتدقيق</span>';
+  const verifyPage = (d.is_verified ? '<span style="color:#60a5fa; font-weight:700;">✔ موثق ورسمي (تم تدقيق البيانات)</span>' : '<span style="color:var(--muted);">⏳ جاري جمع وتدقيق البيانات</span>')
+    + (adminUnlocked ? ` <button type="button" data-badge-id="${esc(d.id)}" class="badge-pill" style="margin-inline-start:8px; background:${d.is_verified ? 'rgba(148,163,184,.2)' : 'rgba(59,130,246,.2)'}; color:${d.is_verified ? 'var(--muted)' : '#60a5fa'}; border:1px solid ${d.is_verified ? 'var(--border-soft)' : 'rgba(59,130,246,.5)'};">${d.is_verified ? '⚪ سحب التوثيق' : '🔵 منح التوثيق'}</button>` : '');
+
+  /* عرض قائمة الخدمات والأسعار في الصفحة الداخلية فقط (للمعامل والأشعة ومحلات النظارات) */
+  const svcs = Array.isArray(d.services) ? d.services.filter(s => s && (s.name || s.price)) : [];
+  const svcTitle = d.spec_key === 'optics' ? '🕶️ قائمة أنواع النظارات والعدسات والأسعار' : '🧪 قائمة التحاليل والأشعة والأسعار';
+  const servicesHtml = svcs.length ? `<div class="svc-box">
+    <h3 class="font-display" style="font-size:16.5px; color:var(--gold);">${svcTitle}</h3>
+    <table class="svc-table">${svcs.map(s => `<tr><td>${esc(s.name || '—')}</td><td>${esc(s.price || '—')}</td></tr>`).join('')}</table>
+  </div>` : '';
+
+  const reviewsHtml = d.reviews.length ? d.reviews.map((r, idx) => {
+    const isMine = !!(myKey && r.userKey && myKey === r.userKey);
+    const canDel = adminUnlocked || isMine;
+    return `<div class="entity-card" style="padding:12px 16px; border-color:var(--border-soft); cursor:default;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <strong style="font-size:13.5px; color:var(--gold);">👤 ${esc(r.author || 'زائر')}</strong>
+          ${isMine ? '<span class="rv-mine">تعليقك</span>' : ''}
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span>${stars(r.stars || 5)}</span>
+          ${canDel ? `<button type="button" class="rv-del" data-del-rev="${idx}" data-place-id="${esc(d.id)}">🗑 حذف</button>` : ''}
+        </div>
+      </div>
+      <p style="font-size:13px; color:var(--text);">${esc(r.body)}</p>
+      <span style="font-size:10.5px; color:var(--muted);">${esc(r.date || '')}</span>
+    </div>`;
+  }).join('') : '<p style="font-size:13px; color:var(--muted); text-align:center; padding:18px;">لا توجد تعليقات بعد. كن أول من يشارك تجربته!</p>';
+
+  const galleryHtml = d.gallery.length > 1 ? '<div style="display:flex; gap:8px; overflow-x:auto; margin-top:18px;">' + d.gallery.map(s => `<img src="${esc(s)}" alt="" loading="lazy" decoding="async" style="width:110px; height:110px; object-fit:cover; border-radius:12px; border:1px solid var(--border);">`).join('') + '</div>' : '';
+
+  const ctx = { c, spMeta, user: u, canManage, isAdmin: adminUnlocked, phoneRow, verifyPage, reviewsHtml, galleryHtml, servicesHtml, lang: currentLang, esc, badge, actions, stars };
+  const custom = runTpl('placePage', d, ctx);
+  $('placePageContent').innerHTML = custom !== null ? custom : defaultPlacePageHtml(d, ctx);
+  mountTTS(id);
+  Cryovion.applyIcons($('placePageContent'));
+  Cryovion.emit('placeRendered', d);
+}
+
 function renderStarPicker() {
   $('starPick').innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" onclick="setPickedStars(${n})" style="font-size:28px; color:${n <= pickedStars ? '#D9B45A' : '#475569'};">★</button>`).join('');
 }
 function setPickedStars(n) { pickedStars = n; renderStarPicker(); }
+
+function hasUserReviewedPlace(placeId, u) {
+  if (!u || !u.email) return null;
+  const key = getUserAccountKey(u);
+  const d = byId(placeId);
+  if (d && Array.isArray(d.reviews)) {
+    const found = d.reviews.find(r => r.userKey === key);
+    if (found) return found;
+  }
+  const local = getLocalReviewedMap()[placeId + ':' + key];
+  return local || null;
+}
+
 function openReviewModal(id) {
-  activeReviewPlaceId = id; pickedStars = 5; renderStarPicker();
-  $('revAuthor').value = ''; $('revBody').value = ''; $('reviewModal').classList.remove('hidden');
+  activeReviewPlaceId = id;
+  const u = getCurrentUser();
+  if (!u) {
+    $('revNeedLogin').classList.remove('hidden');
+    $('revFormBody').classList.add('hidden');
+    $('reviewModal').classList.remove('hidden');
+    return;
+  }
+  const existing = hasUserReviewedPlace(id, u);
+  if (existing) {
+    toast('⚠️ لقد أضفت تقييمك على هذه الصفحة مسبقاً (يمكنك حذفه أولاً لكتابة تقييم جديد)');
+    return;
+  }
+  $('revNeedLogin').classList.add('hidden');
+  $('revFormBody').classList.remove('hidden');
+  pickedStars = 5; renderStarPicker();
+  $('revAs').innerHTML = `سيُنشر التقييم باسم: <b style="color:#fff;">👤 ${esc(getReviewerDisplayName(u))}</b> <button type="button" onclick="closeReviewModal(); navigateApp('settings');" style="color:var(--emerald); font-size:11px; text-decoration:underline; margin-right:6px;">(تغيير الاسم الظاهر)</button>`;
+  $('revBody').value = '';
+  $('reviewModal').classList.remove('hidden');
 }
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
@@ -1491,7 +1950,7 @@ function renderAdminList() {
       </div>
     </div>`).join('');
 }
-/* التفويض يمنح علامة التوثيق (الزرقاء) تلقائياً، وإلغاؤه يسحبها (ويمكن للأدمن تعديلها يدوياً بعد ذلك) */
+
 function delegatePage(id) {
   const p = byId(id); if (!p || !adminUnlocked) return;
   let em = prompt('اكتب إيميل صاحب الصفحة لتفويضه بالتحكم الكامل في "' + p.name + '" (اتركه فارغاً لإلغاء التفويض):', p.owner_email || '');
@@ -1514,13 +1973,43 @@ async function deleteAd(id) {
   await load(); renderAdminList(); toast('تم الحذف');
 }
 
-/* ============ 14) نافذة التعديل + أدوات متفرقة ============ */
+/* ============ 14) نافذة التعديل (إخفاء التخصص للصيدليات والمعامل + خانات الأسعار) ============ */
+function addServiceRow(nameVal = '', priceVal = '') {
+  const box = $('svcRows'); if (!box) return;
+  const max = Cryovion.config.maxServices || 7;
+  if (box.children.length >= max) return toast(`الحد الأقصى ${max} خانات`);
+  const row = document.createElement('div');
+  row.className = 'svc-row';
+  row.innerHTML = `
+    <input type="text" class="input-box svc-name" placeholder="اسم الأشعة / التحليل / الخدمة" value="${esc(nameVal)}">
+    <div style="display:flex; gap:4px;">
+      <input type="text" class="input-box svc-price" placeholder="السعر (مثال: 250 ج.م)" value="${esc(priceVal)}" style="flex:1;">
+      <button type="button" onclick="this.closest('.svc-row').remove()" style="padding:0 10px; border-radius:10px; background:rgba(244,63,94,.18); color:var(--rose); font-weight:700;">✕</button>
+    </div>`;
+  box.appendChild(row);
+}
+
+function syncEditorCatFields() {
+  const catVal = $('edCat').value;
+  const isDoc = (catVal === 'doctor');
+  const isLabOrOptics = (catVal === 'lab' || catVal === 'optics');
+  $('edSpecWrap').classList.toggle('hidden', !isDoc);
+  $('edFeeWrap').classList.toggle('hidden', !isDoc);
+  $('servicesWrap').classList.toggle('hidden', !isLabOrOptics);
+
+  const specInput = $('edSpec');
+  if (catVal === 'pharmacy' && !specInput.value.trim()) specInput.value = 'صيدلية عامة وخدمات دوائية';
+  else if (catVal === 'lab' && !specInput.value.trim()) specInput.value = 'معمل تحاليل طبية وأشعة';
+  else if (catVal === 'optics' && !specInput.value.trim()) specInput.value = 'بصريات ونظارات طبية وشمسية';
+}
+
 function openEditorModal(id) {
   adminUnlocked = isUserMasterAdmin(getCurrentUser());
   const ex = id ? byId(id) : null, s = (ex && ex.sched) || {};
   $('edId').value = ex ? ex.id : '';
-  $('edCat').value = ex ? ex.cat : 'doctor';
-  $('edSpecKey').value = ex ? (ex.spec_key || 'gastro') : 'gastro';
+  const uiCat = ex ? (ex.spec_key === 'optics' ? 'optics' : ex.cat) : 'doctor';
+  $('edCat').value = uiCat;
+  $('edSpecKey').value = (ex && ex.cat === 'doctor') ? (ex.spec_key || 'gastro') : 'gastro';
   $('edName').value = ex ? ex.name : ''; $('edSpec').value = ex ? ex.spec : '';
   $('edBio').value = ex ? (ex.bio || '') : '';
   $('edPhotoUrl').value = ex ? (ex.photo_url || '') : '';
@@ -1539,10 +2028,19 @@ function openEditorModal(id) {
   const gal = ex ? (ex.gallery || []) : [];
   $('edGalleryData').value = JSON.stringify(gal);
   $('edGalleryPreview').innerHTML = gal.map(g => `<img src="${esc(g)}" alt="" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`).join('');
+
+  /* تعبئة خانات الأسعار والخدمات */
+  const svcBox = $('svcRows'); svcBox.innerHTML = '';
+  const svcs = ex && Array.isArray(ex.services) ? ex.services : [];
+  if (svcs.length) svcs.forEach(it => addServiceRow(it.name, it.price));
+  else addServiceRow('', '');
+
+  syncEditorCatFields();
   $('ownerAssignWrap').classList.toggle('hidden', !adminUnlocked);
   $('verifyWrap').classList.toggle('hidden', !adminUnlocked);
   $('editorTitle').textContent = ex ? `تحديث بيانات: ${ex.name}` : 'إضافة صفحة / منشأة جديدة';
   $('editorModal').classList.remove('hidden');
+  Cryovion.emit('editorOpened', ex);
 }
 function closeEditorModal() { $('editorModal').classList.add('hidden'); }
 
@@ -1584,7 +2082,6 @@ function listenVoiceSearch() {
 }
 
 /* ============ 15) ربط الأحداث ============ */
-/* التنقل: الشريط الأيمن + القائمة الجانبية (يعمل باللمس والنقر بدون تكرار) */
 let lastNavTap = 0;
 function onNavTap(e) {
   const b = e.target.closest('[data-nav]'); if (!b) return;
@@ -1604,7 +2101,6 @@ $('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModa
 document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditorModal(); closeReviewModal(); closeSideDrawer(); } });
 
-/* الشعار: العودة للرئيسية، و7 نقرات سريعة لفتح غرفة الإدارة (للأدمن فقط) */
 $('brandLogo').addEventListener('click', () => {
   logoClicks++; clearTimeout(logoTimer); logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
   if (logoClicks >= 7) {
@@ -1613,7 +2109,6 @@ $('brandLogo').addEventListener('click', () => {
   } else if (currentViewName !== 'home') goHomeLogo();
 });
 
-/* اللغة والخط والمظهر */
 $('langSwitchBtn').addEventListener('click', toggleLanguage);
 $('settingsLangBtn').addEventListener('click', toggleLanguage);
 let big = localStorage.getItem('cryovion_big_font') === 'true';
@@ -1630,9 +2125,30 @@ function toggleTheme() {
   const isLight = document.documentElement.classList.toggle('light');
   localStorage.setItem('cryovion_theme', isLight ? 'light' : 'dark');
   toast(isLight ? '☀️ تم تفعيل المظهر الفاتح' : '🌙 تم تفعيل المظهر الداكن');
+  Cryovion.emit('themeChanged', isLight ? 'light' : 'dark');
 }
 $('themeToggleBtn').addEventListener('click', toggleTheme);
 $('quickThemeBtn').addEventListener('click', toggleTheme);
+
+/* إعدادات الاسم الظاهر في التعليقات */
+document.querySelectorAll('input[name="dispMode"]').forEach(r => r.addEventListener('change', () => {
+  const mode = document.querySelector('input[name="dispMode"]:checked')?.value || 'initial';
+  $('dispNick').classList.toggle('hidden', mode !== 'nick');
+  const prefs = getDispPrefs(); prefs.mode = mode; setDispPrefs(prefs);
+  updateDispSettingsUI();
+}));
+$('dispNick').addEventListener('input', e => {
+  const prefs = getDispPrefs(); prefs.nick = e.target.value; setDispPrefs(prefs);
+  updateDispSettingsUI();
+});
+$('dispSaveBtn').addEventListener('click', () => {
+  const mode = document.querySelector('input[name="dispMode"]:checked')?.value || 'initial';
+  const nick = $('dispNick').value.trim();
+  if (containsDefamation(nick)) return toast('🚫 الكنية تحتوي على كلمات غير لائقة');
+  setDispPrefs({ mode, nick });
+  updateDispSettingsUI();
+  toast('✔ تم حفظ الاسم الظاهر للتعليقات');
+});
 
 /* تسجيل الدخول */
 $('tabLoginBtn').addEventListener('click', () => {
@@ -1674,7 +2190,7 @@ $('logoutBtn').addEventListener('click', async () => {
   load();
 });
 
-/* البحث (مع تأخير بسيط لعدم إعادة الرسم عند كل حرف) والأقسام والتخصصات والشريط */
+/* البحث والأقسام والتخصصات (مع عزل الصيدليات والمعامل عن شريط التخصصات) */
 const runSearch = debounce(() => {
   const raw = query.trim(), q = norm(raw), box = $('searchSuggest');
   if (!q) box.classList.add('hidden');
@@ -1689,28 +2205,46 @@ const runSearch = debounce(() => {
         <span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.icon} ${currentLang === 'en' ? sp.labelEn : sp.label}</span></div>`;
     }).join('') : `<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق لـ "${esc(raw)}"</div>`;
     box.classList.remove('hidden');
+    Cryovion.applyIcons(box);
   }
   if (currentViewName !== 'home') switchViewDOM('home', false);
   shownLimit = PAGE_SIZE; render();
+  Cryovion.emit('searched', raw);
 }, 140);
 $('search').addEventListener('input', e => { query = e.target.value; runSearch(); });
 $('searchSuggest').addEventListener('click', e => { const i = e.target.closest('[data-suggest-id]'); if (!i) return; $('searchSuggest').classList.add('hidden'); openPlacePage(i.dataset.suggestId); });
 $('mic').addEventListener('click', listenVoiceSearch);
-$('cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (!b) return; activeCat = activeCat === b.dataset.cat ? null : b.dataset.cat; shownLimit = PAGE_SIZE; render(); });
+
+$('cats').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]'); if (!b) return;
+  activeCat = activeCat === b.dataset.cat ? null : b.dataset.cat;
+  if (activeCat === 'pharmacy' || activeCat === 'lab') activeSpec = 'all';
+  shownLimit = PAGE_SIZE; render();
+});
 $('specsBar').addEventListener('click', e => {
   const b = e.target.closest('[data-spec]'); if (!b) return;
   activeSpec = activeSpec === b.dataset.spec ? 'all' : b.dataset.spec;
-  if (activeSpec !== 'all' && !['pharmacy', 'lab'].includes(activeSpec)) activeCat = 'doctor';
+  if (activeSpec === 'pharmacy') activeCat = 'pharmacy';
+  else if (activeSpec === 'lab' || activeSpec === 'optics') activeCat = 'lab';
+  else if (activeSpec !== 'all') activeCat = 'doctor';
   shownLimit = PAGE_SIZE; render();
 });
 $('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'all'; shownLimit = PAGE_SIZE; render(); });
 $('slidePrev').addEventListener('click', () => $('posterTrack').scrollBy({ left: -posterStep(), behavior: 'smooth' }));
 $('slideNext').addEventListener('click', () => $('posterTrack').scrollBy({ left: posterStep(), behavior: 'smooth' }));
 
-/* النقرات العامة: علامة التوثيق / فتح الصفحة / مشاركة / عرض المزيد / الأزرار الرمادية */
+/* النقرات العامة: علامة التوثيق / حذف تعليق / فتح الصفحة / مشاركة / عرض المزيد */
 document.addEventListener('click', e => {
   const bd = e.target.closest('[data-badge-id]');
   if (bd) { e.preventDefault(); e.stopPropagation(); setVerified(bd.dataset.badgeId); return; }
+  const delRev = e.target.closest('[data-del-rev]');
+  if (delRev) {
+    e.preventDefault(); e.stopPropagation();
+    const pid = delRev.dataset.placeId, idx = +delRev.dataset.delRev;
+    const p = byId(pid);
+    if (p && p.reviews[idx]) deleteReviewItem(pid, p.reviews[idx].rawAuthor, p.reviews[idx].body);
+    return;
+  }
   const off = e.target.closest('[data-off]');
   if (off) { e.preventDefault(); e.stopPropagation(); toast(NO_DATA_MSG); return; }
   if (e.target.closest('a')) return;
@@ -1721,13 +2255,22 @@ document.addEventListener('click', e => {
   else if (a === 'openPage') openPlacePage(id);
 }, true);
 
-/* التقييم */
+/* التقييم (واحد لكل حساب على كل إعلان) */
+$('revLoginBtn').addEventListener('click', () => { closeReviewModal(); navigateApp('account'); });
 $('reviewForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const u = getCurrentUser();
+  if (!u) { closeReviewModal(); navigateApp('account'); return; }
+  if (hasUserReviewedPlace(activeReviewPlaceId, u)) {
+    closeReviewModal();
+    return toast('⚠️ لديك تقييم مسجل بالفعل على هذه الصفحة');
+  }
   const body = $('revBody').value.trim();
   if (containsDefamation(body)) return toast('🚫 التعليق يحتوي على كلمات غير لائقة');
-  const u = getCurrentUser(), author = $('revAuthor').value.trim() || (u ? u.name : 'زائر');
-  saveReview({ place_id: activeReviewPlaceId, author, stars: pickedStars, body });
+  const dispName = getReviewerDisplayName(u);
+  const packedAuthor = packAuthor(dispName, u);
+  markLocalReviewed(activeReviewPlaceId, getUserAccountKey(u), body, pickedStars);
+  saveReview({ place_id: activeReviewPlaceId, author: packedAuthor, stars: pickedStars, body });
   closeReviewModal(); await load();
   if (currentViewName === 'placePage') renderPlacePageDOM(activeReviewPlaceId);
   toast('✔ شكراً لك! تم نشر تقييمك بنجاح');
@@ -1755,7 +2298,10 @@ $('devDel').addEventListener('click', () => {
   writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1)).then(() => { toast('تم حذف الحالة'); return load(); }).catch(() => {});
 });
 
-/* نافذة التعديل: رفع الصور + التوثيق التلقائي + الحفظ */
+/* نافذة التعديل: تبديل نوع المنشأة + إضافة خانات أسعار + رفع الصور + الحفظ */
+$('edCat').addEventListener('change', syncEditorCatFields);
+$('svcAdd').addEventListener('click', () => addServiceRow('', ''));
+
 $('edGalleryFiles').addEventListener('change', e => {
   const files = Array.from(e.target.files); if (!files.length) return;
   Promise.all(files.map(f => new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.onerror = () => res(null); r.readAsDataURL(f); })))
@@ -1776,13 +2322,30 @@ $('editorForm').addEventListener('submit', async e => {
   if (containsDefamation(bioVal) || containsDefamation(nameVal)) return toast('🚫 النص يحتوي على عبارات مسيئة.');
   const id = $('edId').value || ('c-' + crypto.randomUUID().slice(0, 8)), ex = byId(id);
   const off = []; document.querySelectorAll('.offd').forEach(c => { if (c.checked) off.push(+c.value); });
+
+  const uiCat = $('edCat').value;
+  const actualCat = uiCat === 'optics' ? 'lab' : uiCat;
+  const actualSpecKey = uiCat === 'doctor' ? $('edSpecKey').value : (uiCat === 'pharmacy' ? 'pharmacy' : (uiCat === 'optics' ? 'optics' : 'lab'));
+
+  const services = [];
+  if (uiCat === 'lab' || uiCat === 'optics') {
+    document.querySelectorAll('#svcRows .svc-row').forEach(r => {
+      const n = r.querySelector('.svc-name')?.value.trim() || '';
+      const p = r.querySelector('.svc-price')?.value.trim() || '';
+      if (n || p) services.push({ name: n, price: p });
+    });
+  }
+
   const sched = { from: $('edFrom').value, to: $('edTo').value, h24: $('edH24').checked, off };
+  if (services.length) sched.services = services;
+
   let hours = $('edHours').value.trim();
   if (!hours) { if (sched.h24) hours = '24 ساعة'; else if (sched.from && sched.to) hours = 'من ' + t12(sched.from) + ' إلى ' + t12(sched.to); }
   const item = {
-    id, cat: $('edCat').value, spec_key: $('edSpecKey').value, name: nameVal, spec: $('edSpec').value.trim(),
+    id, cat: actualCat, spec_key: actualSpecKey, name: nameVal, spec: $('edSpec').value.trim(),
     bio: bioVal, bio_ts: Date.now(), photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'),
-    addr: $('edAddr').value.trim() || 'غير معروف', fee: $('edFee').value.trim(), map_url: $('edMapUrl').value.trim(),
+    addr: $('edAddr').value.trim() || 'غير معروف', fee: uiCat === 'doctor' ? $('edFee').value.trim() : '', map_url: $('edMapUrl').value.trim(),
+    services,
     is_verified: adminUnlocked ? $('edIsVerified').checked : !!(ex && ex.is_verified),
     lamp_mode: $('edLampMode').value, sched, hours,
     phone: $('edPhone').value.trim() || null, whatsapp: $('edWhatsapp').value.trim() || $('edPhone').value.trim() || null,
@@ -1797,13 +2360,19 @@ $('editorForm').addEventListener('submit', async e => {
   toast('✔ تم حفظ ونشر التعديلات فوراً!');
 });
 
+Cryovion.on('templateChanged', () => { if (appReady) { render(); if (currentViewName === 'placePage' && currentPlaceId) renderPlacePageDOM(currentPlaceId); } });
+
 /* ============ 16) التشغيل ============ */
+if ($('footYear')) $('footYear').textContent = new Date().getFullYear();
 setInterval(() => { if (!document.hidden) recomputeAvailability(); }, 60000);
-setInterval(posterAutoplay, 4500);
 history.replaceState({ view: 'home' }, '', '');
-hydrateFromCache();      /* عرض فوري من الكاش المحلي */
-applyLanguage();         /* نصوص + أزرار + رسم أولي */
+hydrateFromCache();
+applyLanguage();
 renderPostersCarousel();
+startContinuousPosterLoop();
+Cryovion.applyIcons();
+appReady = true;
+Cryovion.emit('ready');
 initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
 </script>
 </body>
