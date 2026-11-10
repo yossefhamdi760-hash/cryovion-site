@@ -16,12 +16,12 @@
 <link id="favIconLink" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='45%25' r='65%25'%3E%3Cstop offset='0%25' stop-color='%230a2e36'/%3E%3Cstop offset='100%25' stop-color='%23040911'/%3E%3C/radialGradient%3E%3ClinearGradient id='cGrad' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='65%25' stop-color='%23cbd5e1'/%3E%3Cstop offset='100%25' stop-color='%23D9B45A'/%3E%3C/linearGradient%3E%3ClinearGradient id='ring' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232dd4bf'/%3E%3Cstop offset='50%25' stop-color='%230d9488'/%3E%3Cstop offset='100%25' stop-color='%23D9B45A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='url(%23bg)'/%3E%3Ccircle cx='256' cy='256' r='196' fill='none' stroke='url(%23ring)' stroke-width='12' opacity='0.9'/%3E%3Ccircle cx='256' cy='256' r='176' fill='none' stroke='%232dd4bf' stroke-width='3' opacity='0.35'/%3E%3Cpath d='M340 165 C295 120 205 125 165 185 C130 235 135 305 180 350 C225 395 300 390 342 345' fill='none' stroke='url(%23cGrad)' stroke-width='44' stroke-linecap='round'/%3E%3Cpath d='M165 262 L235 262 L252 232 L272 295 L294 210 L314 278 L330 262 L415 262' fill='none' stroke='%232dd4bf' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link id="appleTouchIcon" rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%23041b21'/%3E%3Ccircle cx='256' cy='256' r='196' fill='none' stroke='%232dd4bf' stroke-width='14'/%3E%3Cpath d='M340 165 C295 120 205 125 165 185 C130 235 135 305 180 350 C225 395 300 390 342 345' fill='none' stroke='%23ffffff' stroke-width='44' stroke-linecap='round'/%3E%3Cpath d='M165 262 L235 262 L252 232 L272 295 L294 210 L314 278 L330 262 L415 262' fill='none' stroke='%232dd4bf' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
-<!-- ================= نواة التطوير (يجب أن تبقى أول سكربت في الصفحة) ================= -->
+<!-- ================= نواة التطوير القابلة للتوسعة (Plugin Core) ================= -->
 <script>
 (function (w) {
   'use strict';
   var C = w.Cryovion = {
-    version: '1.3.0',
+    version: '1.4.0',
     flags: { mascot: true, posterAutoplay: true },
     config: { cacheVersion: 'v2', maxServices: 7, posterSpeed: 38 },
     hooks: {}, icons: {}, tpl: {},
@@ -34,7 +34,7 @@
       (C.hooks[n] || []).slice().forEach(function (f) { try { f.apply(null, a); } catch (e) { console.error('[Cryovion ext:' + n + ']', e); } });
     },
 
-    /* الأيقونات: أي عنصر فيه data-ico="الاسم" يمكن استبدال محتواه (SVG أو إيموجي أو صورة) */
+    /* الأيقونات: أي عنصر فيه data-ico="الاسم" يمكن استبدال محتواه */
     setIcon: function (name, html) { C.icons[name] = html; C.applyIcons(); },
     setIcons: function (map) { Object.keys(map).forEach(function (k) { C.icons[k] = map[k]; }); C.applyIcons(); },
     icon: function (name, fallback) { return (name in C.icons) ? C.icons[name] : fallback; },
@@ -143,8 +143,8 @@ html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:tr
 html.light .menu-trigger { background:var(--card); }
 .menu-trigger:hover { border-color:var(--gold-light); }
 
-/* ================= 6) الواجهة الزمردية والبحث ================= */
-.jevi-hero-stage { position:relative; padding:26px 20px 24px; text-align:center; border-bottom:1px solid rgba(45,212,191,.25); overflow:hidden;
+/* ================= 6) الواجهة الزمردية وشريط البحث المحكم (الميكروفون بجانب المكبرة يميناً) ================= */
+.jevi-hero-stage { position:relative; padding:24px 16px 22px; text-align:center; border-bottom:1px solid rgba(45,212,191,.25); overflow:hidden;
   background:var(--hero-bg),
     repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 48px),
     repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 48px);
@@ -152,15 +152,36 @@ html.light .menu-trigger { background:var(--card); }
 .jevi-spotlight { position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:540px; height:260px; background:radial-gradient(circle,rgba(94,234,212,.3) 0%,rgba(217,180,90,.1) 45%,transparent 72%); pointer-events:none; z-index:0; }
 .jevi-3d-emblem { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:240px; height:240px; border-radius:50%; background:radial-gradient(circle at 35% 30%,rgba(45,212,191,.18),rgba(6,78,59,.08) 60%,transparent 75%); border:1px solid rgba(94,234,212,.14); box-shadow:inset 0 0 40px rgba(45,212,191,.15); pointer-events:none; z-index:0; }
 .jevi-hero-content { position:relative; z-index:2; }
-.elegant-slogan { font-size:clamp(26px,3.8vw,38px); font-weight:700; letter-spacing:.4px; margin-bottom:10px; display:inline-flex; align-items:center; gap:10px; text-shadow:0 4px 14px rgba(0,0,0,.6); }
+.elegant-slogan { font-size:clamp(25px,3.8vw,38px); font-weight:700; letter-spacing:.4px; margin-bottom:10px; display:inline-flex; align-items:center; gap:10px; text-shadow:0 4px 14px rgba(0,0,0,.6); }
 .slogan-white { color:#fff; }
 .slogan-gold { background:linear-gradient(135deg,#FFF6C2 0%,#D9B45A 55%,#B8860B 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.personal-greet-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:99px; font-size:12.5px; font-weight:700; color:var(--gold-light); background:rgba(9,19,31,.72); border:1px solid var(--border); margin-bottom:12px; }
-.ai-search-container { max-width:780px; margin:0 auto; position:relative; z-index:50; }
-.ai-search-box { display:flex; align-items:center; gap:10px; background:rgba(8,22,34,.95); border:1.5px solid rgba(94,234,212,.35); border-radius:18px; padding:6px 8px 6px 14px; box-shadow:0 10px 24px -10px rgba(0,0,0,.75),inset 0 1px 1px rgba(255,255,255,.15); }
+.personal-greet-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:99px; font-size:12.5px; font-weight:700; color:var(--gold-light); background:rgba(9,19,31,.72); border:1px solid var(--border); margin-bottom:12px; max-width:95%; }
+.ai-search-container { max-width:760px; width:100%; margin:0 auto; position:relative; z-index:50; }
+.ai-search-box {
+  display:flex; align-items:center; gap:8px; width:100%;
+  background:rgba(8,22,34,.95); border:1.5px solid rgba(94,234,212,.38);
+  border-radius:18px; padding:6px 10px;
+  box-shadow:0 10px 24px -10px rgba(0,0,0,.75),inset 0 1px 1px rgba(255,255,255,.15);
+}
 .ai-search-box:focus-within { border-color:var(--gold); box-shadow:0 0 22px -4px rgba(20,184,166,.45); }
-.ai-search-input { flex:1; padding:9px 6px; font-size:15px; color:#fff; outline:none; }
-.ai-search-input::placeholder { color:#94a3b8; }
+.search-right-cluster { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
+.mic-inline-btn {
+  width:36px; height:36px; border-radius:11px; flex-shrink:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:15px; box-shadow:0 3px 10px rgba(217,180,90,.3);
+}
+.mic-inline-btn:active { transform:scale(.94); }
+.ai-search-input {
+  flex:1 1 auto; min-width:0; width:100%;
+  padding:8px 4px; font-size:14.5px; color:#fff; outline:none;
+}
+.ai-search-input::placeholder { color:#94a3b8; font-size:13px; }
+.search-clear-btn {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  background:rgba(255,255,255,.08); color:var(--muted); font-size:12px; font-weight:700;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.search-clear-btn:hover { background:rgba(244,63,94,.22); color:var(--rose); }
 .autocomplete-dropdown { position:absolute; top:calc(100% + 6px); right:0; left:0; background:var(--card); border:1px solid var(--gold); border-radius:16px; box-shadow:0 14px 30px rgba(0,0,0,.8); max-height:290px; overflow-y:auto; text-align:start; z-index:80; padding:6px; }
 .auto-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; border-bottom:1px solid var(--border-soft); }
 .auto-item:hover { background:var(--card-hover); }
@@ -197,7 +218,6 @@ html.light .menu-trigger { background:var(--card); }
   transition:border-color .25s ease, box-shadow .25s ease, transform .2s ease;
 }
 .poster-card:hover { border-color:var(--poster-accent, var(--gold)); transform:translateY(-2px); }
-/* عندما تظهر البطاقة في الواجهة يضيء إطارها بلون تخصص صاحب الريليز أو بالأخضر الزمردي */
 .poster-card.live {
   border-color:var(--poster-accent, var(--live-ring)) !important;
   box-shadow:0 0 0 1.5px var(--poster-accent, var(--live-ring)), 0 0 20px -2px var(--poster-accent, rgba(16,185,129,.55));
@@ -222,7 +242,7 @@ html.light .menu-trigger { background:var(--card); }
 h1 .vbadge, .noon-showcase h2 .vbadge { width:22px; height:22px; }
 .act-off { background:rgba(148,163,184,.18) !important; color:#94a3b8 !important; border:1px dashed rgba(148,163,184,.45) !important; cursor:not-allowed; }
 
-/* ================= 10) البطاقات (تصميم سطح المكتب + تصميم المربع العلوي الأنيق للهاتف) ================= */
+/* ================= 10) البطاقات (كمبيوتر + مربع علوي أنيق للهاتف) ================= */
 .content-body { padding:14px 20px 45px; max-width:1160px; margin:0 auto; }
 .cards-grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(480px,1fr)); }
 .entity-card { background:var(--card); border:1px solid var(--border-soft); border-radius:var(--card-radius); padding:var(--card-pad); position:relative; overflow:hidden; cursor:pointer; transition:border-color .15s ease; content-visibility:auto; contain-intrinsic-size:auto 200px; }
@@ -232,7 +252,6 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
 .entity-card::before { content:''; position:absolute; top:0; right:0; left:0; height:4px; background:var(--cat-accent,var(--gold)); z-index:3; }
 .doctor-watermark { position:absolute; left:10px; bottom:-8px; width:135px; height:135px; opacity:.065; pointer-events:none; z-index:1; color:var(--spec-color,var(--gold)); }
 
-/* تخطيط الكمبيوتر (لا غبار عليه: صورة جانبية 32% ومعلومات 68%) */
 .id-card-layout {
   position:relative; z-index:2; display:grid;
   grid-template-columns:32% 1fr;
@@ -256,7 +275,6 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
 .top-left-activity { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:99px; font-size:10.5px; font-weight:700; background:rgba(255,255,255,.04); border:1px solid var(--border-soft); flex-shrink:0; }
 .badge-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:99px; font-size:11.5px; font-weight:700; }
 
-/* تخطيط الهاتف: الصورة مربع صغير فوق (86×86) والاسم بجانبها، وباقي التفاصيل تمتد بعرض البطاقة أسفلها */
 @media (max-width:640px) {
   .cards-grid { grid-template-columns:1fr; }
   .id-card-layout {
@@ -328,28 +346,83 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 .site-footer b { color:var(--gold); font-weight:700; }
 @media (max-width:1024px) { .site-footer { padding-bottom:96px; } }
 
-/* ================= 13) المساعد الطبي الذكي اللطيف (CryoBot Mascot) ================= */
+/* ================= 13) المساعد الذكي القابل للسحب + نافذة محادثة الذكاء الاصطناعي (CryoBot AI) ================= */
 .cryo-mascot {
-  position:fixed; z-index:88; width:56px; height:56px; pointer-events:auto; cursor:pointer;
-  transition:top .65s cubic-bezier(.34,1.56,.64,1), left .65s cubic-bezier(.34,1.56,.64,1), transform .25s ease;
-  filter:drop-shadow(0 6px 14px rgba(20,184,166,.45)); user-select:none;
+  position:fixed; bottom:84px; left:16px; z-index:95;
+  width:58px; height:58px; cursor:grab; touch-action:none; user-select:none;
+  filter:drop-shadow(0 8px 18px rgba(20,184,166,.45));
+  transition:transform .2s ease;
 }
-.cryo-mascot:hover { transform:scale(1.08); }
+.cryo-mascot:active { cursor:grabbing; transform:scale(.96); }
+.cryo-mascot-online-badge {
+  position:absolute; bottom:2px; right:2px; width:13px; height:13px; border-radius:50%;
+  background:#10b981; border:2px solid #040911; box-shadow:0 0 8px #10b981; pointer-events:none;
+}
+/* الفقاعة تظهر على يمين الأيقونة باتجاه الشاشة المفتوحة ولا تختفي خارج اليسار */
 .cryo-mascot-bubble {
-  position:absolute; bottom:calc(100% + 6px); right:0; background:var(--card); color:var(--gold-light);
-  border:1px solid var(--gold); border-radius:12px 12px 2px 12px; padding:5px 10px; font-size:11px; font-weight:700;
-  white-space:nowrap; box-shadow:0 8px 20px rgba(0,0,0,.65); opacity:0; transform:translateY(4px);
-  transition:opacity .2s ease, transform .2s ease; pointer-events:none;
+  position:absolute; top:50%; left:calc(100% + 10px); transform:translateY(-50%) translateX(-6px);
+  background:var(--card); color:var(--gold-light);
+  border:1.5px solid var(--gold); border-radius:14px 14px 14px 4px;
+  padding:7px 12px; font-size:11.5px; font-weight:700;
+  width:max-content; max-width:min(230px, 68vw); white-space:normal; line-height:1.45;
+  box-shadow:0 10px 24px rgba(0,0,0,.75); opacity:0;
+  transition:opacity .22s ease, transform .22s ease; pointer-events:none;
 }
-.cryo-mascot.speaking .cryo-mascot-bubble, .cryo-mascot:hover .cryo-mascot-bubble { opacity:1; transform:translateY(0); }
-.cryo-mascot-close {
-  position:absolute; top:-4px; left:-4px; width:18px; height:18px; border-radius:50%;
-  background:rgba(244,63,94,.9); color:#fff; font-size:10px; font-weight:900;
-  display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s ease;
+/* إذا سحب المستخدم الأيقونة إلى النصف الأيمن من الشاشة، تنعكس الفقاعة تلقائياً لليسار حتى لا تخرج من اليمين */
+.cryo-mascot.on-right-side .cryo-mascot-bubble {
+  left:auto; right:calc(100% + 10px); border-radius:14px 14px 4px 14px;
 }
-.cryo-mascot:hover .cryo-mascot-close { opacity:1; }
-@keyframes cryoFloat { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-4px) rotate(-3deg); } }
-.cryo-mascot-svg { width:100%; height:100%; animation:cryoFloat 3.2s ease-in-out infinite; }
+.cryo-mascot.speaking .cryo-mascot-bubble, .cryo-mascot:hover .cryo-mascot-bubble {
+  opacity:1; transform:translateY(-50%) translateX(0);
+}
+@keyframes cryoFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
+.cryo-mascot-svg { width:100%; height:100%; animation:cryoFloat 3.4s ease-in-out infinite; pointer-events:none; }
+
+/* نافذة محادثة الذكاء الاصطناعي CryoBot AI */
+.cryo-ai-panel {
+  position:fixed; bottom:150px; left:16px; z-index:115;
+  width:360px; max-width:calc(100vw - 32px); height:490px; max-height:calc(100vh - 180px);
+  background:var(--surface); border:1.5px solid var(--gold); border-radius:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.85); display:flex; flex-direction:column; overflow:hidden;
+}
+.cryo-ai-head {
+  padding:12px 16px; background:linear-gradient(135deg,#0f293a 0%,#09131f 100%);
+  border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.cryo-ai-msgs {
+  flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px;
+  scrollbar-width:thin;
+}
+.ai-msg {
+  max-width:88%; padding:10px 13px; border-radius:16px; font-size:13px; line-height:1.6; word-wrap:break-word;
+}
+.ai-msg.bot {
+  align-self:flex-start; background:var(--card); border:1px solid var(--border);
+  border-top-right-radius:4px; color:var(--text);
+}
+.ai-msg.user {
+  align-self:flex-end; background:linear-gradient(135deg,rgba(20,184,166,.28),rgba(59,130,246,.25));
+  border:1px solid rgba(45,212,191,.45); border-top-left-radius:4px; color:#fff; font-weight:600;
+}
+.ai-chips-bar {
+  display:flex; gap:6px; overflow-x:auto; padding:8px 12px; border-top:1px solid var(--border-soft);
+  background:rgba(255,255,255,.02); scrollbar-width:none; flex-shrink:0;
+}
+.ai-chips-bar::-webkit-scrollbar { display:none; }
+.ai-chip {
+  padding:5px 11px; border-radius:99px; font-size:11.5px; font-weight:700; white-space:nowrap;
+  background:rgba(217,180,90,.12); color:var(--gold-light); border:1px solid var(--border);
+}
+.ai-chip:hover { background:var(--gold); color:#050811; }
+.cryo-ai-foot {
+  padding:10px; border-top:1px solid var(--border-soft); background:var(--card);
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.ai-mini-card {
+  margin-top:6px; padding:8px 10px; border-radius:12px; background:rgba(255,255,255,.04);
+  border:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer;
+}
+.ai-mini-card:hover { border-color:var(--gold); background:rgba(217,180,90,.08); }
 </style>
 
 <!-- ملف التصميم الإضافي -->
@@ -474,11 +547,15 @@ html.light .input-box { background:rgba(0,0,0,.03); }
             <span class="slogan-gold" data-i18n="slogan_2">مما تظن</span>
           </h1>
         </div>
+        <!-- شريط البحث المحكم: المكبرة وبجانبها الميكروفون يميناً، وحقل البحث يتمدد بأمان، وزر مسح يساراً -->
         <div class="ai-search-container">
           <div class="ai-search-box">
-            <span data-ico="search"><svg width="20" height="20" fill="none" stroke="var(--gold)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg></span>
+            <div class="search-right-cluster">
+              <span data-ico="search" style="padding:0 2px;"><svg width="20" height="20" fill="none" stroke="var(--gold)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg></span>
+              <button id="mic" type="button" class="gold-bg mic-inline-btn" data-ico="mic" title="بحث صوتي سريع">🎤</button>
+            </div>
             <input id="search" type="search" autocomplete="off" placeholder="ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب)، أو صيدلية..." class="ai-search-input">
-            <button id="mic" type="button" class="gold-bg" data-ico="mic" style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px;" title="بحث صوتي">🎤</button>
+            <button id="clearSearchBtn" type="button" class="search-clear-btn hidden" title="مسح البحث">✕</button>
           </div>
           <div id="searchSuggest" class="autocomplete-dropdown hidden"></div>
         </div>
@@ -507,7 +584,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     <section class="content-body">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <h2 id="listTitle" class="font-display" style="font-size:20px;" data-i18n="dir_title">الدليل الطبي الموثق</h2>
+          <h2 id="listTitle" class="font-display" style="font-size:20px;" data-i18n="dir_title">الدليل الطبي الموثق (الأعلى تقييماً والنشط أولاً)</h2>
           <span id="totalCountBadge" class="badge-pill" style="background:rgba(217,180,90,.16); color:var(--gold);">0</span>
         </div>
         <button id="showAll" class="hidden badge-pill" style="background:var(--gold); color:#000; padding:5px 14px;" data-i18n="reset_filter">إلغاء الفلتر وعرض الكل ✕</button>
@@ -625,12 +702,10 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         <div><p style="font-weight:700;" data-i18n="set_font_title">🔠 حجم الخط والوضوح</p><p style="font-size:12px; color:var(--muted);" data-i18n="set_font_sub">تكبير النصوص لقراءة مريحة</p></div>
         <button id="settingsBigTextBtn" style="border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:10px; font-size:12.5px; font-weight:700;" data-i18n="font_btn">تكبير / تصغير</button>
       </div>
-      <!-- زر تشغيل وإيقاف المساعد الذكي المتنقل -->
       <div class="entity-card" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-        <div><p style="font-weight:700;">🩺 المساعد الذكي اللطيف (CryoBot)</p><p style="font-size:12px; color:var(--muted);">شخصية لطيفة تتنقل أعلى البطاقات وتلقي التحية</p></div>
+        <div><p style="font-weight:700;">🤖 المساعد الطبي الذكي (CryoBot AI)</p><p style="font-size:12px; color:var(--muted);">إظهار أو إخفاء أيقونة المساعد الذكي أسفل يسار الشاشة</p></div>
         <button id="mascotToggleBtn" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">تشغيل / إيقاف</button>
       </div>
-      <!-- الاسم الظاهر في التعليقات (مع منع اسم Cryovion) -->
       <div id="dispCard" class="entity-card" style="display:grid; gap:10px; cursor:default;">
         <div><p style="font-weight:700;" data-i18n="set_disp_title">🏷️ الاسم الظاهر في تعليقاتك</p><p style="font-size:12px; color:var(--muted);" data-i18n="set_disp_sub">اختر كيف يظهر اسمك عند نشر تقييم (يُمنع انتحال اسم Cryovion الرسمي)</p></div>
         <label class="disp-opt"><input type="radio" name="dispMode" value="initial"><span id="dispInitialLabel">أول حرف من بريدي (الافتراضي)</span></label>
@@ -673,7 +748,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
 
     <div id="adminDashboardContent" style="display:grid; gap:18px;">
-      <!-- حالة Cryovion الرسمية -->
       <div class="entity-card" style="border-color:var(--gold); display:grid; gap:8px; cursor:default;">
         <b style="color:var(--gold);">📣 حالة رسمية من Cryovion (تظهر 24 ساعة في الشريط)</b>
         <textarea id="devText" rows="2" class="input-box" placeholder="تحديث جديد، ميزة، إعلان للمستخدمين..."></textarea>
@@ -698,7 +772,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         <div id="adminRefRequestsList" style="display:grid; gap:10px;"></div>
       </div>
 
-      <!-- قسم جميع الصفحات المنشورة + شريط بحث خاص وسريع للأدمن -->
       <div>
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
           <h3 style="font-size:16px; color:var(--gold);">📋 جميع الصفحات المنشورة (<span id="adminTotalPlaces">0</span>)</h3>
@@ -755,7 +828,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
     <input type="hidden" id="edId">
 
-    <!-- نوع المنشأة + التخصص الدقيق المصحح علمياً -->
     <div class="ed-two">
       <div id="edCatWrap">
         <label style="font-size:11px; color:var(--gold); font-weight:700;">1. نوع المنشأة:</label>
@@ -815,7 +887,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
     <input id="edMapUrl" placeholder="🗺️ رابط الموقع على خرائط جوجل (اختياري)" class="input-box">
 
-    <!-- قائمة الخدمات والأسعار: للمعامل والأشعة ومحلات النظارات فقط -->
     <div id="servicesWrap" class="hidden" style="background:rgba(168,85,247,.08); padding:10px; border-radius:12px; border:1px solid rgba(168,85,247,.35); display:grid; gap:8px;">
       <div>
         <b style="font-size:13px; color:#c084fc;">🧾 قائمة الخدمات والأسعار (حتى 7 خانات):</b>
@@ -825,7 +896,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       <button type="button" id="svcAdd" style="padding:8px; border-radius:10px; font-size:12px; font-weight:700; border:1px dashed rgba(168,85,247,.6); color:#c084fc;">+ إضافة خانة</button>
     </div>
 
-    <!-- علامة التوثيق (تظهر للأدمن فقط) -->
     <div id="verifyWrap" style="background:rgba(59,130,246,.08); padding:10px; border-radius:12px; border:1px solid rgba(59,130,246,.4); display:flex; align-items:center; justify-content:space-between; gap:10px;">
       <div>
         <b style="font-size:13px; color:#60a5fa;">✔ علامة التوثيق (رمادية = غير موثق / زرقاء = موثق):</b>
@@ -836,7 +906,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       </label>
     </div>
 
-    <!-- حالة الدوام والمواعيد -->
     <div style="background:rgba(16,185,129,.07); padding:10px; border-radius:12px; border:1px solid rgba(16,185,129,.3); display:grid; gap:8px;">
       <label style="font-size:12px; color:var(--emerald); font-weight:700;">🟢 حالة الدوام والنقطة المضيئة:</label>
       <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:8px;">
@@ -909,23 +978,53 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 
 <div id="toast" class="toast-box gold-bg hidden"></div>
 
-<!-- ================= المساعد الطبي الذكي اللطيف (CryoBot) ================= -->
-<div id="cryoMascot" class="cryo-mascot hidden" title="مساعد Cryovion الذكي (اضغط لنصيحة سريعة)">
-  <span id="cryoMascotClose" class="cryo-mascot-close" title="إخفاء المساعد">✕</span>
-  <div id="cryoMascotBubble" class="cryo-mascot-bubble">أهلاً بك في Cryovion! 🩺</div>
+<!-- ================= المساعد الطبي الذكي القابل للسحب + نافذة المحادثة (CryoBot AI) ================= -->
+<div id="cryoMascot" class="cryo-mascot" title="مساعد CryoBot الذكي (اسحبني لأي مكان أو اضغط للمحادثة)">
+  <span class="cryo-mascot-online-badge"></span>
+  <div id="cryoMascotBubble" class="cryo-mascot-bubble">أهلاً! اضغط عليّ لنسألك عن أي صيدلية أو طبيب 🩺</div>
   <svg class="cryo-mascot-svg" viewBox="0 0 120 120" fill="none">
     <circle cx="60" cy="64" r="42" fill="#0f1c2e" stroke="#2dd4bf" stroke-width="4"/>
     <path d="M32 48 C32 28 88 28 88 48" fill="#132238" stroke="#D9B45A" stroke-width="3"/>
     <rect x="52" y="22" width="16" height="12" rx="4" fill="#10b981"/>
     <path d="M60 25 V31 M57 28 H63" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="45" cy="62" r="6" fill="#2dd4bf"/>
-    <circle cx="75" cy="62" r="6" fill="#2dd4bf"/>
-    <circle cx="47" cy="60" r="2" fill="#fff"/>
-    <circle cx="77" cy="60" r="2" fill="#fff"/>
+    <circle cx="45" cy="62" r="6" fill="#2dd4bf"/><circle cx="75" cy="62" r="6" fill="#2dd4bf"/>
+    <circle cx="47" cy="60" r="2" fill="#fff"/><circle cx="77" cy="60" r="2" fill="#fff"/>
     <path d="M48 78 Q60 86 72 78" stroke="#F6E29A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
     <path d="M26 70 Q18 88 38 96" stroke="#D9B45A" stroke-width="3" stroke-linecap="round" fill="none"/>
     <circle cx="40" cy="96" r="5" fill="#2dd4bf" stroke="#D9B45A" stroke-width="2"/>
   </svg>
+</div>
+
+<!-- نافذة محادثة الذكاء الاصطناعي CryoBot AI -->
+<div id="cryoAiPanel" class="cryo-ai-panel hidden" role="dialog" aria-label="CryoBot AI Assistant">
+  <div class="cryo-ai-head">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:36px; height:36px; border-radius:12px; background:rgba(45,212,191,.15); border:1px solid #2dd4bf; display:flex; align-items:center; justify-content:center; font-size:18px;">🤖</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <b class="font-display" style="font-size:15px; color:var(--gold);">CryoBot AI</b>
+          <span class="badge-pill" style="background:rgba(16,185,129,.2); color:var(--emerald); font-size:9.5px; padding:1px 7px;">متصل ومؤمّن 🔒</span>
+        </div>
+        <p style="font-size:11px; color:var(--muted);">مساعدك الذكي للأطباء والصيدليات وشرح المنصة</p>
+      </div>
+    </div>
+    <button type="button" id="cryoAiCloseBtn" style="width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.08); font-size:14px;">✕</button>
+  </div>
+
+  <div id="cryoAiMsgs" class="cryo-ai-msgs"></div>
+
+  <div class="ai-chips-bar" id="cryoAiChips">
+    <button type="button" class="ai-chip" data-ai-q="إيه الصيدليات المفتوحة دلوقتي؟">🟢 صيدليات مفتوحة الآن</button>
+    <button type="button" class="ai-chip" data-ai-q="عايز دكتور أطفال شاطر">👶 دكتور أطفال</button>
+    <button type="button" class="ai-chip" data-ai-q="إزاي أستخدم موقع Cryovion؟">💡 شرح مميزات الموقع</button>
+    <button type="button" class="ai-chip" data-ai-q="معامل التحاليل والأشعة والنظارات">🧪 معامل وأشعة ونظارات</button>
+    <button type="button" class="ai-chip" data-ai-q="إزاي أوثق عيادتي أو صيدليتي؟">✔ توثيق صفحتي مجاناً</button>
+  </div>
+
+  <form id="cryoAiForm" class="cryo-ai-foot">
+    <input id="cryoAiInput" type="text" autocomplete="off" maxlength="220" placeholder="اسألني بأسلوبك (مثال: صيدلية فاتحة، دكتور باطنة)..." class="input-box" style="flex:1; padding:9px 12px; font-size:13px;">
+    <button type="submit" class="gold-bg" style="padding:9px 15px; border-radius:12px; font-size:13px; flex-shrink:0;">إرسال ➤</button>
+  </form>
 </div>
 
 <!-- مساحة لواجهات الإضافات المستقبلية -->
@@ -936,7 +1035,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <script>
 'use strict';
 /* =====================================================================
-   Cryovion v1.3.0 — الجزء الثاني (القسم الأول: 2A)
+   Cryovion v1.4.0 — الجزء الثاني (القسم الأول: 2A)
    الإعدادات، الهوية البصرية (DNA + PWA)، الحماية، قاعدة البيانات، والترتيب الذكي
    ===================================================================== */
 
@@ -981,7 +1080,6 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
     <path d="M0 160 L95 160 L112 125 L130 195 L150 95 L172 180 L188 150 L205 160 L360 160" stroke="#14b8a6" stroke-width="1.6" opacity="0.22" fill="none"/>
     <!-- الشريط الحلزوني المائل بزاوية القطر -->
     <g transform="rotate(-26 180 400) translate(5, -35)" filter="url(#cryoNeon)">
-      <!-- الروابط الداخلية المزدوجة للسلم الحلزوني -->
       <g stroke="url(#cryoRung)" stroke-width="2.2" stroke-linecap="round" opacity="0.72">
         <line x1="102" y1="62" x2="228" y2="62"/><line x1="118" y1="88" x2="212" y2="88"/><line x1="138" y1="112" x2="192" y2="112"/>
         <line x1="138" y1="158" x2="192" y2="158"/><line x1="118" y1="182" x2="212" y2="182"/><line x1="102" y1="208" x2="228" y2="208"/>
@@ -992,13 +1090,10 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
         <line x1="102" y1="578" x2="228" y2="578"/><line x1="118" y1="604" x2="212" y2="604"/><line x1="138" y1="628" x2="192" y2="628"/>
         <line x1="138" y1="674" x2="192" y2="674"/><line x1="118" y1="698" x2="212" y2="698"/><line x1="102" y1="724" x2="228" y2="724"/>
       </g>
-      <!-- الخيط الأول (توهج عريض + قلب أبيض رفيع لإعطاء اللمعة الزجاجية) -->
       <path d="M85,15 C255,101 75,187 245,273 C75,359 255,445 85,531 C255,617 75,703 245,789" stroke="url(#cryoStrandA)" stroke-width="8" stroke-linecap="round"/>
       <path d="M85,15 C255,101 75,187 245,273 C75,359 255,445 85,531 C255,617 75,703 245,789" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.75"/>
-      <!-- الخيط الثاني المعاكس -->
       <path d="M245,15 C75,101 255,187 85,273 C255,359 75,445 245,531 C75,617 255,703 85,789" stroke="url(#cryoStrandB)" stroke-width="8" stroke-linecap="round"/>
       <path d="M245,15 C75,101 255,187 85,273 C255,359 75,445 245,531 C75,617 255,703 85,789" stroke="#FFF6C2" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
-      <!-- الذرات المضيئة المتناثرة حول الـ DNA -->
       <g fill="#5eead4" opacity="0.9">
         <circle cx="102" cy="62" r="3.4"/><circle cx="228" cy="62" r="3.4" fill="#F6E29A"/>
         <circle cx="70" cy="115" r="2.2"/><circle cx="252" cy="135" r="2.5" fill="#F6E29A"/>
@@ -1027,7 +1122,7 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
     .side-drawer > * { position: relative; z-index: 1; }
   `);
 
-  /* ب) توليد أيقونة PNG عالية الدقة + Manifest لتثبيت الموقع كتطبيق (PWA) باسم Cryovion وشعار نبض القلب */
+  /* ب) توليد أيقونة PNG عالية الدقة + Manifest لتثبيت الموقع كتطبيق (PWA) */
   try {
     const iconSvg = document.getElementById('favIconLink')?.getAttribute('href') || '';
     const manifest = {
@@ -1047,7 +1142,6 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
     mLink.href = 'data:application/manifest+json;utf8,' + encodeURIComponent(JSON.stringify(manifest));
     document.head.appendChild(mLink);
 
-    /* رسم أيقونة PNG حقيقية عبر Canvas لدعم أجهزة آيفون وأندرويد التي تفضل PNG عند الإضافة للشاشة الرئيسية */
     const img = new Image();
     img.onload = () => {
       try {
@@ -1061,7 +1155,6 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
   } catch {}
 })();
 
-/* التقاط حدث تثبيت التطبيق في كروم لإظهار زر "تثبيت التطبيق" عند توفره */
 let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault(); deferredInstallPrompt = e;
@@ -1104,7 +1197,6 @@ const I18N = {
   }
 };
 
-/* التخصصات بعد المراجعة العلمية الدقيقة: فصل المخ والأعصاب عن العمود الفقري، وضم العمود الفقري للعظام والمفاصل */
 const SPECS_META = {
   all:      { label: 'كل التخصصات', labelEn: 'All Specialties', icon: '✨', color: '#D9B45A', bg: 'rgba(217,180,90,0.15)' },
   peds:     { label: 'طب الأطفال وحديثي الولادة', labelEn: 'Pediatrics & Neonatology', icon: '👶', color: '#f472b6', bg: 'rgba(244,114,182,0.18)', svg: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 3c1.5 0 2 1 2 2"/>' },
@@ -1139,7 +1231,6 @@ const ICON = {
 };
 const BAD_WORDS = ['نصاب','حرامي','فاشل','غبي','زباله','قذر','وسخ','كلب','حمار','كذاب','شرموط','عرص','خول'];
 const BAD_NORM = BAD_WORDS.map(w => w.replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase());
-/* الكلمات المحجوزة لاسم المنصة الرسمي (يُمنع على أي مستخدم عادي تسمية نفسه بها) */
 const RESERVED_BRAND_PATTERNS = ['cryovion','cryo vion','cryo','كرايوفيون','كريوفيون','كرايفون','كريوفين','كرايوفين','ادمن','الادارة','مشرف المنصة'];
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
@@ -1165,7 +1256,6 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim().toLowerCase();
 const containsDefamation = txt => { const n = norm(txt); return BAD_NORM.some(w => n.includes(w)); };
 
-/* فحص ما إذا كان الاسم أو الكنية ينتحل اسم Cryovion الرسمي (مسموح فقط للأدمن المالك) */
 function isReservedBrandName(txt) {
   if (isUserMasterAdmin(getCurrentUser())) return false;
   const cleaned = norm(txt).replace(/[^a-z0-9\u0621-\u064A]/g, '');
@@ -1264,7 +1354,6 @@ function revSignature(placeId, rawAuthor, body) {
   return `${placeId}::${rawAuthor}::${body}`;
 }
 
-/* حفظ وقراءة بيانات الجنس والفئة العمرية للمستخدم */
 function getUserDemographics(email) {
   if (!email) return null;
   try {
@@ -1341,7 +1430,6 @@ function getAvailabilityStatus(d) {
   return st('unknown', 'var(--muted)', 'لم تُفعل من المُفوض', 'Not Configured');
 }
 
-/* حساب نقاط الأولوية للترتيب التلقائي: النشط (مفتوح الآن) أولاً، ثم الموثق، ثم الأعلى تقييماً وعدد التقييمات */
 function computePriorityScore(d) {
   const availRank = d.avail_state === 'online' ? 3000 : (d.avail_state === 'unknown' ? 1000 : 0);
   const verRank = d.is_verified ? 500 : 0;
@@ -1417,7 +1505,9 @@ function goBackSmart() {
 }
 function goHomeLogo() {
   activeCat = null; activeSpec = 'all'; query = ''; shownLimit = PAGE_SIZE;
-  $('search').value = ''; $('searchSuggest').classList.add('hidden');
+  $('search').value = '';
+  if ($('clearSearchBtn')) $('clearSearchBtn').classList.add('hidden');
+  $('searchSuggest').classList.add('hidden');
   savedHomeScrollY = 0; switchViewDOM('home', false); render();
 }
 function openPlacePage(id) {
@@ -1505,7 +1595,6 @@ function refreshUserUI() {
         ? `🌸 أهلاً بكِ يا <b>${esc(dispName)}</b> — دليلكِ الطبي جاهز لخدمتكِ`
         : `✨ أهلاً بك يا <b>${esc(dispName)}</b> — دليلك الطبي جاهز لخدمتك`;
     }
-    /* تكييف نصوص البحث حسب جنس المستخدم */
     if ($('search') && currentLang === 'ar') {
       $('search').placeholder = isFemale
         ? 'ابحثي عن طبيب، تخصص (أطفال، باطنة، نساء وتوليد، عظام)، أو صيدلية...'
@@ -1610,7 +1699,6 @@ function savePlace(item) {
   writeQueue = writeQueue.then(() => dbWrite(copy)).catch(e => { console.error(e); toast('تعذر الحفظ في قاعدة البيانات'); });
 }
 
-/* حذف أي ريليز (حالة يومية) مباشرة بضغطة زر من الشريط أو من لوحة الإدارة */
 async function deleteStoryRelease(id) {
   const u = getCurrentUser();
   if (id === '__dev__') {
@@ -1726,7 +1814,6 @@ function buildPlaces(rows, revs) {
     const a = getAvailabilityStatus(o); o.avail_state = a.state; o.avail_label = a.label; o.avail_color = a.color;
     return o;
   });
-  /* تطبيق ترتيب الأولوية الذكي فور بناء القائمة */
   sortPlacesByPriority();
   placeMap = new Map(places.map(p => [p.id, p]));
 }
@@ -1770,7 +1857,6 @@ async function load() {
   Cryovion.emit('placesLoaded', places);
 }
 
-/* ----- التحكم الحقيقي بعلامة التوثيق (رمادي ⇄ أزرق) ----- */
 const verifyBusy = new Set();
 function repaintVerified(id) {
   sortPlacesByPriority();
@@ -1806,8 +1892,8 @@ async function setVerified(id, val) {
 }
 const toggleVerify = id => setVerified(id);
     /* =====================================================================
-   Cryovion v1.3.0 — الجزء الثاني (القسم الأخير: 2B)
-   البطاقات، شريط الريليز الملون، بحث الأدمن، المساعد CryoBot، وتشغيل المنصة
+   Cryovion v1.4.0 — الجزء الثاني (القسم الأخير: 2B)
+   البطاقات، شريط الريليز الملون، بحث الأدمن، محرك CryoBot AI المحمي، والتشغيل
    ===================================================================== */
 
 /* ============ 10) الأزرار: اتصال / واتساب / خريطة ============ */
@@ -1848,7 +1934,6 @@ function paintFilters() {
   $('specsBar').classList.toggle('hidden', hideSpecs);
 }
 
-/* شريط الـ 24 ساعة: كل ريليز يأخذ لون تخصص صاحبه (--poster-accent) + زر حذف مباشر */
 let posterIO = null, posterRaf = null, posterPaused = false, posterLastTs = 0;
 
 function setupPosterLiveObserver() {
@@ -1942,7 +2027,6 @@ function cardCtx(d) {
   return { c, spMeta, isPeds: d.cat === 'doctor' && d.spec_key === 'peds', lang: currentLang, esc, badge, actions, stars, orb, ico, CATS, SPECS_META, ICON, formatWaNumber };
 }
 
-/* البطاقة: تستخدم Grid Areas بحيث على الكمبيوتر تكون الصورة جانبية، وعلى الهاتف تصبح مربعاً أنيقاً بالركن العلوي وبجانبها الاسم وتحتها التفاصيل كاملة */
 function card(d) {
   const ctx = cardCtx(d), c = ctx.c, spMeta = ctx.spMeta, isPeds = ctx.isPeds;
   const custom = runTpl('card', d, ctx);
@@ -2183,7 +2267,7 @@ function openReviewModal(id) {
 }
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
-/* ============ 13) إدارة صفحتي + دعوة صديق + غرفة الإدارة (مع شريط البحث السريع للأدمن) ============ */
+/* ============ 13) إدارة صفحتي + دعوة صديق + غرفة الإدارة ============ */
 function renderManagedAds() {
   const u = getCurrentUser(), box = $('managedListBox');
   if (!u) {
@@ -2277,7 +2361,6 @@ function renderReferralsHub() {
   });
 }
 
-/* غرفة الإدارة: تدعم البحث الفوري السريع للأدمن + زر حذف الريليز لأي صفحة */
 function renderAdminList() {
   const reqs = getRefRequests();
   $('adminRefReqCount').textContent = reqs.length;
@@ -2444,23 +2527,7 @@ function listenVoiceSearch() {
   r.start();
 }
 
-/* ============ 14.5) المساعد الطبي اللطيف المتنقل (CryoBot Mascot) ============ */
-const MASCOT_TIPS_MALE = [
-  '🟢 النقطة الخضراء تعني مفتوح الآن!',
-  '🎤 جرب البحث الصوتي بالأعلى!',
-  '⭐ تقييمك يساعد أهل قريتك!',
-  '🤔 أتفقد أعلى العيادات تقييماً لك...',
-  '💊 هل تبحث عن صيدلية مفتوحة؟'
-];
-const MASCOT_TIPS_FEMALE = [
-  '🌸 أهلاً بكِ! النقطة الخضراء تعني مفتوح الآن',
-  '🎤 جربي البحث الصوتي السريع بالأعلى!',
-  '⭐ تقييمكِ الصادق يفيد الجميع!',
-  '🤔 أرتب لكِ العيادات الأعلى تقييماً...',
-  '🩺 صحتكِ وصحة أسرتكِ أقرب مما تظنين!'
-];
-let mascotTimer = null;
-
+/* ============ 14.5) المساعد الطبي الذكي الثابت والقابل للسحب + محرك محادثة CryoBot AI المحمي بالكامل ============ */
 function isMascotEnabled() {
   const saved = localStorage.getItem('cryovion_mascot');
   return saved === null ? true : saved === 'true';
@@ -2468,50 +2535,248 @@ function isMascotEnabled() {
 function updateMascotToggleUI() {
   const on = isMascotEnabled();
   Cryovion.flags.mascot = on;
-  const el = $('cryoMascot');
+  const el = $('cryoMascot'), panel = $('cryoAiPanel');
   if (el) el.classList.toggle('hidden', !on);
+  if (!on && panel) panel.classList.add('hidden');
   const btn = $('mascotToggleBtn');
   if (btn) btn.textContent = on ? '🟢 مُفعّل (إيقاف)' : '⚪ متوقف (تشغيل)';
 }
-function moveMascotToRandomCard() {
-  const el = $('cryoMascot');
-  if (!el || !isMascotEnabled() || document.hidden) return;
-  const cards = Array.from(document.querySelectorAll('#list .entity-card, #posterTrack .poster-card')).filter(c => {
-    const r = c.getBoundingClientRect();
-    return r.top > 90 && r.bottom < window.innerHeight - 60 && r.width > 120;
+
+/* تفعيل السحب الحر (Drag & Drop) للأيقونة مع بقائها ثابتة في مكانها دون حركة عشوائية، وضبط اتجاه الفقاعة لليمين */
+function initDraggableMascot() {
+  const el = $('cryoMascot'), bubble = $('cryoMascotBubble');
+  if (!el) return;
+  updateMascotToggleUI();
+
+  /* استرجاع آخر مكان سحبها إليه المستخدم إن وجد */
+  try {
+    const savedPos = JSON.parse(localStorage.getItem('cryovion_mascot_pos') || 'null');
+    if (savedPos && typeof savedPos.left === 'number' && typeof savedPos.top === 'number') {
+      const clampedLeft = Math.max(10, Math.min(window.innerWidth - 68, savedPos.left));
+      const clampedTop = Math.max(60, Math.min(window.innerHeight - 75, savedPos.top));
+      el.style.left = clampedLeft + 'px';
+      el.style.top = clampedTop + 'px';
+      el.style.bottom = 'auto';
+      el.classList.toggle('on-right-side', clampedLeft > window.innerWidth * 0.52);
+    }
+  } catch {}
+
+  let dragging = false, moved = false, startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+  el.addEventListener('pointerdown', e => {
+    dragging = true; moved = false;
+    const rect = el.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY;
+    origLeft = rect.left; origTop = rect.top;
+    el.setPointerCapture(e.pointerId);
   });
-  if (cards.length) {
-    const pick = cards[Math.floor(Math.random() * cards.length)];
-    const r = pick.getBoundingClientRect();
-    const topPos = Math.max(68, Math.min(window.innerHeight - 90, r.top - 36));
-    const leftPos = Math.max(16, Math.min(window.innerWidth - 76, r.left + 22));
-    el.style.top = topPos + 'px';
-    el.style.left = leftPos + 'px';
-  } else {
-    el.style.top = (window.innerHeight - 135) + 'px';
-    el.style.left = '20px';
+
+  el.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
+    if (!moved) return;
+    const newLeft = Math.max(8, Math.min(window.innerWidth - 66, origLeft + dx));
+    const newTop = Math.max(56, Math.min(window.innerHeight - 72, origTop + dy));
+    el.style.left = newLeft + 'px';
+    el.style.top = newTop + 'px';
+    el.style.bottom = 'auto';
+    el.style.right = 'auto';
+    el.classList.toggle('on-right-side', newLeft > window.innerWidth * 0.52);
+  });
+
+  const endDrag = e => {
+    if (!dragging) return;
+    dragging = false;
+    try { el.releasePointerCapture(e.pointerId); } catch {}
+    if (moved) {
+      const rect = el.getBoundingClientRect();
+      localStorage.setItem('cryovion_mascot_pos', JSON.stringify({ left: rect.left, top: rect.top }));
+    } else {
+      toggleCryoAiPanel();
+    }
+  };
+  el.addEventListener('pointerup', endDrag);
+  el.addEventListener('pointercancel', endDrag);
+
+  /* إظهار تلميح ترحيبي لطيف على يمين الأيقونة عند فتح الموقع */
+  setTimeout(() => {
+    if (!isMascotEnabled() || !$('cryoAiPanel').classList.contains('hidden')) return;
+    const u = getCurrentUser(), demo = u ? getUserDemographics(u.email) : null;
+    if (bubble) {
+      bubble.textContent = (demo && demo.gender === 'female')
+        ? '🌸 أهلاً بكِ! اضغطي عليّ لو بتدوري على صيدلية فاتحة أو دكتور'
+        : '✨ أهلاً بك! اضغط عليّ لو بتدور على صيدلية فاتحة أو دكتور';
+    }
+    el.classList.add('speaking');
+    setTimeout(() => el.classList.remove('speaking'), 5500);
+  }, 1600);
+}
+
+/* محرك محادثة CryoBot AI (ذكي، عفوي، ومحصن بجدار حماية يمنع تسريب أي بيانات خاصة أو إيميلات) */
+function getPublicSafePlaces() {
+  /* نسخ الحقول العامة فقط واستبعاد owner_email و userKey وأي بيانات حساسة نهائياً */
+  return places.map(p => ({
+    id: p.id, cat: p.cat, spec_key: p.spec_key, name: p.name, spec: p.spec,
+    addr: p.addr, hours: p.hours, avail_state: p.avail_state, avail_label: p.avail_label,
+    phone: p.phone, whatsapp: p.whatsapp, fee: p.fee, is_verified: !!p.is_verified,
+    rate: p.rate || 5, n: p.n || 0, services: p.services || []
+  }));
+}
+
+function formatMiniCardsHtml(list) {
+  return list.slice(0, 4).map(p => {
+    const sp = SPECS_META[p.spec_key] || SPECS_META[p.cat] || SPECS_META.gastro;
+    const dot = p.avail_state === 'online' ? '🟢 مفتوح' : (p.avail_state === 'offline' ? '🔴 مغلق' : '⚪');
+    return `<div class="ai-mini-card" data-ai-open="${esc(p.id)}">
+      <div style="min-width:0;">
+        <div style="font-weight:700; font-size:12.5px; color:var(--gold);">${sp.icon} ${esc(p.name)} ${p.is_verified ? '🔵' : ''}</div>
+        <div style="font-size:11px; color:var(--muted);">${esc(p.spec)} • 📍 ${esc(p.addr)}</div>
+      </div>
+      <span style="font-size:10.5px; font-weight:700; white-space:nowrap; color:var(--emerald);">${dot} ←</span>
+    </div>`;
+  }).join('');
+}
+
+function generateCryoBotReply(userText) {
+  const q = norm(userText);
+  const u = getCurrentUser(), demo = u ? getUserDemographics(u.email) : null;
+  const fem = !!(demo && demo.gender === 'female');
+  const safeList = getPublicSafePlaces();
+
+  /* 1) جدار الحماية الصارم (Zero-Leak Security Guard): رفض أي سؤال عن إيميلات أو حسابات أو أدمن أو كود */
+  const secPatterns = ['ايميل','بريد','ادمن','مشرف','باسورد','كلمه السر','كلمه مرور','حسابات','قاعده البيانات','سوبابيز','supabase','admin','email','password','token','key','owner','مين صاحب الموقع','بيانات المستخدمين'];
+  if (secPatterns.some(w => q.includes(norm(w)))) {
+    return `🔒 <b>حماية الخصوصية في Cryovion:</b><br>أنا مساعد طبي مخصص لخدمتك في البحث عن الأطباء والصيدليات والمعامل فقط. جميع بيانات الحسابات والإدارة مشفرة ومحمية بالكامل ولا يمكنني الاطلاع عليها أو مشاركتها.<br><br>لو حابب تتواصل مع الإدارة لتوثيق صفحة طبية، تقدر تفتح قسم <b>"التعاون الإعلاني والتواصل"</b> من القائمة الجانبية! 😊`;
+  }
+
+  /* 2) الترحيب والسلام */
+  if (/^(اهلا|مرحبا|السلام عليكم|صباح|مساء|هاي|ازيك|عامل ايه|من انت|مين انت)/.test(q)) {
+    return fem
+      ? `أهلاً وسهلاً بحضرتكِ يا فندم! 🌸 أنا <b>CryoBot</b>، المساعد الذكي لمنصة <b>Cryovion</b>.<br>تقدري تسأليني بأسلوبك العادي عن:<br>• 🟢 الصيدليات المفتوحة دلوقتي<br>• 🩺 ترشيح دكتور في أي تخصص (أطفال، باطنة، أسنان، عظام...)<br>• 🧪 معامل التحاليل والأشعة ومحلات النظارات<br>• 💡 إزاي تستخدمي مميزات الموقع!`
+      : `يا أهلاً وسهلاً بك! ✨ أنا <b>CryoBot</b>، المساعد الذكي لمنصة <b>Cryovion</b>.<br>تقدر تسألني كأنك بتكلم صديقك عن:<br>• 🟢 الصيدليات المفتوحة دلوقتي<br>• 🩺 أفضل الأطباء في أي تخصص<br>• 🧪 معامل التحاليل والأشعة والنظارات<br>• 💡 شرح أي ميزة في الموقع!`;
+  }
+
+  /* 3) السؤال عن كيفية استخدام الموقع أو مميزاته */
+  if (q.includes('اشرح') || q.includes('ازاي استخدم') || q.includes('مميزات') || q.includes('يعني ايه') || q.includes('فكره الموقع')) {
+    return `💡 <b>ببساطة شديدة.. منصة Cryovion معمولة عشان تريحك:</b><br>
+    1️⃣ <b>النقطة الخضراء 🟢:</b> معناها العيادة أو الصيدلية فاتحة وشغالة دلوقتي، والحمراء 🔴 يعني قافلة أو إجازة.<br>
+    2️⃣ <b>العلامة الزرقاء 🔵:</b> معناها الصفحة موثقة رسمياً وبياناتها مؤكدة 100%.<br>
+    3️⃣ <b>شريط الـ 24 ساعة 📢:</b> ده شريط بيظهر فيه يومياً عروض العيادات أو الأدوية اللي توفرت في الصيدليات.<br>
+    4️⃣ <b>القراءة والبحث الصوتي 🎤:</b> تقدر تضغط على الميكروفون وتنطق اسم الدكتور أو التخصص، وداخل أي صفحة تقدر تضغط "استماع للبيانات" عشان يقرأها لك بالصوت!`;
+  }
+
+  /* 4) السؤال عن توثيق أو إضافة عيادة أو صيدلية */
+  if (q.includes('توثيق') || q.includes('اوثق') || q.includes('اضيف عياد') || q.includes('اضيف صيدلي') || q.includes('اعلان') || q.includes('تفويض')) {
+    return `✔ <b>توثيق وتفويض الصفحات الطبية مجاني 100%!</b><br>
+    لو حضرتك طبيب أو صيدلي أو صاحب معمل، تقدر تتواصل مع إدارة المنصة لتسلم إدارة صفحتك بالكامل (تتحكم في مواعيد الفتح والإغلاق التلقائي، ترفع صورك، أسعار الكشف، وتنشر حالات يومية لمدة 24 ساعة) مع الحصول على <b>شارة التوثيق الزرقاء 🔵</b>.<br>
+    • أو تقدر تستخدم ميزة <b>"✨ دعوة صديق"</b> من القائمة العلوية!`;
+  }
+
+  /* 5) البحث عن صيدليات (خصوصاً المفتوحة الآن) */
+  if (q.includes('صيدلي') || q.includes('دواء') || q.includes('علاج')) {
+    const allPh = safeList.filter(p => p.cat === 'pharmacy');
+    const openPh = allPh.filter(p => p.avail_state === 'online');
+    const listToShow = openPh.length ? openPh : allPh;
+    if (!listToShow.length) return `حالياً لا توجد صيدليات مسجلة مطابقة، جرب عرض كل الأقسام من الصفحة الرئيسية.`;
+    return `💊 ${openPh.length ? `لقيت لك <b>${openPh.length} صيدلية مفتوحة ونشطة دلوقتي 🟢</b>:` : `دي أبرز الصيدليات المسجلة في الدليل:`}<br><span style="font-size:11.5px; color:var(--muted);">اضغط على أي صيدلية لفتح صفحتها والاتصال مباشرة:</span>` + formatMiniCardsHtml(listToShow);
+  }
+
+  /* 6) البحث عن معامل تحاليل أو أشعة أو نظارات */
+  if (q.includes('معمل') || q.includes('تحليل') || q.includes('تحاليل') || q.includes('اشعه') || q.includes('رنين') || q.includes('نظار') || q.includes('بصريات')) {
+    const isOpt = q.includes('نظار') || q.includes('بصريات');
+    const labs = safeList.filter(p => isOpt ? p.spec_key === 'optics' : (p.cat === 'lab' && p.spec_key !== 'optics'));
+    const listToShow = labs.length ? labs : safeList.filter(p => p.cat === 'lab');
+    if (!listToShow.length) return `لم أجد معامل مطابقة حالياً، يمكنك تصفح قسم "معامل ونظارات" من الأعلى.`;
+    return `${isOpt ? '🕶️ <b>محلات البصريات والنظارات الطبية:</b>' : '🧪 <b>معامل التحاليل ومراكز الأشعة المتاحة:</b>'}` + formatMiniCardsHtml(listToShow);
+  }
+
+  /* 7) البحث عن تخصص طبي محدد */
+  const specKeywords = [
+    { key: 'peds', words: ['اطفال','طفل','حديثي الولاده','رضع','صفراء'] },
+    { key: 'gastro', words: ['باطنه','معده','قولون','كبد','كلي','سكر','ضغط','هضمي'] },
+    { key: 'neuro', words: ['مخ','اعصاب','نفسي','نفسيه','توتر','قلق','وسواس'] },
+    { key: 'ortho', words: ['عظام','مفاصل','عمود فقري','غضروف','ركبه','كسور','ظهر'] },
+    { key: 'obgyn', words: ['نساء','توليد','حمل','ولاده','حقن مجهري','تاخر انجاب'] },
+    { key: 'dental', words: ['اسنان','ضرس','تقويم','لثه','حشو','زراعه اسنان'] },
+    { key: 'eye', words: ['عيون','رمد','نظر','ليزك','قاع عين'] },
+    { key: 'ent', words: ['انف','اذن','حنجره','جيوب انفيه','سمعيات'] },
+    { key: 'cardio', words: ['قلب','اوعيه','قسطره','ايكو'] },
+    { key: 'physio', words: ['علاج طبيعي','تاهيل','جلسات'] },
+    { key: 'surgery', words: ['جراحه','مسالك','مناظير'] },
+    { key: 'nutrition', words: ['تغذيه','تخسيس','سمنه','نحافه','دايت','ريجيم'] },
+    { key: 'cosmetic', words: ['تجميل','جلديه','بشره'] },
+    { key: 'laser', words: ['ليزر'] }
+  ];
+  for (const sk of specKeywords) {
+    if (sk.words.some(w => q.includes(norm(w)))) {
+      const matched = safeList.filter(p => p.spec_key === sk.key);
+      const spName = SPECS_META[sk.key]?.label || 'هذا التخصص';
+      if (!matched.length) return `حالياً لم يُسجل طبيب في تخصص <b>${spName}</b>، جرب البحث في التخصصات القريبة أو تصفح الدليل الكامل!`;
+      return `🩺 لقيت لك في تخصص <b>${spName}</b> (${matched.length} نتيجة مرتبة حسب النشاط والتقييم):` + formatMiniCardsHtml(matched);
+    }
+  }
+
+  /* 8) السؤال عن الأماكن المفتوحة الآن بشكل عام */
+  if (q.includes('مفتوح') || q.includes('فاتح') || q.includes('شغال دلوقتي')) {
+    const openNow = safeList.filter(p => p.avail_state === 'online');
+    if (!openNow.length) return `لا توجد منشآت مفعّلة على وضع "مفتوح الآن" في هذه اللحظة، لكن يمكنك تصفح كافة العيادات والصيدليات والاتصال بها للتأكد.`;
+    return `🟢 <b>المنشآت الطبية والصيدليات المفتوحة الآن (${openNow.length}):</b>` + formatMiniCardsHtml(openNow);
+  }
+
+  /* 9) بحث مباشر بالاسم أو العنوان داخل القائمة الآمنة */
+  const directMatches = safeList.filter(p => norm(`${p.name} ${p.spec} ${p.addr}`).includes(q));
+  if (directMatches.length) {
+    return `🔍 وجدت لك <b>${directMatches.length} نتيجة</b> مطابقة لسؤالك:` + formatMiniCardsHtml(directMatches);
+  }
+
+  /* 10) رد ذكي افتراضي عندما يكون السؤال عاماً */
+  const topOpen = safeList.slice(0, 3);
+  return `سؤال جميل! 😊 عشان أجيبلك أدق نتيجة في ثانية، قولي مثلاً: <b>"صيدلية فاتحة"</b>، أو <b>"دكتور أطفال"</b>، أو <b>"دكتور باطنة في أوسيم"</b>، أو اضغط على الأزرار السريعة بالأسفل.<br><br>ودي أعلى الأماكن نشاطاً وتقييماً حالياً على المنصة:` + formatMiniCardsHtml(topOpen);
+}
+
+function appendAiMessage(html, who = 'bot') {
+  const box = $('cryoAiMsgs'); if (!box) return;
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + who;
+  div.innerHTML = html;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function toggleCryoAiPanel(forceOpen) {
+  const panel = $('cryoAiPanel'), msgs = $('cryoAiMsgs');
+  if (!panel) return;
+  const willOpen = typeof forceOpen === 'boolean' ? forceOpen : panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', !willOpen);
+  if (willOpen) {
+    if (msgs && !msgs.children.length) {
+      const u = getCurrentUser(), demo = u ? getUserDemographics(u.email) : null;
+      const welcome = (demo && demo.gender === 'female')
+        ? `أهلاً بكِ يا <b>${esc(u.name || 'فندم')}</b>! 🌸 أنا <b>CryoBot AI</b> مساعدكِ الذكي.<br>اسأليني عن أي صيدلية مفتوحة، دكتور، أو معمل في أوسيم والكوم الأحمر، أو اختاري من الأزرار بالأسفل!`
+        : `أهلاً بك${u && u.name ? ' يا <b>' + esc(u.name) + '</b>' : ''}! ✨ أنا <b>CryoBot AI</b> مساعدك الذكي.<br>اسألني عن أي صيدلية مفتوحة، دكتور، أو معمل في أوسيم والكوم الأحمر، أو اختر من الأزرار بالأسفل!`;
+      appendAiMessage(welcome, 'bot');
+    }
+    setTimeout(() => { if ($('cryoAiInput')) $('cryoAiInput').focus(); }, 120);
   }
 }
-function speakMascotTip() {
-  const el = $('cryoMascot'), b = $('cryoMascotBubble');
-  if (!el || !b || !isMascotEnabled()) return;
-  const u = getCurrentUser();
-  const demo = u ? getUserDemographics(u.email) : null;
-  const list = (demo && demo.gender === 'female') ? MASCOT_TIPS_FEMALE : MASCOT_TIPS_MALE;
-  b.textContent = list[Math.floor(Math.random() * list.length)];
-  el.classList.add('speaking');
-  clearTimeout(speakMascotTip.t);
-  speakMascotTip.t = setTimeout(() => el.classList.remove('speaking'), 4200);
-}
-function initMascotSystem() {
-  updateMascotToggleUI();
-  setTimeout(() => { moveMascotToRandomCard(); speakMascotTip(); }, 1400);
-  if (mascotTimer) clearInterval(mascotTimer);
-  mascotTimer = setInterval(() => {
-    if (!isMascotEnabled() || document.hidden) return;
-    moveMascotToRandomCard();
-    if (Math.random() < 0.65) speakMascotTip();
-  }, 8500);
+
+function sendUserQueryToAi(text) {
+  const clean = String(text || '').trim();
+  if (!clean) return;
+  appendAiMessage(esc(clean), 'user');
+  const box = $('cryoAiMsgs');
+  const typing = document.createElement('div');
+  typing.className = 'ai-msg bot';
+  typing.style.color = 'var(--muted)';
+  typing.textContent = '🤖 جاري البحث في الدليل الطبي...';
+  box.appendChild(typing);
+  box.scrollTop = box.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    appendAiMessage(generateCryoBotReply(clean), 'bot');
+  }, 260);
 }
 
 /* ============ 15) ربط الأحداث ============ */
@@ -2533,9 +2798,14 @@ $('editorModal').addEventListener('click', e => { if (e.target === $('editorModa
 $('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
 $('onboardingModal').addEventListener('click', e => { if (e.target === $('onboardingModal')) $('onboardingModal').classList.add('hidden'); });
 document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden'); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditorModal(); closeReviewModal(); closeSideDrawer(); $('onboardingModal').classList.add('hidden'); } });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeEditorModal(); closeReviewModal(); closeSideDrawer();
+    $('onboardingModal').classList.add('hidden');
+    if ($('cryoAiPanel')) $('cryoAiPanel').classList.add('hidden');
+  }
+});
 
-/* زر تثبيت التطبيق (PWA) */
 if ($('installAppBtn')) {
   $('installAppBtn').addEventListener('click', async () => {
     if (!deferredInstallPrompt) return toast('للتثبيت: افتح قائمة المتصفح (⋮) واختر "إضافة إلى الشاشة الرئيسية"');
@@ -2546,27 +2816,39 @@ if ($('installAppBtn')) {
   });
 }
 
-/* أحداث المساعد الذكي CryoBot */
+/* أحداث المساعد الذكي CryoBot AI */
 if ($('mascotToggleBtn')) {
   $('mascotToggleBtn').addEventListener('click', () => {
     const next = !isMascotEnabled();
     localStorage.setItem('cryovion_mascot', String(next));
     updateMascotToggleUI();
-    if (next) { moveMascotToRandomCard(); speakMascotTip(); }
-    toast(next ? '🩺 تم تشغيل المساعد اللطيف CryoBot' : 'تم إخفاء المساعد (يمكنك تفعيله من الإعدادات متى شئت)');
+    toast(next ? '🤖 تم إظهار المساعد الذكي CryoBot AI' : 'تم إخفاء المساعد الذكي (يمكنك تفعيله من الإعدادات متى شئت)');
   });
 }
-if ($('cryoMascot')) {
-  $('cryoMascot').addEventListener('click', e => {
-    if (e.target.id === 'cryoMascotClose') {
-      e.stopPropagation();
-      localStorage.setItem('cryovion_mascot', 'false');
-      updateMascotToggleUI();
-      toast('تم إخفاء المساعد (يمكنك تفعيله من الإعدادات)');
-      return;
-    }
-    moveMascotToRandomCard();
-    speakMascotTip();
+if ($('cryoAiCloseBtn')) $('cryoAiCloseBtn').addEventListener('click', () => toggleCryoAiPanel(false));
+if ($('cryoAiForm')) {
+  $('cryoAiForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const inp = $('cryoAiInput');
+    if (!inp || !inp.value.trim()) return;
+    const q = inp.value; inp.value = '';
+    sendUserQueryToAi(q);
+  });
+}
+if ($('cryoAiChips')) {
+  $('cryoAiChips').addEventListener('click', e => {
+    const chip = e.target.closest('[data-ai-q]');
+    if (!chip) return;
+    sendUserQueryToAi(chip.getAttribute('data-ai-q'));
+  });
+}
+if ($('cryoAiMsgs')) {
+  $('cryoAiMsgs').addEventListener('click', e => {
+    const cardEl = e.target.closest('[data-ai-open]');
+    if (!cardEl) return;
+    const pid = cardEl.getAttribute('data-ai-open');
+    toggleCryoAiPanel(false);
+    openPlacePage(pid);
   });
 }
 
@@ -2651,7 +2933,7 @@ $('dispSaveBtn').addEventListener('click', () => {
   toast('✔ تم حفظ الاسم الظاهر للتعليقات');
 });
 
-/* تسجيل الدخول (مع منع انتحال اسم Cryovion وفتح نافذة الجنس والعمر) */
+/* تسجيل الدخول */
 $('tabLoginBtn').addEventListener('click', () => {
   isRegisterMode = false; $('registerExtraFields').classList.add('hidden');
   $('tabLoginBtn').className = 'gold-bg'; $('tabRegisterBtn').className = ''; $('tabRegisterBtn').style.background = 'rgba(255,255,255,0.05)';
@@ -2698,9 +2980,10 @@ $('logoutBtn').addEventListener('click', async () => {
   load();
 });
 
-/* البحث العام + بحث الأدمن الفوري داخل غرفة الإدارة */
+/* البحث العام + زر مسح البحث + بحث الأدمن الفوري */
 const runSearch = debounce(() => {
   const raw = query.trim(), q = norm(raw), box = $('searchSuggest');
+  if ($('clearSearchBtn')) $('clearSearchBtn').classList.toggle('hidden', !raw);
   if (!q) box.classList.add('hidden');
   else {
     const matches = [];
@@ -2720,6 +3003,14 @@ const runSearch = debounce(() => {
   Cryovion.emit('searched', raw);
 }, 140);
 $('search').addEventListener('input', e => { query = e.target.value; runSearch(); });
+if ($('clearSearchBtn')) {
+  $('clearSearchBtn').addEventListener('click', () => {
+    query = ''; $('search').value = '';
+    $('clearSearchBtn').classList.add('hidden');
+    $('searchSuggest').classList.add('hidden');
+    shownLimit = PAGE_SIZE; render();
+  });
+}
 if ($('adminSearchInput')) {
   $('adminSearchInput').addEventListener('input', e => {
     adminQuery = e.target.value;
@@ -2747,7 +3038,7 @@ $('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'a
 $('slidePrev').addEventListener('click', () => $('posterTrack').scrollBy({ left: -posterStep(), behavior: 'smooth' }));
 $('slideNext').addEventListener('click', () => $('posterTrack').scrollBy({ left: posterStep(), behavior: 'smooth' }));
 
-/* النقرات العامة: علامة التوثيق / حذف ريليز / حذف تعليق / فتح الصفحة / مشاركة / عرض المزيد */
+/* النقرات العامة */
 document.addEventListener('click', e => {
   const bd = e.target.closest('[data-badge-id]');
   if (bd) { e.preventDefault(); e.stopPropagation(); setVerified(bd.dataset.badgeId); return; }
@@ -2771,7 +3062,7 @@ document.addEventListener('click', e => {
   else if (a === 'openPage') openPlacePage(id);
 }, true);
 
-/* التقييم (واحد لكل حساب على كل إعلان) */
+/* التقييم */
 $('revLoginBtn').addEventListener('click', () => { closeReviewModal(); navigateApp('account'); });
 $('reviewForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -2815,7 +3106,7 @@ $('devDel').addEventListener('click', () => {
   writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1)).then(() => { toast('تم حذف الحالة'); return load(); }).catch(() => {});
 });
 
-/* نافذة التعديل: تبديل نوع المنشأة + إضافة خانات أسعار + رفع الصور + الحفظ */
+/* نافذة التعديل */
 $('edCat').addEventListener('change', syncEditorCatFields);
 $('svcAdd').addEventListener('click', () => addServiceRow('', ''));
 
@@ -2887,7 +3178,7 @@ hydrateFromCache();
 applyLanguage();
 renderPostersCarousel();
 startContinuousPosterLoop();
-initMascotSystem();
+initDraggableMascot();
 Cryovion.applyIcons();
 appReady = true;
 Cryovion.emit('ready');
