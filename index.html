@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#041b21">
+<meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cryovion">
@@ -12,16 +13,16 @@
 <meta name="copyright" content="© 2026 Cryovion. All rights reserved.">
 <title>Cryovion | صحتك أقرب مما تظن</title>
 
-<!-- ================= أيقونة الموقع (Favicon) وتطبيق الشاشة الرئيسية (PWA) بشعار Cryovion ونبض القلب ================= -->
+<!-- ================= أيقونة الموقع (Favicon) وتطبيق الشاشة الرئيسية (PWA) ================= -->
 <link id="favIconLink" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='45%25' r='65%25'%3E%3Cstop offset='0%25' stop-color='%230a2e36'/%3E%3Cstop offset='100%25' stop-color='%23040911'/%3E%3C/radialGradient%3E%3ClinearGradient id='cGrad' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='65%25' stop-color='%23cbd5e1'/%3E%3Cstop offset='100%25' stop-color='%23D9B45A'/%3E%3C/linearGradient%3E%3ClinearGradient id='ring' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232dd4bf'/%3E%3Cstop offset='50%25' stop-color='%230d9488'/%3E%3Cstop offset='100%25' stop-color='%23D9B45A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='url(%23bg)'/%3E%3Ccircle cx='256' cy='256' r='196' fill='none' stroke='url(%23ring)' stroke-width='12' opacity='0.9'/%3E%3Ccircle cx='256' cy='256' r='176' fill='none' stroke='%232dd4bf' stroke-width='3' opacity='0.35'/%3E%3Cpath d='M340 165 C295 120 205 125 165 185 C130 235 135 305 180 350 C225 395 300 390 342 345' fill='none' stroke='url(%23cGrad)' stroke-width='44' stroke-linecap='round'/%3E%3Cpath d='M165 262 L235 262 L252 232 L272 295 L294 210 L314 278 L330 262 L415 262' fill='none' stroke='%232dd4bf' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link id="appleTouchIcon" rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%23041b21'/%3E%3Ccircle cx='256' cy='256' r='196' fill='none' stroke='%232dd4bf' stroke-width='14'/%3E%3Cpath d='M340 165 C295 120 205 125 165 185 C130 235 135 305 180 350 C225 395 300 390 342 345' fill='none' stroke='%23ffffff' stroke-width='44' stroke-linecap='round'/%3E%3Cpath d='M165 262 L235 262 L252 232 L272 295 L294 210 L314 278 L330 262 L415 262' fill='none' stroke='%232dd4bf' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
-<!-- ================= نواة التطوير القابلة للتوسعة (Plugin Core v1.7.0) ================= -->
+<!-- ================= نواة التطوير القابلة للتوسعة (Plugin Core v1.8.0) — يجب أن تبقى أول سكربت ================= -->
 <script>
 (function (w) {
   'use strict';
   var C = w.Cryovion = {
-    version: '1.7.0',
+    version: '1.8.0',
     flags: { posterAutoplay: true },
     config: { cacheVersion: 'v5', maxServices: 7, posterSpeed: 38 },
     hooks: {}, icons: {}, tpl: {},
@@ -56,8 +57,37 @@
       var s = document.getElementById('ext-style');
       if (s) s.appendChild(document.createTextNode(text));
     },
-    ready: function (f) { if (document.readyState !== 'loading') f(); else document.addEventListener('DOMContentLoaded', f); }
+    ready: function (f) { if (document.readyState !== 'loading') f(); else document.addEventListener('DOMContentLoaded', f); },
+
+    /* مدير النوافذ الطافية: أي عنصر يحمل الفئة cv-panel يُنقل تلقائياً إلى <body>،
+       وعند فتحه (بإزالة الفئة hidden) تظهر خلفية معتمة ويُقفل تمرير الصفحة، وتبقى النافذة وحدها في المقدمة.
+       لإضافة نافذة جديدة: <div id="x" class="cv-panel hidden">...</div> ثم Cryovion.panels.register(el) إن أُضيفت لاحقاً */
+    panels: {
+      els: [], bd: null,
+      isOpen: function () { return C.panels.els.some(function (p) { return !p.classList.contains('hidden'); }); },
+      sync: function () {
+        var o = C.panels.isOpen();
+        if (C.panels.bd) C.panels.bd.classList.toggle('hidden', !o);
+        document.body.classList.toggle('panel-open', o);
+      },
+      closeAll: function () {
+        C.panels.els.forEach(function (p) { p.classList.add('hidden'); });
+        C.panels.sync(); C.emit('panelsClosed');
+      },
+      register: function (el) {
+        if (!el || el.__cvp) return;
+        el.__cvp = 1; C.panels.els.push(el); document.body.appendChild(el);
+        new MutationObserver(C.panels.sync).observe(el, { attributes: true, attributeFilter: ['class'] });
+      },
+      init: function () {
+        C.panels.bd = document.getElementById('panelBackdrop');
+        document.querySelectorAll('.cv-panel').forEach(C.panels.register);
+        if (C.panels.bd) C.panels.bd.addEventListener('click', C.panels.closeAll);
+        C.panels.sync();
+      }
+    }
   };
+  C.ready(function () { C.panels.init(); });
 })(window);
 </script>
 
@@ -68,7 +98,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700&family=Reem+Kufi:wght@700&display=swap" rel="stylesheet">
 <style id="core-style">
-/* ================= 1) المتغيرات والألوان ================= */
+/* ================= 1) المتغيرات والألوان وسلّم الطبقات ================= */
 :root {
   --bg:#040911; --surface:#09131f; --surface-glass:rgba(9,19,31,.97); --card:#0f1c2e; --card-hover:#15263d;
   --border:rgba(217,180,90,.26); --border-soft:rgba(255,255,255,.08); --text:#f8fafc; --muted:#94a3b8;
@@ -85,6 +115,10 @@
   --card-radius:22px; --card-pad:16px;
   --hero-bg:radial-gradient(65% 85% at 50% 18%,rgba(20,184,166,.42) 0%,rgba(13,148,136,.22) 42%,rgba(6,24,34,.94) 85%,#06101b 100%);
   --nav-bg:rgba(4,24,30,.97);
+  /* سلّم الطبقات: كل ما فوق --z-backdrop يغطي الموقع بالكامل */
+  --z-hero:60; --z-dock:85; --z-nav:250;
+  --z-drawer-bd:1200; --z-drawer:1250; --z-modal:1400;
+  --z-backdrop:1490; --z-panel:1500; --z-toast:2000;
 }
 html.light {
   --bg:#e2eeec; --surface:#f4f9f8; --surface-glass:rgba(244,249,248,.97); --card:#fff; --card-hover:#f1f5f9;
@@ -100,6 +134,7 @@ html, body {
   line-height:1.55; overflow-x:hidden;
   text-rendering:optimizeSpeed; -webkit-font-smoothing:antialiased;
 }
+body.panel-open { overflow:hidden; }
 html[dir="ltr"] body { font-family:var(--font-body-ltr); }
 .font-display { font-family:var(--font-display); }
 .hidden { display:none !important; }
@@ -127,7 +162,7 @@ html.light .brand-text { background:linear-gradient(135deg,#0B2E3A 0%,#8A6718 10
 .top-ctrl-btn:hover { border-color:var(--gold); }
 
 /* ================= 4) شريط الأيقونات الأيمن (Dock) ================= */
-.right-icon-dock { position:fixed; top:50%; right:12px; transform:translateY(-50%); z-index:85; display:flex; flex-direction:column; gap:8px; background:var(--surface-glass); padding:8px; border-radius:20px; border:1px solid var(--border); box-shadow:0 8px 20px rgba(0,0,0,.5); }
+.right-icon-dock { position:fixed; top:50%; right:12px; transform:translateY(-50%); z-index:var(--z-dock); display:flex; flex-direction:column; gap:8px; background:var(--surface-glass); padding:8px; border-radius:20px; border:1px solid var(--border); box-shadow:0 8px 20px rgba(0,0,0,.5); }
 html[dir="ltr"] .right-icon-dock { right:auto; left:12px; }
 .dock-item { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:var(--muted); position:relative; background:rgba(255,255,255,.03); border:1px solid transparent; }
 .dock-item:hover { color:var(--gold); background:rgba(217,180,90,.12); border-color:var(--border); }
@@ -140,14 +175,14 @@ html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:tr
   .dock-tooltip { display:none; }
 }
 
-/* ================= 5) النافذة الرئيسية وشريط التنقل العلوي + القوائم المنسدلة (المناطق والتخصصات) ================= */
+/* ================= 5) النافذة الرئيسية وشريط التنقل العلوي ================= */
 .main-window { max-width:1200px; margin:0 auto 18px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 14px 34px -12px rgba(0,0,0,.7); min-height:86vh; position:relative; overflow:visible; }
-.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--border-soft); background:var(--nav-bg); border-radius:26px 26px 0 0; position:sticky; top:0; z-index:250; gap:8px; }
+.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--border-soft); background:var(--nav-bg); border-radius:26px 26px 0 0; position:sticky; top:0; z-index:var(--z-nav); gap:8px; }
 .menu-trigger { display:inline-flex; align-items:center; gap:8px; padding:8px 13px; border-radius:12px; background:rgba(15,28,46,.95); border:1px solid var(--border); color:var(--gold); font-weight:700; font-size:13px; flex-shrink:0; }
 html.light .menu-trigger { background:var(--card); }
 .menu-trigger:hover { border-color:var(--gold-light); }
 
-/* زر وقائمة اختيار المناطق والقرى (الجيزة) فوق الجميع */
+/* زر اختيار المنطقة (الجيزة) — النافذة نفسها صارت في آخر الصفحة (انظر قسم النوافذ الطافية) */
 .area-picker-wrap { position:relative; display:inline-block; }
 .area-trigger-btn {
   display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:99px;
@@ -158,45 +193,10 @@ html.light .menu-trigger { background:var(--card); }
   background:var(--gold-grad); color:var(--on-gold); border-color:var(--gold);
   box-shadow:0 0 14px rgba(217,180,90,.35);
 }
-.area-dropdown-panel {
-  position:fixed; top:112px; left:50%; transform:translateX(-50%);
-  width:min(420px, 94vw); max-height:74vh;
-  background:var(--surface); border:1.5px solid var(--gold); border-radius:22px;
-  box-shadow:0 24px 60px rgba(0,0,0,.92); z-index:1100;
-  display:flex; flex-direction:column; overflow:hidden; text-align:start;
-}
-.area-panel-head {
-  padding:12px 15px; background:linear-gradient(135deg,#0f293a 0%,#09131f 100%);
-  border-bottom:1px solid var(--border-soft); display:grid; gap:8px;
-}
-.area-list-scroll {
-  padding:10px 12px; overflow-y:auto; flex:1; display:grid; gap:10px;
-}
-.area-group-title {
-  font-size:11.5px; font-weight:700; color:var(--gold); padding:4px 6px;
-  border-right:3px solid var(--gold); background:rgba(217,180,90,.08); border-radius:4px; margin-bottom:5px;
-}
-.area-chips-grid {
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(118px, 1fr)); gap:6px;
-}
-.area-check-item {
-  display:flex; align-items:center; gap:6px; padding:7px 9px; border-radius:11px;
-  background:rgba(255,255,255,.03); border:1px solid var(--border-soft);
-  font-size:12px; font-weight:600; cursor:pointer; user-select:none; transition:all .12s ease;
-}
-.area-check-item:hover { border-color:var(--gold); }
-.area-check-item.checked {
-  background:rgba(16,185,129,.18); border-color:var(--emerald); color:#fff; font-weight:700;
-}
-.area-check-item input { width:15px; height:15px; accent-color:var(--emerald); flex-shrink:0; pointer-events:none; }
-.area-panel-foot {
-  padding:10px 14px; border-top:1px solid var(--border-soft); background:var(--card);
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
-}
 
 /* ================= 6) الواجهة الزمردية وشريط البحث ================= */
 .jevi-hero-stage {
-  position:relative; z-index:60; padding:24px 16px 22px; text-align:center;
+  position:relative; z-index:var(--z-hero); padding:24px 16px 22px; text-align:center;
   border-bottom:1px solid rgba(45,212,191,.25); overflow:visible;
   background:var(--hero-bg),
     repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 48px),
@@ -211,7 +211,7 @@ html.light .menu-trigger { background:var(--card); }
 .slogan-white { color:#fff; }
 .slogan-gold { background:linear-gradient(135deg,#FFF6C2 0%,#D9B45A 55%,#B8860B 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .personal-greet-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:99px; font-size:12.5px; font-weight:700; color:var(--gold-light); background:rgba(9,19,31,.72); border:1px solid var(--border); margin-bottom:12px; max-width:95%; }
-.ai-search-container { max-width:760px; width:100%; margin:0 auto; position:relative; z-index:900; }
+.ai-search-container { max-width:760px; width:100%; margin:0 auto; position:relative; z-index:20; }
 .ai-search-box {
   display:flex; align-items:center; gap:8px; width:100%;
   background:rgba(8,22,34,.95); border:1.5px solid rgba(94,234,212,.38);
@@ -226,36 +226,28 @@ html.light .menu-trigger { background:var(--card); }
   font-size:15px; box-shadow:0 3px 10px rgba(217,180,90,.3);
 }
 .mic-inline-btn:active { transform:scale(.94); }
-.ai-search-input {
-  flex:1 1 auto; min-width:0; width:100%;
-  padding:8px 4px; font-size:14.5px; color:#fff; outline:none;
-}
+.ai-search-input { flex:1 1 auto; min-width:0; width:100%; padding:8px 4px; font-size:14.5px; color:#fff; outline:none; }
 .ai-search-input::placeholder { color:#94a3b8; font-size:13px; }
-.search-clear-btn {
-  width:28px; height:28px; border-radius:50%; flex-shrink:0;
-  background:rgba(255,255,255,.08); color:var(--muted); font-size:12px; font-weight:700;
-  display:inline-flex; align-items:center; justify-content:center;
-}
+.search-clear-btn { width:28px; height:28px; border-radius:50%; flex-shrink:0; background:rgba(255,255,255,.08); color:var(--muted); font-size:12px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
 .search-clear-btn:hover { background:rgba(244,63,94,.22); color:var(--rose); }
 .autocomplete-dropdown {
   position:absolute; top:calc(100% + 8px); right:0; left:0;
   background:var(--card); border:1.5px solid var(--gold); border-radius:18px;
   box-shadow:0 22px 50px rgba(0,0,0,.92); max-height:330px; overflow-y:auto;
-  text-align:start; z-index:999; padding:8px;
+  text-align:start; z-index:30; padding:8px;
 }
 .auto-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; border-bottom:1px solid var(--border-soft); gap:8px; }
 .auto-item:last-child { border-bottom:none; }
 .auto-item:hover { background:var(--card-hover); }
 
-/* ================= 7) الأقسام + زر ونافذة سلم التخصصات المتعددة المريحة للهاتف ================= */
+/* ================= 7) الأقسام + زر سلم التخصصات ================= */
 .cats-modern-bar { max-width:720px; margin:18px auto 0; display:flex; justify-content:center; align-items:center; gap:14px; position:relative; z-index:2; }
 .cat-orb-pill { display:inline-flex; align-items:center; gap:12px; padding:10px 20px 10px 14px; border-radius:99px; background:rgba(7,20,32,.9); border:1px solid rgba(94,234,212,.28); box-shadow:0 5px 12px -6px rgba(0,0,0,.6); flex:1; max-width:220px; justify-content:center; color:#fff; }
 .cat-orb-pill:hover { border-color:var(--gold); }
 .cat-orb-pill.active { background:linear-gradient(135deg,rgba(217,180,90,.32),rgba(10,30,44,.95)); border:1.5px solid var(--gold); box-shadow:0 0 18px rgba(217,180,90,.25); }
 .orb-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; box-shadow:0 3px 8px rgba(0,0,0,.35); }
 
-/* زر سلم التخصصات الموحد + النافذة المنسدلة التي تعرض نفس أشكال التخصصات لاختيار واحد أو عدة تخصصات */
-.spec-ladder-wrap { max-width:540px; margin:14px auto 0; position:relative; z-index:850; }
+.spec-ladder-wrap { max-width:540px; margin:14px auto 0; position:relative; z-index:2; }
 .spec-ladder-trigger {
   width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
   padding:11px 18px; border-radius:16px;
@@ -268,17 +260,7 @@ html.light .menu-trigger { background:var(--card); }
   background:linear-gradient(135deg,rgba(217,180,90,.26),rgba(16,185,129,.18));
   border-color:var(--gold); box-shadow:0 0 18px rgba(217,180,90,.3);
 }
-.spec-dropdown-panel {
-  position:fixed; top:118px; left:50%; transform:translateX(-50%);
-  width:min(520px, 94vw); max-height:74vh;
-  background:var(--surface); border:1.5px solid var(--gold); border-radius:24px;
-  box-shadow:0 26px 65px rgba(0,0,0,.94); z-index:1150;
-  display:flex; flex-direction:column; overflow:hidden; text-align:start;
-}
-.spec-ladder-grid {
-  padding:12px 14px; overflow-y:auto; flex:1;
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(195px, 1fr)); gap:8px;
-}
+.spec-ladder-grid { padding:12px 14px; overflow-y:auto; overscroll-behavior:contain; flex:1; min-height:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(195px, 1fr)); gap:8px; }
 .spec-chip {
   display:flex; align-items:center; justify-content:space-between; gap:8px;
   padding:9px 12px; border-radius:14px; font-size:12.5px; font-weight:700;
@@ -286,18 +268,9 @@ html.light .menu-trigger { background:var(--card); }
   color:#e2e8f0; cursor:pointer; user-select:none; transition:all .14s ease;
 }
 .spec-chip:hover { border-color:var(--gold); color:#fff; }
-.spec-chip.active {
-  background:var(--spec-bg, rgba(217,180,90,.22));
-  color:#fff; border-color:var(--spec-clr, var(--gold));
-  box-shadow:0 0 12px rgba(217,180,90,.22);
-}
-.spec-chip-check {
-  width:18px; height:18px; border-radius:6px; border:1.5px solid rgba(255,255,255,.3);
-  display:inline-flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0;
-}
-.spec-chip.active .spec-chip-check {
-  background:var(--gold); color:#050811; border-color:var(--gold); font-weight:900;
-}
+.spec-chip.active { background:var(--spec-bg, rgba(217,180,90,.22)); color:#fff; border-color:var(--spec-clr, var(--gold)); box-shadow:0 0 12px rgba(217,180,90,.22); }
+.spec-chip-check { width:18px; height:18px; border-radius:6px; border:1.5px solid rgba(255,255,255,.3); display:inline-flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
+.spec-chip.active .spec-chip-check { background:var(--gold); color:#050811; border-color:var(--gold); font-weight:900; }
 @media (max-width:640px) {
   .main-window { border-radius:24px 24px 0 0; margin-bottom:12px; border-left:none; border-right:none; }
   .cats-modern-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:100%; }
@@ -306,9 +279,30 @@ html.light .menu-trigger { background:var(--card); }
   .spec-ladder-grid { grid-template-columns:1fr; }
 }
 
+/* ================= 7.5) النوافذ الطافية (المناطق والتخصصات): في المقدمة دائماً مع خلفية معتمة ================= */
+.panel-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.68); z-index:var(--z-backdrop); }
+.cv-panel {
+  position:fixed; top:max(60px, 7vh); left:50%; transform:translateX(-50%);
+  width:min(520px, 94vw);
+  max-height:84vh; max-height:min(84dvh, 720px);
+  background:var(--surface); border:1.5px solid var(--gold); border-radius:24px;
+  box-shadow:0 26px 65px rgba(0,0,0,.94); z-index:var(--z-panel);
+  display:flex; flex-direction:column; overflow:hidden; text-align:start;
+}
+.area-dropdown-panel { width:min(420px, 94vw); }
+.area-panel-head { flex-shrink:0; padding:12px 15px; background:linear-gradient(135deg,#0f293a 0%,#09131f 100%); border-bottom:1px solid var(--border-soft); display:grid; gap:8px; }
+.area-list-scroll { padding:10px 12px; overflow-y:auto; overscroll-behavior:contain; flex:1; min-height:0; display:grid; gap:10px; align-content:start; }
+.area-group-title { font-size:11.5px; font-weight:700; color:var(--gold); padding:4px 6px; border-right:3px solid var(--gold); background:rgba(217,180,90,.08); border-radius:4px; margin-bottom:5px; }
+.area-chips-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(118px, 1fr)); gap:6px; }
+.area-check-item { display:flex; align-items:center; gap:6px; padding:7px 9px; border-radius:11px; background:rgba(255,255,255,.03); border:1px solid var(--border-soft); font-size:12px; font-weight:600; cursor:pointer; user-select:none; transition:all .12s ease; }
+.area-check-item:hover { border-color:var(--gold); }
+.area-check-item.checked { background:rgba(16,185,129,.18); border-color:var(--emerald); color:#fff; font-weight:700; }
+.area-check-item input { width:15px; height:15px; accent-color:var(--emerald); flex-shrink:0; pointer-events:none; }
+.area-panel-foot { flex-shrink:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top:1px solid var(--border-soft); background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+
 /* ================= 8) شريط الحالات (24 ساعة) ================= */
 .poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; position:relative; z-index:10; }
-.poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; will-change:scroll-position; }
+.poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
 .poster-track::-webkit-scrollbar { display:none; }
 .poster-card {
   flex:0 0 340px; max-width:86vw; border-radius:20px; padding:12px 15px;
@@ -388,16 +382,10 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
       "foot foot";
     gap:10px 12px; min-height:unset; align-items:center;
   }
-  .id-card-right-photo {
-    width:86px; height:86px; min-height:86px; max-height:86px;
-    border-radius:16px; align-self:start;
-  }
+  .id-card-right-photo { width:86px; height:86px; min-height:86px; max-height:86px; border-radius:16px; align-self:start; }
   .id-card-right-photo .fallback-ico { font-size:28px !important; margin-bottom:2px !important; }
   .id-card-right-photo .fallback-lbl { font-size:9px !important; }
-  .id-card-details {
-    background:rgba(255,255,255,.025); padding:9px 11px; border-radius:13px;
-    border:1px solid var(--border-soft); margin-top:2px; font-size:12.5px; gap:4px;
-  }
+  .id-card-details { background:rgba(255,255,255,.025); padding:9px 11px; border-radius:13px; border:1px solid var(--border-soft); margin-top:2px; font-size:12.5px; gap:4px; }
   html.light .id-card-details { background:rgba(11,46,58,.03); }
 }
 
@@ -422,8 +410,8 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
 .rv-mine { font-size:10.5px; padding:2px 8px; border-radius:99px; background:rgba(16,185,129,.18); color:var(--emerald); font-weight:700; }
 
 /* ================= 12) القائمة الجانبية والنوافذ العلوية ================= */
-.drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:1200; }
-.side-drawer { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:86vw; background:var(--surface); border-left:1px solid var(--border); z-index:1250; padding:20px; display:flex; flex-direction:column; justify-content:space-between; overflow-y:auto; transform:translateX(100%); transition:transform .2s cubic-bezier(.16,1,.3,1); will-change:transform; }
+.drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:var(--z-drawer-bd); }
+.side-drawer { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:86vw; background:var(--surface); border-left:1px solid var(--border); z-index:var(--z-drawer); padding:20px; display:flex; flex-direction:column; justify-content:space-between; overflow-y:auto; transform:translateX(100%); transition:transform .2s cubic-bezier(.16,1,.3,1); will-change:transform; }
 html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-right:1px solid var(--border); transform:translateX(-100%); }
 .side-drawer.open { transform:translateX(0) !important; }
 .nav-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-radius:14px; font-weight:600; font-size:14px; color:var(--text); margin-bottom:6px; text-align:start; }
@@ -432,12 +420,12 @@ html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-righ
 .nav-btn:hover { background:rgba(255,255,255,.06); }
 .nav-btn.active { background:rgba(217,180,90,.15); color:var(--gold); border:1px solid var(--border); }
 .nav-btn.active .nav-icon-box { background:var(--gold); color:#050811; border-color:var(--gold); }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:1400; display:flex; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:16px; }
 .modal-box { width:100%; max-width:620px; max-height:92vh; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:22px; }
 .input-box { width:100%; background:rgba(255,255,255,.04); border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; font-size:14px; color:var(--text); outline:none; }
 html.light .input-box { background:rgba(0,0,0,.03); }
 .input-box:focus { border-color:var(--gold); }
-.toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:2000; padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.6); }
+.toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:var(--z-toast); padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.6); }
 .ed-two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .ed-two.ed-addr { grid-template-columns:1.6fr 1fr; }
 .ed-two:has(> .hidden) { grid-template-columns:1fr; }
@@ -449,10 +437,11 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 @media (max-width:1024px) { .site-footer { padding-bottom:96px; } }
 </style>
 
-<!-- ملف التصميم الإضافي -->
+<!-- ملف التصميم الإضافي: يأتي آخر شيء في head فيتغلب على الأنماط الأساسية بدون تعديلها -->
 <style id="ext-style"></style>
 </head>
 <body>
+<noscript><p style="padding:20px; text-align:center; color:#fff;">يحتاج موقع Cryovion إلى تفعيل جافاسكربت ليعمل.</p></noscript>
 
 <!-- ================= الشريط العلوي ================= -->
 <div class="top-ambient-bar">
@@ -554,33 +543,13 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap; justify-content:flex-end;">
       <button id="topAdminShortcut" onclick="navigateApp('admin')" class="hidden badge-pill gold-bg" style="padding:5px 11px;">🛡️ الأدمن</button>
 
-      <!-- زر وقائمة اختيار مناطق وقرى الجيزة -->
+      <!-- زر اختيار مناطق وقرى الجيزة (النافذة في آخر الصفحة) -->
       <div class="area-picker-wrap" id="areaPickerWrap">
         <button type="button" id="areaPickerBtn" class="area-trigger-btn" title="تحديد القرية أو المنطقة في الجيزة">
           <span>📍</span>
           <span id="areaPickerLabel">كل الجيزة</span>
           <span style="font-size:9px; opacity:.8;">▼</span>
         </button>
-
-        <div id="areaDropdownPanel" class="area-dropdown-panel hidden" onclick="event.stopPropagation()">
-          <div class="area-panel-head">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-              <div>
-                <b class="font-display" style="font-size:14.5px; color:var(--gold);">📍 اختر منطقتك أو قريتك (محافظة الجيزة)</b>
-                <p style="font-size:11px; color:var(--muted);">يمكنك اختيار قرية واحدة أو عدة قرى معاً أو كل الجيزة</p>
-              </div>
-              <button type="button" id="closeAreaPanelBtn" style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.08); font-size:13px;">✕</button>
-            </div>
-            <input id="areaQuickSearch" type="search" autocomplete="off" placeholder="🔍 ابحث عن قريتك (مثال: الكوم الأحمر، أوسيم، الوراق...)" class="input-box" style="padding:7px 12px; font-size:12.5px;">
-          </div>
-
-          <div id="areaGroupsContainer" class="area-list-scroll"></div>
-
-          <div class="area-panel-foot">
-            <button type="button" id="selectAllGizaBtn" style="padding:7px 12px; border-radius:10px; background:rgba(255,255,255,.07); font-size:12px; font-weight:700; color:var(--gold);">✨ عرض كل الجيزة</button>
-            <button type="button" id="applyAreaFilterBtn" class="gold-bg" style="padding:7px 18px; border-radius:10px; font-size:12.5px;">تطبيق وإغلاق ✔</button>
-          </div>
-        </div>
       </div>
 
       <button onclick="navigateApp('referrals')" class="badge-pill" style="background:rgba(217,180,90,.14); color:var(--gold); border:1px solid var(--border); padding:5px 11px;" data-i18n="nav_referrals_short">✨ دعوة صديق</button>
@@ -604,7 +573,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
             <span class="slogan-gold" data-i18n="slogan_2">مما تظن</span>
           </h1>
         </div>
-        <!-- شريط البحث المحكم + القائمة المنسدلة التي تطفو فوق شريط الريلز -->
         <div class="ai-search-container">
           <div class="ai-search-box">
             <div class="search-right-cluster">
@@ -620,7 +588,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         <!-- الأقسام الثلاثة الرئيسية -->
         <div id="cats" class="cats-modern-bar"></div>
 
-        <!-- زر ونافذة سلم التخصصات المتعددة المريحة للهاتف والكمبيوتر -->
+        <!-- زر سلم التخصصات (النافذة في آخر الصفحة) -->
         <div class="spec-ladder-wrap" id="specLadderWrap">
           <button type="button" id="specLadderBtn" class="spec-ladder-trigger">
             <span style="display:inline-flex; align-items:center; gap:8px;">
@@ -629,25 +597,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
             </span>
             <span style="font-size:11px; color:var(--gold); font-weight:700;">اختر تخصص أو أكثر ▾</span>
           </button>
-
-          <div id="specDropdownPanel" class="spec-dropdown-panel hidden" onclick="event.stopPropagation()">
-            <div class="area-panel-head">
-              <div style="display:flex; align-items:center; justify-content:space-between;">
-                <div>
-                  <b class="font-display" style="font-size:15px; color:var(--gold);">🩺 اختر التخصص أو التخصصات المطلوبة</b>
-                  <p style="font-size:11px; color:var(--muted);">يمكنك اختيار تخصص واحد أو عدة تخصصات معاً أو عرض الكل</p>
-                </div>
-                <button type="button" id="closeSpecPanelBtn" style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.08); font-size:13px;">✕</button>
-              </div>
-            </div>
-
-            <div id="specsBar" class="spec-ladder-grid"></div>
-
-            <div class="area-panel-foot">
-              <button type="button" id="selectAllSpecsBtn" style="padding:7px 12px; border-radius:10px; background:rgba(255,255,255,.07); font-size:12px; font-weight:700; color:var(--gold);">✨ عرض كل التخصصات</button>
-              <button type="button" id="applySpecFilterBtn" class="gold-bg" style="padding:7px 18px; border-radius:10px; font-size:12.5px;">تطبيق وإغلاق ✔</button>
-            </div>
-          </div>
         </div>
 
         <div id="ext-hero-slot"></div>
@@ -687,7 +636,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <!-- ===== صفحة المكان ===== -->
   <div id="view-placePage" class="spa-view hidden"><div id="placePageContent" class="noon-page"></div></div>
 
-  <!-- ===== إدارة صفحتي (مع معاينة حية ومباشرة لشكل البطاقة كما تظهر للناس) ===== -->
+  <!-- ===== إدارة صفحتي (مع معاينة حية لشكل البطاقة) ===== -->
   <div id="view-myManaged" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
@@ -773,7 +722,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
   </div>
 
-  <!-- ===== الإعدادات (نظيفة بدون زر البوت المحذوف) ===== -->
+  <!-- ===== الإعدادات ===== -->
   <div id="view-settings" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="settings_header">⚙️ الإعدادات واللغة والمظهر</h2>
@@ -853,7 +802,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 
       <div id="ext-admin-slot"></div>
 
-      <!-- قسم مراقبة وبحث جميع التعليقات في الموقع -->
       <div class="entity-card" style="border-color:rgba(244,63,94,.35); display:grid; gap:10px; cursor:default;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
@@ -892,7 +840,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <div id="ext-footer-slot"></div>
 </footer>
 
-<!-- ================= نافذة الترحيب لاختيار الجنس والعمر عند التسجيل لأول مرة ================= -->
+<!-- ================= نافذة الترحيب لاختيار الجنس والعمر ================= -->
 <div id="onboardingModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <form id="onboardingForm" class="modal-box" onclick="event.stopPropagation()" style="max-width:440px; display:grid; gap:14px; text-align:center;">
     <div style="font-size:40px;">👋</div>
@@ -1083,13 +1031,55 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 </div>
 
 <div id="toast" class="toast-box gold-bg hidden"></div>
+
+<!-- ================= النوافذ الطافية (في المقدمة دائماً): خلفية معتمة + نافذة المناطق + نافذة التخصصات ================= -->
+<div id="panelBackdrop" class="panel-backdrop hidden"></div>
+
+<div id="areaDropdownPanel" class="cv-panel area-dropdown-panel hidden" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+  <div class="area-panel-head">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <b class="font-display" style="font-size:14.5px; color:var(--gold);">📍 اختر منطقتك أو قريتك (محافظة الجيزة)</b>
+        <p style="font-size:11px; color:var(--muted);">يمكنك اختيار قرية واحدة أو عدة قرى معاً أو كل الجيزة</p>
+      </div>
+      <button type="button" id="closeAreaPanelBtn" style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.08); font-size:13px;">✕</button>
+    </div>
+    <input id="areaQuickSearch" type="search" autocomplete="off" placeholder="🔍 ابحث عن قريتك (مثال: الكوم الأحمر، أوسيم، الوراق...)" class="input-box" style="padding:7px 12px; font-size:12.5px;">
+  </div>
+  <div id="areaGroupsContainer" class="area-list-scroll"></div>
+  <div class="area-panel-foot">
+    <button type="button" id="selectAllGizaBtn" style="padding:7px 12px; border-radius:10px; background:rgba(255,255,255,.07); font-size:12px; font-weight:700; color:var(--gold);">✨ عرض كل الجيزة</button>
+    <button type="button" id="applyAreaFilterBtn" class="gold-bg" style="padding:7px 18px; border-radius:10px; font-size:12.5px;">تطبيق وإغلاق ✔</button>
+  </div>
+</div>
+
+<div id="specDropdownPanel" class="cv-panel spec-dropdown-panel hidden" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+  <div class="area-panel-head">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <b class="font-display" style="font-size:15px; color:var(--gold);">🩺 اختر التخصص أو التخصصات المطلوبة</b>
+        <p style="font-size:11px; color:var(--muted);">يمكنك اختيار تخصص واحد أو عدة تخصصات معاً أو عرض الكل</p>
+      </div>
+      <button type="button" id="closeSpecPanelBtn" style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.08); font-size:13px;">✕</button>
+    </div>
+  </div>
+  <div id="specsBar" class="spec-ladder-grid"></div>
+  <div class="area-panel-foot">
+    <button type="button" id="selectAllSpecsBtn" style="padding:7px 12px; border-radius:10px; background:rgba(255,255,255,.07); font-size:12px; font-weight:700; color:var(--gold);">✨ عرض كل التخصصات</button>
+    <button type="button" id="applySpecFilterBtn" class="gold-bg" style="padding:7px 18px; border-radius:10px; font-size:12.5px;">تطبيق وإغلاق ✔</button>
+  </div>
+</div>
+
+<!-- مساحة لواجهات الإضافات المستقبلية -->
 <div id="ext-root"></div>
+
 <!-- ======================= نهاية الجزء الأول ======================= -->
+<!-- الجزء الثاني يبدأ من هنا بوسم <script> ويحتوي كل الأكواد البرمجية -->
   <script>
 'use strict';
 /* =====================================================================
-   Cryovion v1.7.0 — الجزء الثاني (القسم الأول: 2A)
-   الإعدادات، الهوية البصرية (DNA + PWA)، صيدليات الكوم الأحمر الجديدة، التخصصات المتعددة، وقاعدة البيانات
+   Cryovion v1.8.0 — الجزء الثاني (الأكواد البرمجية كاملة)
+   النوافذ الطافية (المناطق/التخصصات) تُدار عبر Cryovion.panels من الجزء الأول
    ===================================================================== */
 
 /* ============ 1) الإعدادات الأساسية ============ */
@@ -1103,7 +1093,7 @@ const PAGE_SIZE = 24;
 const CACHE_KEY = 'cryovion_places_' + Cryovion.config.cacheVersion;
 const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-/* ============ 1.5) الهوية البصرية: شريط الـ DNA المائل المضيء + تطبيق الشاشة الرئيسية (PWA) ============ */
+/* ============ 1.5) الهوية البصرية: شريط الـ DNA في القائمة الجانبية + تطبيق الشاشة الرئيسية (PWA) ============ */
 (function initBrandVisualsAndPWA() {
   const dnaSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 800" fill="none">
     <defs>
@@ -1196,8 +1186,7 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
       try {
         const cv = document.createElement('canvas'); cv.width = 192; cv.height = 192;
         cv.getContext('2d').drawImage(img, 0, 0, 192, 192);
-        const pngUrl = cv.toDataURL('image/png');
-        const ap = document.getElementById('appleTouchIcon'); if (ap) ap.href = pngUrl;
+        const ap = document.getElementById('appleTouchIcon'); if (ap) ap.href = cv.toDataURL('image/png');
       } catch {}
     };
     img.src = iconSvg;
@@ -1210,7 +1199,7 @@ window.addEventListener('beforeinstallprompt', e => {
   const btn = document.getElementById('installAppBtn'); if (btn) btn.classList.remove('hidden');
 });
 
-/* ============ 1.8) قاعدة بيانات قرى ومراكز وأحياء محافظة الجيزة + الربط الذكي بالعناوين ============ */
+/* ============ 1.8) قرى ومراكز وأحياء محافظة الجيزة + الربط الذكي بالعناوين ============ */
 const GIZA_AREAS_GROUPS = [
   {
     group: '🌿 مركز أوسيم وقراه',
@@ -1273,7 +1262,7 @@ GIZA_AREAS_GROUPS.forEach(g => g.items.forEach(it => {
   GIZA_AREAS_FLAT.push(it);
 }));
 
-/* ============ 2) القواميس والتخصصات الطبية + صيدليات الكوم الأحمر الجديدة من خرائط جوجل ============ */
+/* ============ 2) القواميس والتخصصات الطبية + صيدليات الكوم الأحمر ============ */
 const I18N = {
   ar: {
     menu_btn: 'القائمة', nav_home: 'الدليل الطبي الذكي', nav_managed: 'إدارة صفحتي', nav_referrals: 'دعوة صديق ومكافأة النشر',
@@ -1336,6 +1325,8 @@ const CATS = {
   pharmacy: { label: 'صيدليات',       labelEn: 'Pharmacies',        color: '#34d399', accent: '#10b981', bg: 'rgba(16,185,129,0.15)' },
   lab:      { label: 'معامل ونظارات', labelEn: 'Labs & Optics',     color: '#c084fc', accent: '#a855f7', bg: 'rgba(168,85,247,0.15)' }
 };
+const specCatOf = k => k === 'pharmacy' ? 'pharmacy' : (k === 'lab' || k === 'optics') ? 'lab' : 'doctor';
+
 const ICON = {
   doctor: '<path fill="currentColor" fill-opacity=".3" stroke="none" d="M6 3v6a5 5 0 0 0 10 0V3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-1"/><circle cx="19" cy="12" r="2" fill="currentColor"/>',
   pharmacy: '<g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="currentColor" fill-opacity=".4" stroke="none"/><path d="M12 8v8"/></g>',
@@ -1347,7 +1338,6 @@ const RESERVED_BRAND_PATTERNS = ['cryovion','cryo vion','cryo','كرايوفيو
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
 const nowTs = Date.now();
-/* الصيدليات الجديدة المستخرجة من خرائط جوجل لمنطقة الكوم الأحمر */
 const KOM_AHMAR_GOOGLE_PHARMACIES = [
   { id: 'ph-kom-eltawel', cat: 'pharmacy', spec_key: 'pharmacy', name: 'صيدلية مصطفى الطويل - د. ياسر المصري', spec: 'صيدلية عامة وخدمات دوائية (24 ساعة)',
     bio: 'خدمة دوائية على مدار 24 ساعة وصرف الأدوية والمستلزمات الطبية.', bio_ts: null, hours: 'مفتوح 24 ساعة يومياً', lamp_mode: 'open',
@@ -1391,7 +1381,7 @@ const DEFAULT_DIRECTORY = [
   ...KOM_AHMAR_GOOGLE_PHARMACIES
 ];
 
-/* ============ 3) أدوات مساعدة فائقة السرعة + محلل المناطق الذكي ============ */
+/* ============ 3) أدوات مساعدة + محلل المناطق الذكي ============ */
 const $ = id => document.getElementById(id);
 const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
@@ -1452,7 +1442,7 @@ function badge(d, interactive) {
   return `<span class="vbadge${on ? ' on' : ''}${can ? ' clickable' : ''}" role="img" aria-label="${on ? 'صفحة موثقة رسمياً' : 'صفحة غير موثقة'}" title="${on ? 'موثق (أزرق)' : 'غير موثق (رمادي)'}${can ? ' — اضغط للتبديل' : ''}"${can ? ` data-badge-id="${esc(d.id)}"` : ''}>${CHECK_SVG}</span>`;
 }
 
-/* ============ 3.5) نظام هوية المعلق + الجنس والعمر + تقييم واحد لكل حساب ============ */
+/* ============ 3.5) هوية المعلق + الجنس والعمر + تقييم واحد لكل حساب ============ */
 function getUserAccountKey(u) {
   if (!u || !u.email) return '';
   let h = 0; const s = norm(u.email);
@@ -1503,9 +1493,7 @@ function addDeletedRevSig(sig) {
   const s = getDeletedRevsSet(); s.add(sig);
   localStorage.setItem('cryovion_deleted_revs', JSON.stringify(Array.from(s)));
 }
-function revSignature(placeId, rawAuthor, body) {
-  return `${placeId}::${rawAuthor}::${body}`;
-}
+function revSignature(placeId, rawAuthor, body) { return `${placeId}::${rawAuthor}::${body}`; }
 
 function getUserDemographics(email) {
   if (!email) return null;
@@ -1538,7 +1526,7 @@ function updateDispSettingsUI() {
   if (prev) prev.textContent = 'سيظهر اسمك في التعليقات هكذا: 👤 ' + (u ? getReviewerDisplayName(u) : initial);
 }
 
-/* ============ 4) الحالة العامة + المناطق المختارة + التخصصات المتعددة المختارة ============ */
+/* ============ 4) الحالة العامة ============ */
 let places = [], placeMap = new Map(), allReviewsFlat = [], refCache = [];
 let activeCat = null, query = '', adminQuery = '', adminRevQuery = '', areaSearchQuery = '';
 let selectedAreas = new Set((() => {
@@ -1588,7 +1576,7 @@ Cryovion.api = {
   specs: SPECS_META, cats: CATS
 };
 
-/* ============ 5) حالة الدوام (النقطة المضيئة) + ترتيب الأولوية الذكي ============ */
+/* ============ 5) حالة الدوام + ترتيب الأولوية الذكي ============ */
 function getAvailabilityStatus(d) {
   const en = currentLang === 'en';
   const st = (state, color, ar, e) => ({ state, color, label: en ? e : ar });
@@ -1651,6 +1639,12 @@ function toggleLanguage() {
   toast(currentLang === 'en' ? '🌐 Switched to English' : '🌐 تم التبديل إلى اللغة العربية');
 }
 
+/* إغلاق النوافذ الطافية (المناطق والتخصصات) — الخلفية المعتمة تُدار تلقائياً من Cryovion.panels */
+function closePanels() {
+  ['areaDropdownPanel', 'specDropdownPanel'].forEach(id => { const el = $(id); if (el) el.classList.add('hidden'); });
+  if (Cryovion.panels && Cryovion.panels.sync) Cryovion.panels.sync();
+}
+
 function switchViewDOM(viewName, restoreScroll = false) {
   adminUnlocked = isUserMasterAdmin(getCurrentUser());
   if (viewName === 'admin' && !adminUnlocked) viewName = 'home';
@@ -1661,10 +1655,9 @@ function switchViewDOM(viewName, restoreScroll = false) {
   const target = $('view-' + viewName); if (target) target.classList.remove('hidden');
   document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === viewName));
   closeSideDrawer();
-  if ($('areaDropdownPanel')) $('areaDropdownPanel').classList.add('hidden');
-  if ($('specDropdownPanel')) $('specDropdownPanel').classList.add('hidden');
+  closePanels();
   $('searchSuggest').classList.add('hidden');
-  if (viewName === 'home' && homeDirty) { homeDirty = false; render(); }
+  if (viewName === 'home' && homeDirty) { homeDirty = false; buildFilters(); render(); }
   if (viewName === 'myManaged') renderManagedAds();
   if (viewName === 'referrals') renderReferralsHub();
   if (viewName === 'admin') renderAdminList();
@@ -1692,6 +1685,7 @@ function goHomeLogo() {
 function openPlacePage(id) {
   if (!byId(id)) return;
   if (currentViewName === 'home') savedHomeScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  closePanels();
   renderPlacePageDOM(id);
   history.pushState({ view: 'placePage', placeId: id }, '', '');
   switchViewDOM('placePage', false);
@@ -1810,7 +1804,7 @@ async function initSupabaseSession() {
   }, 0));
 }
 
-/* ============ 9) طبقة قاعدة البيانات (Supabase) + دمج صيدليات الكوم الأحمر الجديدة تلقائياً ============ */
+/* ============ 9) طبقة قاعدة البيانات (Supabase) ============ */
 const PLACE_COLS = 'id,cat,spec_key,name,spec,bio,bio_ts,photo_url,gallery,addr,hours,lamp_mode,sched,phone,whatsapp,fee,map_url,is_verified,ref_count,status,created_at,updated_at';
 const PLACE_KEYS = PLACE_COLS.split(',');
 const uploadedCache = {};
@@ -1885,7 +1879,7 @@ async function deleteStoryRelease(id) {
     if (!adminUnlocked) return;
     if (!confirm('حذف حالة Cryovion الرسمية من الشريط؟')) return;
     localStorage.removeItem('cryovion_dev_status');
-    if (db) await db.from('site_status').delete().eq('id', 1).catch(() => {});
+    if (db) { try { await db.from('site_status').delete().eq('id', 1); } catch {} }
     renderPostersCarousel();
     toast('🗑 تم حذف حالة Cryovion من الشريط');
     return;
@@ -1902,11 +1896,15 @@ async function deleteStoryRelease(id) {
   toast('🗑 تم حذف الحالة اليومية من الشريط');
 }
 
+/* يعيد وعداً بنتيجة النشر (true عند النجاح) حتى لا يُسجَّل التقييم محلياً إلا بعد نجاحه فعلاً */
 function saveReview(rv) {
-  if (!db) return toast('الخدمة غير متاحة حالياً');
+  if (!db) { toast('الخدمة غير متاحة حالياً'); return Promise.resolve(false); }
+  let ok = false;
   writeQueue = writeQueue
     .then(() => db.from('reviews').insert({ place_id: rv.place_id, author: rv.author, stars: rv.stars, body: rv.body }))
-    .then(r => { if (r && r.error) toast('تعذر نشر التقييم'); else Cryovion.emit('reviewAdded', rv); }).catch(() => {});
+    .then(r => { if (r && r.error) toast('تعذر نشر التقييم'); else { ok = true; Cryovion.emit('reviewAdded', rv); } })
+    .catch(() => {});
+  return writeQueue.then(() => ok);
 }
 async function deleteReviewItem(placeId, rawAuthor, body) {
   const u = getCurrentUser();
@@ -1953,13 +1951,10 @@ function hydrateFromCache() {
   } catch {}
 }
 function buildPlaces(rows, revs) {
-  /* دمج صيدليات الكوم الأحمر الجديدة المستخرجة من خرائط جوجل إن لم تكن مسجلة بعد */
   const rowMap = new Map((rows || []).map(r => [r.id, r]));
   const existingNames = new Set((rows || []).map(r => norm(r.name)));
   KOM_AHMAR_GOOGLE_PHARMACIES.forEach(ph => {
-    if (!rowMap.has(ph.id) && !existingNames.has(norm(ph.name))) {
-      rowMap.set(ph.id, { ...ph });
-    }
+    if (!rowMap.has(ph.id) && !existingNames.has(norm(ph.name))) rowMap.set(ph.id, { ...ph });
   });
   const mergedRows = Array.from(rowMap.values());
 
@@ -2045,14 +2040,11 @@ async function load() {
     else if (!r[2].error) localStorage.removeItem('cryovion_dev_status');
     metaRows = r[3].data || []; reqRows = r[4].data || [];
 
-    /* مزامنة صيدليات الكوم الأحمر الجديدة تلقائياً إلى Supabase عند دخول الأدمن */
     if (!failed && admin && s) {
       const dbIds = new Set(rows.map(x => x.id));
       const dbNames = new Set(rows.map(x => norm(x.name)));
       const missingPh = KOM_AHMAR_GOOGLE_PHARMACIES.filter(p => !dbIds.has(p.id) && !dbNames.has(norm(p.name)));
-      if (missingPh.length) {
-        writeQueue = writeQueue.then(() => Promise.all(missingPh.map(x => dbWrite(x)))).catch(() => {});
-      }
+      if (missingPh.length) writeQueue = writeQueue.then(() => Promise.all(missingPh.map(x => dbWrite(x)))).catch(() => {});
     }
   }
   if (failed) rows = DEFAULT_DIRECTORY.map(x => ({ ...x }));
@@ -2104,10 +2096,6 @@ async function setVerified(id, val) {
   } finally { verifyBusy.delete(id); }
 }
 const toggleVerify = id => setVerified(id);
-    /* =====================================================================
-   Cryovion v1.7.0 — الجزء الثاني (القسم الأخير: 2B)
-   سلم التخصصات المتعددة، قرى الجيزة، المعاينة الحية في إدارة صفحتي، والبحث الفوري (بدون البوت)
-   ===================================================================== */
 
 /* ============ 10) نظام اختيار قرى ومناطق الجيزة المتعدد ============ */
 function populateEditorAreaSelect() {
@@ -2128,9 +2116,8 @@ function updateAreaPickerButtonUI() {
     btn.classList.remove('has-selection');
     if (pill) pill.classList.add('hidden');
   } else if (count === 1) {
-    const firstKey = Array.from(selectedAreas)[0];
-    const meta = GIZA_AREAS_MAP.get(firstKey);
-    const name = meta ? meta.label : firstKey;
+    const meta = GIZA_AREAS_MAP.get(Array.from(selectedAreas)[0]);
+    const name = meta ? meta.label : Array.from(selectedAreas)[0];
     lbl.textContent = name;
     btn.classList.add('has-selection');
     if (pill) { pill.textContent = `📍 المنطقة: ${name} (تغيير)`; pill.classList.remove('hidden'); }
@@ -2145,9 +2132,7 @@ function renderAreaDropdownItems() {
   const box = $('areaGroupsContainer'); if (!box) return;
   const q = norm(areaSearchQuery);
   const countPerArea = new Map();
-  places.forEach(p => {
-    if (p.area_key) countPerArea.set(p.area_key, (countPerArea.get(p.area_key) || 0) + 1);
-  });
+  places.forEach(p => { if (p.area_key) countPerArea.set(p.area_key, (countPerArea.get(p.area_key) || 0) + 1); });
 
   let html = '';
   GIZA_AREAS_GROUPS.forEach(g => {
@@ -2168,28 +2153,29 @@ function renderAreaDropdownItems() {
       </div>
     </div>`;
   });
-
   box.innerHTML = html || '<p style="text-align:center; padding:18px; font-size:12.5px; color:var(--muted);">لا توجد قرية أو منطقة مطابقة لبحثك.</p>';
 }
 
+/* فتح/إغلاق نافذة المناطق: النافذة في <body> وتظهر وحدها في المقدمة مع خلفية معتمة */
 function openAreaDropdown(forceState) {
   const panel = $('areaDropdownPanel'); if (!panel) return;
   const willOpen = typeof forceState === 'boolean' ? forceState : panel.classList.contains('hidden');
-  panel.classList.toggle('hidden', !willOpen);
   if (willOpen) {
     $('searchSuggest').classList.add('hidden');
-    if ($('specDropdownPanel')) $('specDropdownPanel').classList.add('hidden');
+    const other = $('specDropdownPanel'); if (other) other.classList.add('hidden');
     renderAreaDropdownItems();
   }
+  panel.classList.toggle('hidden', !willOpen);
+  if (Cryovion.panels && Cryovion.panels.sync) Cryovion.panels.sync();
 }
 
 function toggleAreaKey(key) {
   if (!key) return;
-  if (selectedAreas.has(key)) selectedAreas.delete(key);
-  else selectedAreas.add(key);
+  if (selectedAreas.has(key)) selectedAreas.delete(key); else selectedAreas.add(key);
   saveSelectedAreas();
   renderAreaDropdownItems();
   updateAreaPickerButtonUI();
+  buildFilters();
   shownLimit = PAGE_SIZE;
   render();
   renderPostersCarousel();
@@ -2200,12 +2186,13 @@ function clearAllAreaFilters() {
   saveSelectedAreas();
   renderAreaDropdownItems();
   updateAreaPickerButtonUI();
+  buildFilters();
   shownLimit = PAGE_SIZE;
   render();
   renderPostersCarousel();
 }
 
-/* ============ 10.2) نافذة سلم التخصصات المتعددة (اختيار تخصص واحد أو أكثر أو الكل بسهولة) ============ */
+/* ============ 10.2) نافذة سلم التخصصات المتعددة ============ */
 function updateSpecLadderButtonUI() {
   const btn = $('specLadderBtn'), lbl = $('specLadderLabel'), wrap = $('specLadderWrap');
   if (!btn || !lbl) return;
@@ -2230,36 +2217,29 @@ function updateSpecLadderButtonUI() {
 function openSpecDropdown(forceState) {
   const panel = $('specDropdownPanel'); if (!panel) return;
   const willOpen = typeof forceState === 'boolean' ? forceState : panel.classList.contains('hidden');
-  panel.classList.toggle('hidden', !willOpen);
   if (willOpen) {
     $('searchSuggest').classList.add('hidden');
-    if ($('areaDropdownPanel')) $('areaDropdownPanel').classList.add('hidden');
+    const other = $('areaDropdownPanel'); if (other) other.classList.add('hidden');
     buildFilters();
   }
+  panel.classList.toggle('hidden', !willOpen);
+  if (Cryovion.panels && Cryovion.panels.sync) Cryovion.panels.sync();
 }
 
 function toggleSpecKey(key) {
   if (!key || key === 'all') {
     selectedSpecs.clear();
   } else {
-    if (selectedSpecs.has(key)) selectedSpecs.delete(key);
-    else selectedSpecs.add(key);
-    if (selectedSpecs.size === 1) {
-      const only = Array.from(selectedSpecs)[0];
-      if (only === 'pharmacy') activeCat = 'pharmacy';
-      else if (only === 'lab' || only === 'optics') activeCat = 'lab';
-    } else if (selectedSpecs.size > 1) {
-      activeCat = null;
-    }
+    if (selectedSpecs.has(key)) selectedSpecs.delete(key); else selectedSpecs.add(key);
+    if (selectedSpecs.size === 1) activeCat = specCatOf(Array.from(selectedSpecs)[0]) === 'doctor' ? activeCat : specCatOf(Array.from(selectedSpecs)[0]);
+    else if (selectedSpecs.size > 1) activeCat = null;
   }
-  updateSpecLadderButtonUI();
   shownLimit = PAGE_SIZE;
-  render();
+  render();          /* render يلوّن الأزرار فقط دون إعادة بنائها، فلا يقفز التمرير داخل النافذة */
 }
 
 function clearAllSpecFilters() {
   selectedSpecs.clear();
-  updateSpecLadderButtonUI();
   shownLimit = PAGE_SIZE;
   render();
 }
@@ -2273,13 +2253,14 @@ function actions(d, mode) {
                   : 'padding:5px 11px; border-radius:9px; font-size:11.5px; font-weight:700;';
   const one = (ok, href, blank, css, label) => ok
     ? `<a href="${esc(href)}"${blank ? ' target="_blank" rel="noopener"' : ''} onclick="event.stopPropagation()" style="${base}${css}">${label}</a>`
-    : `<button type="button" data-off="1" class="act-off" style="${base}">${label}</a>`;
+    : `<button type="button" data-off="1" class="act-off" style="${base}">${label}</button>`;
   return one(!!d.phone, 'tel:' + d.phone, false, 'background:var(--emerald); color:#fff;', pg ? '📞 اتصال مباشر' : '📞 اتصل')
     + one(!!wa, 'https://wa.me/' + wa, true, 'background:var(--whatsapp); color:#fff;', pg ? '💬 مراسلة واتساب' : '💬 واتساب')
     + (pg ? one(!!mu, mu, true, 'background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);', '🗺️ الموقع على الخريطة') : '');
 }
 
-/* ============ 11) العرض: الأقسام والتخصصات (بنظام السلم المنسدل) والبطاقات ============ */
+/* ============ 11) العرض: الأقسام والتخصصات والبطاقات ============ */
+/* بناء كامل (عند تغيّر اللغة/البيانات/المناطق فقط) */
 function buildFilters() {
   const dict = I18N[currentLang] || I18N.ar;
   $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => {
@@ -2291,9 +2272,7 @@ function buildFilters() {
 
   const countPerSpec = new Map();
   places.forEach(p => {
-    if (doesPlaceMatchSelectedAreas(p) && p.spec_key) {
-      countPerSpec.set(p.spec_key, (countPerSpec.get(p.spec_key) || 0) + 1);
-    }
+    if (doesPlaceMatchSelectedAreas(p) && p.spec_key) countPerSpec.set(p.spec_key, (countPerSpec.get(p.spec_key) || 0) + 1);
   });
 
   $('specsBar').innerHTML = SPEC_BAR_ORDER.map(k => {
@@ -2317,16 +2296,30 @@ function buildFilters() {
   Cryovion.applyIcons($('cats')); Cryovion.applyIcons($('specsBar'));
 }
 
-let posterIO = null, posterRaf = null, posterPaused = false, posterLastTs = 0;
+/* تلوين سريع للأزرار فقط (بدون إعادة بناء) — يُستدعى مع كل render */
+function paintFilters() {
+  const cats = $('cats');
+  if (cats) cats.querySelectorAll('[data-cat]').forEach(b => b.classList.toggle('active', b.dataset.cat === activeCat));
+  const bar = $('specsBar');
+  if (bar) bar.querySelectorAll('[data-spec]').forEach(b => {
+    const k = b.dataset.spec;
+    const on = k === 'all' ? selectedSpecs.size === 0 : selectedSpecs.has(k);
+    b.classList.toggle('active', on);
+    const ck = b.querySelector('.spec-chip-check'); if (ck) ck.textContent = on ? '✔' : '';
+  });
+  updateSpecLadderButtonUI();
+}
+
+/* ----- شريط الحالات: حركة مستمرة في اتجاه واحد وبلا قفزات + إطار أخضر للظاهر ----- */
+let posterIO = null, posterRaf = null, posterPaused = false, posterLastTs = 0, posterAcc = null, posterHoldUntil = 0, posterSig = '';
+const holdPoster = ms => { posterHoldUntil = performance.now() + ms; };
 
 function setupPosterLiveObserver() {
   const track = $('posterTrack'); if (!track) return;
   if (posterIO) posterIO.disconnect();
   if (!('IntersectionObserver' in window)) return;
   posterIO = new IntersectionObserver(entries => {
-    entries.forEach(en => {
-      en.target.classList.toggle('live', en.isIntersecting && en.intersectionRatio >= 0.55);
-    });
+    entries.forEach(en => en.target.classList.toggle('live', en.isIntersecting && en.intersectionRatio >= 0.55));
   }, { root: track, threshold: [0.2, 0.55, 0.85] });
   track.querySelectorAll('.poster-card').forEach(c => posterIO.observe(c));
 }
@@ -2364,44 +2357,50 @@ function renderPostersCarousel() {
       <div class="poster-bio-body">${esc(d.bio)}</div>${foot}</div>`);
   });
 
-  const baseHtml = items.join('');
-  track.dataset.looped = items.length >= 2 ? '1' : '0';
-  track.innerHTML = items.length >= 2 ? (baseHtml + baseHtml) : baseHtml;
+  const base = items.join('');
+  const looped = items.length >= 2;
+  /* عدد النسخ يضمن أن المحتوى أعرض من الشاشة + طول دورة كاملة، فلا يتوقف الشريط ولا يقفز */
+  const copies = looped ? Math.max(2, Math.ceil(1400 / (items.length * 354)) + 1) : 1;
+  const html = looped ? base.repeat(copies) : base;
+  const sig = copies + '|' + html;
+  if (sig === posterSig && track.firstChild) return;       /* لم يتغير شيء: لا نعيد البناء (يمنع الارتجاج) */
+  posterSig = sig;
+  const keep = track.scrollLeft;
+  track.dataset.looped = looped ? '1' : '0';
+  track.dataset.n = String(items.length);
+  track.innerHTML = html;
+  try { track.scrollLeft = keep; } catch {}
+  posterAcc = null;
   setupPosterLiveObserver();
 }
 
 function startContinuousPosterLoop() {
-  const track = $('posterTrack'); if (!track) return;
+  const track = $('posterTrack'); if (!track || posterRaf) return;
   ['pointerenter', 'touchstart'].forEach(ev => track.addEventListener(ev, () => { posterPaused = true; }, { passive: true }));
-  ['pointerleave', 'touchend', 'touchcancel'].forEach(ev => track.addEventListener(ev, () => { posterPaused = false; }, { passive: true }));
+  ['pointerleave', 'touchend', 'touchcancel'].forEach(ev => track.addEventListener(ev, () => { posterPaused = false; holdPoster(1400); }, { passive: true }));
 
-  function tick(ts) {
-    if (!posterLastTs) posterLastTs = ts;
-    const dt = Math.min(64, ts - posterLastTs) / 1000;
+  const tick = ts => {
+    const dt = posterLastTs ? Math.min(64, ts - posterLastTs) / 1000 : 0;
     posterLastTs = ts;
-
-    if (!posterPaused && Cryovion.flags.posterAutoplay !== false && !document.hidden && currentViewName === 'home') {
-      const cards = track.children;
-      if (cards.length >= 2 && track.scrollWidth > track.clientWidth + 10) {
-        const speed = Number(Cryovion.config.posterSpeed) || 38;
-        const dir = document.documentElement.dir === 'rtl' ? -1 : 1;
-        track.scrollLeft += dir * speed * dt;
-
-        if (track.dataset.looped === '1') {
-          const halfCount = cards.length / 2;
-          const firstCard = cards[0], midCard = cards[halfCount];
-          if (firstCard && midCard) {
-            const span = Math.abs(midCard.offsetLeft - firstCard.offsetLeft);
-            if (span > 0 && Math.abs(track.scrollLeft) >= span) {
-              track.scrollLeft += (dir < 0 ? span : -span);
-            }
-          }
+    const idle = posterPaused || ts < posterHoldUntil || Cryovion.flags.posterAutoplay === false || document.hidden || currentViewName !== 'home';
+    if (idle) {
+      posterAcc = null;                                      /* عند العودة نبدأ من موضع اللمس الحقيقي */
+    } else if (track.children.length >= 2 && track.scrollWidth > track.clientWidth + 10) {
+      if (posterAcc === null) posterAcc = track.scrollLeft;
+      const dir = document.documentElement.dir === 'rtl' ? -1 : 1;
+      posterAcc += dir * (Number(Cryovion.config.posterSpeed) || 38) * dt;   /* متغير عشري يمنع توقف الحركة بسبب تقريب scrollLeft */
+      if (track.dataset.looped === '1') {
+        const n = +track.dataset.n || 0, cards = track.children;
+        if (n && cards[n] && cards[0]) {
+          const span = Math.abs(cards[n].offsetLeft - cards[0].offsetLeft);
+          if (span > 0 && Math.abs(posterAcc) >= span) posterAcc += (dir < 0 ? span : -span);
         }
       }
+      track.scrollLeft = posterAcc;
     }
     posterRaf = requestAnimationFrame(tick);
-  }
-  if (!posterRaf) posterRaf = requestAnimationFrame(tick);
+  };
+  posterRaf = requestAnimationFrame(tick);
 }
 const posterStep = () => document.documentElement.dir === 'rtl' ? -354 : 354;
 
@@ -2486,7 +2485,7 @@ function render() {
   }
 
   $('showAll').classList.toggle('hidden', !activeCat && selectedSpecs.size === 0 && selectedAreas.size === 0);
-  buildFilters();
+  paintFilters();
   Cryovion.emit('rendered', res);
 }
 
@@ -2658,8 +2657,7 @@ function hasUserReviewedPlace(placeId, u) {
     const found = d.reviews.find(r => r.userKey === key);
     if (found) return found;
   }
-  const local = getLocalReviewedMap()[placeId + ':' + key];
-  return local || null;
+  return getLocalReviewedMap()[placeId + ':' + key] || null;
 }
 
 function openReviewModal(id) {
@@ -2671,8 +2669,7 @@ function openReviewModal(id) {
     $('reviewModal').classList.remove('hidden');
     return;
   }
-  const existing = hasUserReviewedPlace(id, u);
-  if (existing) {
+  if (hasUserReviewedPlace(id, u)) {
     toast('⚠️ لقد أضفت تقييمك على هذه الصفحة مسبقاً (يمكنك حذفه أولاً لكتابة تقييم جديد)');
     return;
   }
@@ -2685,7 +2682,7 @@ function openReviewModal(id) {
 }
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
-/* ============ 13) إدارة صفحتي (مع عرض البطاقة الحية كما تظهر للناس مباشرة) + دعوة صديق + غرفة الإدارة ============ */
+/* ============ 13) إدارة صفحتي (معاينة حية) + دعوة صديق + غرفة الإدارة ============ */
 function renderManagedAds() {
   const u = getCurrentUser(), box = $('managedListBox');
   if (!u) {
@@ -2713,7 +2710,6 @@ function renderManagedAds() {
         </div>
       </div>
 
-      <!-- معاينة حية ومباشرة لشكل البطاقة كما تظهر للزوار في الموقع -->
       <div style="background:rgba(4,9,17,.65); padding:14px; border-radius:18px; border:1.5px dashed var(--gold);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
           <span style="font-size:12px; font-weight:700; color:var(--gold);">👁️ معاينة حية لبطاقتك كما يراها الزوار الآن في الدليل (اضغط عليها لفتح صفحتك الكاملة):</span>
@@ -2732,725 +2728,4 @@ function renderManagedAds() {
       </div>
 
       <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:14px; border:1px solid var(--border-soft);">
-        <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; margin-bottom:6px;"><span style="color:var(--gold);">✨ عداد دعوة صديق الخاص بصفحتك:</span><span style="color:var(--emerald);">${count} / 100 صديق</span></div>
-        <div style="height:9px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:10px;"><div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div></div>
-        <div style="display:flex; gap:8px;"><input readonly value="${esc(refLink)}" class="input-box" style="font-size:12px; padding:8px 10px;">
-        <button onclick="navigator.clipboard.writeText('${esc(refLink)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 14px; border-radius:10px; font-size:12px; white-space:nowrap;">نسخ الرابط</button></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function quickToggleLamp(id) {
-  const p = byId(id); if (!p) return;
-  const order = ['auto', 'open', 'closed', 'unknown'], nx = order[(order.indexOf(p.lamp_mode) + 1) % 4];
-  p.lamp_mode = nx;
-  const a = getAvailabilityStatus(p);
-  p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color;
-  renderManagedAds();
-  savePlace({ ...p, lamp_mode: nx });
-  await load(); renderManagedAds();
-  toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ غير معروف' }[nx]);
-}
-function saveDailyStatus(id, text) {
-  const q = byId(id); if (!q) return;
-  if (containsDefamation(text)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
-  savePlace({ ...q, bio: text, bio_ts: text ? Date.now() : null });
-  load().then(() => { renderManagedAds(); toast(text ? '✔ تم نشر حالتك وتحديث معاينتك' : '🗑 تم حذف الحالة من الشريط'); });
-}
-
-function renderReferralsHub() {
-  const u = getCurrentUser(), box = $('referralsDashboardBox'), baseUrl = window.location.href.split('?')[0];
-  if (!u) {
-    box.innerHTML = `<div class="entity-card" style="text-align:center; padding:28px;"><h3 style="font-size:18px; color:var(--gold); margin-bottom:8px;">✨ شارك المنصة عبر ميزة دعوة صديق</h3><p style="font-size:13px; color:var(--muted); margin-bottom:14px;">سجل دخولك بحساب مجاني للحصول على رابط دعوة الأصدقاء الخاص بك.</p><button onclick="navigateApp('account')" class="gold-bg" style="padding:11px 22px; border-radius:12px;">تسجيل الدخول الآن ←</button></div>`;
-    return;
-  }
-  const uMap = JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}');
-  const myCode = u.ref_code || ('u-' + norm(u.email).replace(/[^a-z0-9]/g, '').slice(0, 10));
-  const myAds = places.filter(p => norm(p.owner_email) === norm(u.email));
-  const totalRefs = (uMap[myCode] || 0) + myAds.reduce((a, i) => a + (i.ref_count || 0), 0), pct = Math.min(100, totalRefs);
-  const myRefUrl = myAds.length ? `${baseUrl}?ref=${myAds[0].id}` : `${baseUrl}?ref=${myCode}`;
-  box.innerHTML = `
-    <div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px; cursor:default;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div><span class="badge-pill" style="background:rgba(217,180,90,0.2); color:var(--gold);">✨ دعوة صديق</span><h3 style="font-size:19px; margin-top:4px;">مرحباً ${esc(u.name)}</h3></div>
-        <div style="text-align:center; background:rgba(16,185,129,0.12); border:1px solid var(--emerald); padding:8px 16px; border-radius:14px;"><span style="font-size:22px; font-weight:700; color:var(--emerald); display:block; line-height:1.1;">${totalRefs}</span><span style="font-size:11px; color:var(--muted);">صديق مدعو</span></div>
-      </div>
-      <p style="font-size:13px; color:var(--muted); line-height:1.6;">قم بدعوة أصدقائك عبر الرابط التالي؛ وعند دعوة 100 شخص حقيقي يمكنك طلب وضع إعلان لنشاطك الطبي أو التجميلي مجاناً:</p>
-      <div><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>التقدم نحو مكافأة الـ 100 صديق:</span><b style="color:var(--gold);">${totalRefs} / 100</b></div>
-      <div style="height:10px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden;"><div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div></div></div>
-      <div style="display:flex; gap:8px;"><input readonly value="${esc(myRefUrl)}" class="input-box" style="font-size:12.5px;">
-      <button onclick="navigator.clipboard.writeText('${esc(myRefUrl)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 18px; border-radius:12px; font-size:13px; white-space:nowrap;">✨ نسخ الرابط 📋</button></div>
-    </div>
-    <form id="refAdRequestForm" class="entity-card" style="display:grid; gap:10px; cursor:default;">
-      <h4 style="font-size:16px; color:var(--gold);">📢 طلب نشر إعلان لنشاطك المسموح به</h4>
-      <input id="rqTitle" required placeholder="اسم النشاط أو العيادة *" class="input-box">
-      <input id="rqType" required placeholder="نوع النشاط *" class="input-box">
-      <input id="rqPhone" required placeholder="رقم الهاتف أو الواتساب *" class="input-box">
-      <textarea id="rqDesc" required rows="2" placeholder="تفاصيل الإعلان والعنوان وسعر الكشف..." class="input-box"></textarea>
-      <button type="submit" class="gold-bg" style="padding:12px; border-radius:12px; font-size:14px;">إرسال الطلب للإدارة (${totalRefs} صديق) ✔</button>
-    </form>`;
-  $('refAdRequestForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const desc = $('rqDesc').value.trim();
-    if (containsDefamation(desc)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
-    saveRefRequest({ user_name: u.name, user_email: u.email, refs: totalRefs, title: $('rqTitle').value.trim(), type: $('rqType').value.trim(), phone: $('rqPhone').value.trim(), desc });
-    e.target.reset(); toast('✔ تم إرسال طلبك إلى الإدارة بنجاح!');
-  });
-}
-
-function renderAdminReviewsMonitor() {
-  const box = $('adminAllReviewsList'), countEl = $('adminTotalRevs');
-  if (!box || !countEl) return;
-  const rq = norm(adminRevQuery);
-  const filtered = !rq ? allReviewsFlat : allReviewsFlat.filter(r => r._hay.includes(rq));
-  countEl.textContent = `${filtered.length} / ${allReviewsFlat.length}`;
-
-  box.innerHTML = filtered.length ? filtered.slice(0, 60).map((r, i) => `
-    <div style="padding:10px 14px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-      <div style="min-width:0; flex:1;">
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px;">
-          <b style="color:var(--gold);">👤 ${esc(r.author)}</b>
-          <span style="color:var(--emerald); font-weight:700; cursor:pointer;" onclick="openPlacePage('${esc(r.place_id)}')">📍 في: ${esc(r.place_name)} ↗</span>
-          <span>${stars(r.stars || 5)}</span>
-          <span style="color:var(--muted); font-size:11px;">${esc(r.date)}</span>
-        </div>
-        <p style="font-size:13px; color:var(--text); margin-top:4px;">${esc(r.body)}</p>
-      </div>
-      <button type="button" class="rv-del" data-admin-del-rev="${i}" style="padding:6px 12px; font-size:12px;">🗑 حذف التعليق</button>
-    </div>`).join('')
-    : '<div style="text-align:center; padding:14px; font-size:12.5px; color:var(--muted);">لا توجد تعليقات مطابقة لبحثك.</div>';
-
-  box.querySelectorAll('[data-admin-del-rev]').forEach(btn => {
-    btn.onclick = () => {
-      const item = filtered[+btn.dataset.adminDelRev];
-      if (item) deleteReviewItem(item.place_id, item.rawAuthor, item.body);
-    };
-  });
-}
-
-function renderAdminList() {
-  renderAdminReviewsMonitor();
-  const reqs = getRefRequests();
-  $('adminRefReqCount').textContent = reqs.length;
-  $('adminRefRequestsList').innerHTML = reqs.length ? reqs.map(r => `
-    <div class="entity-card" style="border-color:var(--emerald); padding:12px 16px; cursor:default;">
-      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gold);"><span>المرسل: ${esc(r.user_name)} (${esc(r.user_email)})</span><b style="color:var(--emerald);">الدعوات: ${r.refs}</b></div>
-      <h4 style="font-size:16px; margin-top:4px;">${esc(r.title)} — <span style="font-size:13px; color:var(--gold);">${esc(r.type)}</span></h4>
-      <p style="font-size:13px; color:var(--muted); margin-top:4px;">${esc(r.desc)} | هاتف: ${esc(r.phone)}</p></div>`).join('')
-    : '<div class="entity-card" style="text-align:center; padding:16px; color:var(--muted); cursor:default;">لا توجد طلبات جديدة.</div>';
-
-  const aq = norm(adminQuery);
-  const filteredPlaces = !aq ? places : places.filter(p => {
-    const hay = `${p._s || ''} ${norm(p.phone || '')} ${norm(p.owner_email || '')}`;
-    return hay.includes(aq);
-  });
-
-  $('adminTotalPlaces').textContent = `${filteredPlaces.length} / ${places.length}`;
-  $('adminAllPlacesList').innerHTML = filteredPlaces.length ? filteredPlaces.map(p => {
-    const hasActiveStory = !!(p.bio && (!p.bio_ts || (Date.now() - p.bio_ts <= DAY_MS)));
-    return `
-    <div class="entity-card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; cursor:default;">
-      <div>
-        <span style="font-size:11px; color:var(--gold); font-weight:700;">[${(SPECS_META[p.spec_key] || SPECS_META.gastro).label}]</span>
-        <strong style="font-size:15px; margin-right:6px;">${esc(p.name)}</strong>${badge(p, true)}
-        ${p.area_label ? `<span style="font-size:11px; color:#5eead4; margin-right:6px;">(📍 ${esc(p.area_label)})</span>` : ''}
-        <p style="font-size:12px; color:var(--muted); margin-top:2px;">موثق: <b style="color:${p.is_verified ? '#60a5fa' : 'var(--muted)'};">${p.is_verified ? 'نعم 🔵' : 'لا ⚪'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b> ${p.phone ? `| 📞 ${esc(p.phone)}` : ''}</p>
-      </div>
-      <div style="display:flex; gap:6px; flex-wrap:wrap;">
-        ${hasActiveStory ? `<button onclick="deleteStoryRelease('${p.id}')" style="background:rgba(244,63,94,0.16); color:var(--rose); border:1px solid rgba(244,63,94,0.4); padding:7px 11px; border-radius:9px; font-size:11.5px; font-weight:700;">📢 حذف الريليز</button>` : ''}
-        <button onclick="setVerified('${p.id}')" style="background:${p.is_verified ? 'rgba(148,163,184,0.2)' : 'rgba(59,130,246,0.22)'}; color:${p.is_verified ? 'var(--muted)' : '#60a5fa'}; padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">${p.is_verified ? '⚪ سحب التوثيق' : '🔵 منح التوثيق'}</button>
-        <button onclick="delegatePage('${p.id}')" style="background:rgba(16,185,129,0.2); color:var(--emerald); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">🔑 تفويض</button>
-        <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:7px 14px; border-radius:9px; font-size:12px;">✏️ تعديل</button>
-        <button onclick="deleteAd('${p.id}')" style="background:rgba(244,63,94,0.2); color:var(--rose); padding:7px 12px; border-radius:9px; font-size:12px; font-weight:700;">🗑 حذف</button>
-      </div>
-    </div>`;
-  }).join('') : '<div class="entity-card" style="text-align:center; padding:18px; color:var(--muted);">لا توجد صفحة مطابقة لبحثك في الإدارة.</div>';
-}
-
-function delegatePage(id) {
-  const p = byId(id); if (!p || !adminUnlocked) return;
-  let em = prompt('اكتب إيميل صاحب الصفحة لتفويضه بالتحكم الكامل في "' + p.name + '" (اتركه فارغاً لإلغاء التفويض):', p.owner_email || '');
-  if (em === null) return;
-  em = em.trim().toLowerCase();
-  if (em && em.indexOf('@') < 0) return toast('إيميل غير صحيح');
-  savePlace({ ...p, owner_email: em, is_verified: !!em });
-  load().then(() => {
-    renderAdminList();
-    if (!em) return toast('تم إلغاء التفويض وسحب علامة التوثيق');
-    const msg = 'تم تفويض إيميلك (' + em + ') للتحكم الكامل بصفحة "' + p.name + '" على Cryovion. سجّل الدخول بهذا الإيميل من ' + location.origin + ' ثم افتح "إدارة صفحتي".';
-    try { navigator.clipboard.writeText(msg); } catch {}
-    toast('✔ تم التفويض ومنح علامة التوثيق، ونُسخت رسالة الدعوة');
-  });
-}
-async function deleteAd(id) {
-  if (!adminUnlocked) return toast('الحذف للأدمن فقط');
-  if (!confirm('حذف هذه الصفحة نهائياً؟')) return;
-  savePlace({ id, deleted: true });
-  await load(); renderAdminList(); toast('تم الحذف');
-}
-
-/* ============ 14) نافذة التعديل + المنطقة + الخدمات ============ */
-function addServiceRow(nameVal = '', priceVal = '') {
-  const box = $('svcRows'); if (!box) return;
-  const max = Cryovion.config.maxServices || 7;
-  if (box.children.length >= max) return toast(`الحد الأقصى ${max} خانات`);
-  const row = document.createElement('div');
-  row.className = 'svc-row';
-  row.innerHTML = `
-    <input type="text" class="input-box svc-name" placeholder="اسم الأشعة / التحليل / الخدمة" value="${esc(nameVal)}">
-    <div style="display:flex; gap:4px;">
-      <input type="text" class="input-box svc-price" placeholder="السعر (مثال: 250 ج.م)" value="${esc(priceVal)}" style="flex:1;">
-      <button type="button" onclick="this.closest('.svc-row').remove()" style="padding:0 10px; border-radius:10px; background:rgba(244,63,94,.18); color:var(--rose); font-weight:700;">✕</button>
-    </div>`;
-  box.appendChild(row);
-}
-
-function syncEditorCatFields() {
-  const catVal = $('edCat').value;
-  const isDoc = (catVal === 'doctor');
-  const isLabOrOptics = (catVal === 'lab' || catVal === 'optics');
-  $('edSpecWrap').classList.toggle('hidden', !isDoc);
-  $('edFeeWrap').classList.toggle('hidden', !isDoc);
-  $('servicesWrap').classList.toggle('hidden', !isLabOrOptics);
-
-  const specInput = $('edSpec');
-  if (catVal === 'pharmacy' && !specInput.value.trim()) specInput.value = 'صيدلية عامة وخدمات دوائية';
-  else if (catVal === 'lab' && !specInput.value.trim()) specInput.value = 'معمل تحاليل طبية وأشعة';
-  else if (catVal === 'optics' && !specInput.value.trim()) specInput.value = 'بصريات ونظارات طبية وشمسية';
-}
-
-function openEditorModal(id) {
-  adminUnlocked = isUserMasterAdmin(getCurrentUser());
-  populateEditorAreaSelect();
-  const ex = id ? byId(id) : null, s = (ex && ex.sched) || {};
-  $('edId').value = ex ? ex.id : '';
-  const uiCat = ex ? (ex.spec_key === 'optics' ? 'optics' : ex.cat) : 'doctor';
-  $('edCat').value = uiCat;
-  $('edSpecKey').value = (ex && ex.cat === 'doctor') ? (ex.spec_key || 'gastro') : 'gastro';
-  $('edName').value = ex ? ex.name : ''; $('edSpec').value = ex ? ex.spec : '';
-  $('edBio').value = ex ? (ex.bio || '') : '';
-  $('edPhotoUrl').value = ex ? (ex.photo_url || '') : '';
-  $('edAreaKey').value = ex ? (ex.area_key || '') : '';
-  $('edAddr').value = ex ? ex.addr : '';
-  $('edFee').value = ex && ex.fee ? ex.fee : '';
-  $('edMapUrl').value = ex && ex.map_url ? ex.map_url : '';
-  $('edIsVerified').checked = ex ? !!ex.is_verified : true;
-  $('edLampMode').value = ex ? (ex.lamp_mode || 'unknown') : 'auto';
-  $('edHours').value = ex && ex.hours !== 'غير معروف' ? ex.hours : '';
-  $('edFrom').value = s.from || ''; $('edTo').value = s.to || ''; $('edH24').checked = !!s.h24;
-  document.querySelectorAll('.offd').forEach(c => { c.checked = (s.off || []).includes(+c.value); });
-  $('edPhone').value = ex && ex.phone ? ex.phone : '';
-  $('edWhatsapp').value = ex && ex.whatsapp ? ex.whatsapp : (ex && ex.phone ? ex.phone : '');
-  $('edOwnerEmail').value = ex && ex.owner_email ? ex.owner_email : '';
-  $('edRefCount').value = ex ? (ex.ref_count || 0) : 0;
-  const gal = ex ? (ex.gallery || []) : [];
-  $('edGalleryData').value = JSON.stringify(gal);
-  $('edGalleryPreview').innerHTML = gal.map(g => `<img src="${esc(g)}" alt="" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`).join('');
-
-  const svcBox = $('svcRows'); svcBox.innerHTML = '';
-  const svcs = ex && Array.isArray(ex.services) ? ex.services : [];
-  if (svcs.length) svcs.forEach(it => addServiceRow(it.name, it.price));
-  else addServiceRow('', '');
-
-  syncEditorCatFields();
-  $('ownerAssignWrap').classList.toggle('hidden', !adminUnlocked);
-  $('verifyWrap').classList.toggle('hidden', !adminUnlocked);
-  $('editorTitle').textContent = ex ? `تحديث بيانات: ${ex.name}` : 'إضافة صفحة / منشأة جديدة';
-  $('editorModal').classList.remove('hidden');
-  Cryovion.emit('editorOpened', ex);
-}
-function closeEditorModal() { $('editorModal').classList.add('hidden'); }
-
-async function share(id) {
-  const d = byId(id); if (!d) return;
-  const shareUrl = `${window.location.href.split('?')[0]}?ref=${d.id}`;
-  const text = `✨ دعوة صديق لزيارة صفحة: ${d.name} (${d.spec})\n📍 العنوان: ${d.addr}\n${shareUrl}`;
-  try {
-    if (navigator.share) await navigator.share({ title: d.name, text, url: shareUrl });
-    else { await navigator.clipboard.writeText(text); toast('تم نسخ رابط دعوة صديق 📋'); }
-  } catch {}
-}
-function checkIncomingReferral() {
-  const refId = new URLSearchParams(window.location.search).get('ref');
-  if (!refId) return;
-  const visitedKey = 'cryovion_visited_' + refId;
-  if (!localStorage.getItem(visitedKey)) {
-    localStorage.setItem(visitedKey, 'true');
-    if (refId.startsWith('u-')) {
-      const uMap = JSON.parse(localStorage.getItem('cryovion_user_refs') || '{}');
-      uMap[refId] = (uMap[refId] || 0) + 1;
-      localStorage.setItem('cryovion_user_refs', JSON.stringify(uMap));
-    } else {
-      const cur = byId(refId);
-      if (cur && adminUnlocked) savePlace({ ...cur, ref_count: (cur.ref_count || 0) + 1 });
-    }
-    toast('👋 أهلاً بك في منصة Cryovion الطبية!');
-  }
-  if (!refId.startsWith('u-')) setTimeout(() => openPlacePage(refId), 300);
-}
-function listenVoiceSearch() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return toast('البحث بالصوت غير مدعوم في هذا المتصفح');
-  const r = new SR(), m = $('mic'); r.lang = currentLang === 'en' ? 'en-US' : 'ar-EG';
-  r.onstart = () => { m.style.boxShadow = '0 0 0 6px rgba(217,180,90,.5)'; }; r.onend = () => { m.style.boxShadow = ''; };
-  r.onerror = () => toast('لم أسمعك، حاول مرة أخرى');
-  r.onresult = e => { $('search').value = e.results[0][0].transcript; $('search').dispatchEvent(new Event('input')); };
-  r.start();
-}
-
-/* ============ 15) ربط الأحداث السريعة + إغلاق القوائم المنسدلة (المناطق والتخصصات) عند النقر خارجها ============ */
-let lastNavTap = 0;
-function onNavTap(e) {
-  const b = e.target.closest('[data-nav]'); if (!b) return;
-  e.preventDefault(); e.stopPropagation();
-  const t = Date.now(); if (t - lastNavTap < 380) return;
-  lastNavTap = t; navigateApp(b.dataset.nav);
-}
-[document.querySelector('.right-icon-dock'), $('sideDrawer')].forEach(box => {
-  box.style.touchAction = 'manipulation';
-  ['pointerup', 'click'].forEach(ev => box.addEventListener(ev, onNavTap, true));
-});
-$('openDrawer').addEventListener('click', openSideDrawer);
-$('closeDrawer').addEventListener('click', closeSideDrawer);
-$('drawerBackdrop').addEventListener('click', closeSideDrawer);
-$('editorModal').addEventListener('click', e => { if (e.target === $('editorModal')) closeEditorModal(); });
-$('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
-$('onboardingModal').addEventListener('click', e => { if (e.target === $('onboardingModal')) $('onboardingModal').classList.add('hidden'); });
-
-/* أحداث قائمة اختيار المناطق (الجيزة) */
-if ($('areaPickerBtn')) {
-  $('areaPickerBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    openAreaDropdown();
-  });
-}
-if ($('closeAreaPanelBtn')) $('closeAreaPanelBtn').addEventListener('click', () => openAreaDropdown(false));
-if ($('applyAreaFilterBtn')) {
-  $('applyAreaFilterBtn').addEventListener('click', () => {
-    openAreaDropdown(false);
-    toast(selectedAreas.size ? `📍 تم عرض نتائج (${selectedAreas.size}) منطقة مختارة` : '📍 تم عرض كل مناطق الجيزة');
-  });
-}
-if ($('selectAllGizaBtn')) {
-  $('selectAllGizaBtn').addEventListener('click', () => {
-    clearAllAreaFilters();
-    openAreaDropdown(false);
-    toast('📍 تم تفعيل عرض كل مناطق الجيزة');
-  });
-}
-if ($('areaQuickSearch')) {
-  $('areaQuickSearch').addEventListener('input', e => {
-    areaSearchQuery = e.target.value;
-    renderAreaDropdownItems();
-  });
-}
-if ($('areaGroupsContainer')) {
-  $('areaGroupsContainer').addEventListener('click', e => {
-    const item = e.target.closest('[data-area-toggle]');
-    if (!item) return;
-    toggleAreaKey(item.getAttribute('data-area-toggle'));
-  });
-}
-
-/* أحداث نافذة سلم التخصصات المتعددة */
-if ($('specLadderBtn')) {
-  $('specLadderBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    openSpecDropdown();
-  });
-}
-if ($('closeSpecPanelBtn')) $('closeSpecPanelBtn').addEventListener('click', () => openSpecDropdown(false));
-if ($('applySpecFilterBtn')) {
-  $('applySpecFilterBtn').addEventListener('click', () => {
-    openSpecDropdown(false);
-    toast(selectedSpecs.size ? `🩺 تم عرض نتائج (${selectedSpecs.size}) تخصص محدد` : '🩺 تم عرض كل التخصصات الطبية');
-  });
-}
-if ($('selectAllSpecsBtn')) {
-  $('selectAllSpecsBtn').addEventListener('click', () => {
-    clearAllSpecFilters();
-    openSpecDropdown(false);
-    toast('🩺 تم تفعيل عرض كل التخصصات');
-  });
-}
-if ($('specsBar')) {
-  $('specsBar').addEventListener('click', e => {
-    const b = e.target.closest('[data-spec]');
-    if (!b) return;
-    toggleSpecKey(b.dataset.spec);
-  });
-}
-
-/* إغلاق أي نافذة منسدلة تلقائياً عند الضغط في أي مكان فارغ */
-document.addEventListener('click', e => {
-  if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden');
-  if (!e.target.closest('#areaPickerWrap') && $('areaDropdownPanel') && !$('areaDropdownPanel').classList.contains('hidden')) {
-    openAreaDropdown(false);
-  }
-  if (!e.target.closest('#specLadderWrap') && $('specDropdownPanel') && !$('specDropdownPanel').classList.contains('hidden')) {
-    openSpecDropdown(false);
-  }
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeEditorModal(); closeReviewModal(); closeSideDrawer();
-    $('onboardingModal').classList.add('hidden');
-    openAreaDropdown(false);
-    openSpecDropdown(false);
-  }
-});
-
-if ($('installAppBtn')) {
-  $('installAppBtn').addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return toast('للتثبيت: افتح قائمة المتصفح (⋮) واختر "إضافة إلى الشاشة الرئيسية"');
-    deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    if (outcome === 'accepted') $('installAppBtn').classList.add('hidden');
-    deferredInstallPrompt = null;
-  });
-}
-
-document.querySelectorAll('.gender-pick-btn').forEach(btn => btn.addEventListener('click', () => {
-  pickedGender = btn.dataset.gender;
-  document.querySelectorAll('.gender-pick-btn').forEach(b => {
-    const on = b.dataset.gender === pickedGender;
-    b.style.borderColor = on ? 'var(--gold)' : 'var(--border-soft)';
-    b.style.background = on ? 'rgba(217,180,90,.16)' : 'rgba(255,255,255,.03)';
-  });
-}));
-$('onboardingForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const u = getCurrentUser();
-  const ageGroup = $('onbAgeGroup').value || '+18';
-  if (u && u.email) {
-    saveUserDemographics(u.email, pickedGender, ageGroup);
-    u.gender = pickedGender; u.ageGroup = ageGroup;
-    setCurrentUser(u);
-  }
-  if (ageGroup === 'senior') {
-    localStorage.setItem('cryovion_big_font', 'true');
-    document.documentElement.style.fontSize = '18px';
-  }
-  $('onboardingModal').classList.add('hidden');
-  toast(pickedGender === 'female' ? '🌸 أهلاً بكِ في منصة Cryovion الطبية!' : '✨ أهلاً بك في منصة Cryovion الطبية!');
-});
-
-$('brandLogo').addEventListener('click', () => {
-  logoClicks++; clearTimeout(logoTimer); logoTimer = setTimeout(() => { logoClicks = 0; }, 2200);
-  if (logoClicks >= 7) {
-    logoClicks = 0;
-    if (isUserMasterAdmin(getCurrentUser())) { navigateApp('admin'); toast('🛡️ مرحباً بك في غرفة تحكم الإدارة'); }
-  } else if (currentViewName !== 'home') goHomeLogo();
-});
-
-$('langSwitchBtn').addEventListener('click', toggleLanguage);
-$('settingsLangBtn').addEventListener('click', toggleLanguage);
-let big = localStorage.getItem('cryovion_big_font') === 'true';
-if (big) document.documentElement.style.fontSize = '18px';
-function toggleBig() {
-  big = !big; localStorage.setItem('cryovion_big_font', String(big));
-  document.documentElement.style.fontSize = big ? '18px' : '16px';
-  toast(big ? '🔠 تم تكبير الخط' : '🔠 الحجم الطبيعي');
-}
-$('bigText').addEventListener('click', toggleBig);
-$('settingsBigTextBtn').addEventListener('click', toggleBig);
-if (localStorage.getItem('cryovion_theme') === 'light') document.documentElement.classList.add('light');
-function toggleTheme() {
-  const isLight = document.documentElement.classList.toggle('light');
-  localStorage.setItem('cryovion_theme', isLight ? 'light' : 'dark');
-  toast(isLight ? '☀️ تم تفعيل المظهر الفاتح' : '🌙 تم تفعيل المظهر الداكن');
-  Cryovion.emit('themeChanged', isLight ? 'light' : 'dark');
-}
-$('themeToggleBtn').addEventListener('click', toggleTheme);
-$('quickThemeBtn').addEventListener('click', toggleTheme);
-
-/* إعدادات الاسم الظاهر في التعليقات + منع اسم Cryovion */
-document.querySelectorAll('input[name="dispMode"]').forEach(r => r.addEventListener('change', () => {
-  const mode = document.querySelector('input[name="dispMode"]:checked')?.value || 'initial';
-  $('dispNick').classList.toggle('hidden', mode !== 'nick');
-  const prefs = getDispPrefs(); prefs.mode = mode; setDispPrefs(prefs);
-  updateDispSettingsUI();
-}));
-$('dispNick').addEventListener('input', e => {
-  const val = e.target.value;
-  if (isReservedBrandName(val)) {
-    toast('🚫 اسم Cryovion محجوز رسمياً لإدارة المنصة ولا يمكن استعارته');
-    return;
-  }
-  const prefs = getDispPrefs(); prefs.nick = val; setDispPrefs(prefs);
-  updateDispSettingsUI();
-});
-$('dispSaveBtn').addEventListener('click', () => {
-  const mode = document.querySelector('input[name="dispMode"]:checked')?.value || 'initial';
-  const nick = $('dispNick').value.trim();
-  if (containsDefamation(nick)) return toast('🚫 الكنية تحتوي على كلمات غير لائقة');
-  if (isReservedBrandName(nick)) return toast('🚫 اسم Cryovion محجوز رسمياً للإدارة ولا يُسمح باستخدامه');
-  setDispPrefs({ mode, nick });
-  updateDispSettingsUI();
-  toast('✔ تم حفظ الاسم الظاهر للتعليقات');
-});
-
-/* تسجيل الدخول */
-$('tabLoginBtn').addEventListener('click', () => {
-  isRegisterMode = false; $('registerExtraFields').classList.add('hidden');
-  $('tabLoginBtn').className = 'gold-bg'; $('tabRegisterBtn').className = ''; $('tabRegisterBtn').style.background = 'rgba(255,255,255,0.05)';
-  $('authSubmitBtn').textContent = 'دخول بالبريد الإلكتروني ✔';
-});
-$('tabRegisterBtn').addEventListener('click', () => {
-  isRegisterMode = true; $('registerExtraFields').classList.remove('hidden');
-  $('tabRegisterBtn').className = 'gold-bg'; $('tabLoginBtn').className = ''; $('tabLoginBtn').style.background = 'rgba(255,255,255,0.05)';
-  $('authSubmitBtn').textContent = 'إنشاء الحساب وتفعيله ✔';
-});
-document.querySelectorAll('.role-btn').forEach(b => b.addEventListener('click', () => {
-  selectedRole = b.dataset.role;
-  document.querySelectorAll('.role-btn').forEach(x => { const on = x.dataset.role === selectedRole; x.style.borderColor = on ? 'var(--gold)' : 'var(--border-soft)'; x.style.background = on ? 'rgba(217,180,90,0.15)' : 'transparent'; });
-}));
-$('accountForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const email = $('accEmail').value.trim().toLowerCase();
-  let name = ($('accName').value || '').trim() || email.split('@')[0];
-  if (email !== ADMIN_EMAIL && isReservedBrandName(name)) {
-    return toast('🚫 اسم Cryovion خاص بإدارة المنصة الرسمية فقط، يرجى كتابة اسمك الحقيقي');
-  }
-  setCurrentUser({ name, email, role: selectedRole, provider: 'email' });
-  toast(`مرحباً بك ${name}! تم تسجيل الدخول`);
-  openOnboardingModal(false);
-});
-$('googleDirectBtn').addEventListener('click', async () => {
-  if (!db) return toast('الخدمة غير متاحة حالياً');
-  const res = await db.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
-  if (res.error) toast('تعذر الدخول عبر Google');
-});
-$('facebookDirectBtn').addEventListener('click', () => {
-  const fb = prompt('تسجيل الدخول بحساب Facebook\nأدخل اسم حسابك أو بريدك الإلكتروني:');
-  if (fb && fb.trim()) {
-    if (isReservedBrandName(fb)) return toast('🚫 اسم Cryovion محجوز رسمياً لإدارة المنصة');
-    const clean = fb.trim().toLowerCase(), emailFmt = clean.includes('@') ? clean : `${clean.replace(/\s+/g, '.')}@facebook.user`;
-    setCurrentUser({ name: fb.trim().split('@')[0], email: emailFmt, role: selectedRole, provider: 'facebook' });
-    toast('✔ تم تسجيل الدخول عبر Facebook بنجاح');
-    openOnboardingModal(false);
-  }
-});
-$('logoutBtn').addEventListener('click', async () => {
-  if (db) { try { await db.auth.signOut(); } catch {} }
-  verifiedEmail = null; lastUid = null; setCurrentUser(null); toast('تم تسجيل الخروج');
-  load();
-});
-
-/* البحث العام السريع (90ms) */
-const runSearch = debounce(() => {
-  const raw = query.trim(), q = norm(raw), box = $('searchSuggest');
-  if ($('clearSearchBtn')) $('clearSearchBtn').classList.toggle('hidden', !raw);
-  if (!q) box.classList.add('hidden');
-  else {
-    const matches = [];
-    for (let i = 0; i < places.length && matches.length < 7; i++) {
-      if (doesPlaceMatchSelectedAreas(places[i]) && places[i]._n.includes(q)) matches.push(places[i]);
-    }
-    box.innerHTML = matches.length ? matches.map(m => {
-      const sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
-      return `<div class="auto-item" data-suggest-id="${m.id}"><div style="display:flex; align-items:center; gap:10px; min-width:0;">${orb(m.cat, 34)}
-        <div style="min-width:0;"><p style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;"><span>${esc(m.name)}</span><span class="status-dot ${m.avail_state}"></span></p>
-        <p style="font-size:11px; color:${sp.color};">${esc(m.spec)} • 📍 ${esc(m.addr)}</p></div></div>
-        <span class="badge-pill" style="background:${sp.bg}; color:${sp.color}; flex-shrink:0;">${sp.icon} ${currentLang === 'en' ? sp.labelEn : sp.label}</span></div>`;
-    }).join('') : `<div style="padding:12px; font-size:13px; color:var(--muted); text-align:center;">لا يوجد تطابق لـ "${esc(raw)}"</div>`;
-    box.classList.remove('hidden');
-    Cryovion.applyIcons(box);
-  }
-  if (currentViewName !== 'home') switchViewDOM('home', false);
-  shownLimit = PAGE_SIZE; render();
-  Cryovion.emit('searched', raw);
-}, 90);
-$('search').addEventListener('input', e => { query = e.target.value; runSearch(); });
-if ($('clearSearchBtn')) {
-  $('clearSearchBtn').addEventListener('click', () => {
-    query = ''; $('search').value = '';
-    $('clearSearchBtn').classList.add('hidden');
-    $('searchSuggest').classList.add('hidden');
-    shownLimit = PAGE_SIZE; render();
-  });
-}
-if ($('adminSearchInput')) {
-  $('adminSearchInput').addEventListener('input', e => {
-    adminQuery = e.target.value;
-    renderAdminList();
-  });
-}
-if ($('adminReviewSearchInput')) {
-  $('adminReviewSearchInput').addEventListener('input', e => {
-    adminRevQuery = e.target.value;
-    renderAdminReviewsMonitor();
-  });
-}
-$('searchSuggest').addEventListener('click', e => { const i = e.target.closest('[data-suggest-id]'); if (!i) return; $('searchSuggest').classList.add('hidden'); openPlacePage(i.dataset.suggestId); });
-$('mic').addEventListener('click', listenVoiceSearch);
-
-$('cats').addEventListener('click', e => {
-  const b = e.target.closest('[data-cat]'); if (!b) return;
-  activeCat = activeCat === b.dataset.cat ? null : b.dataset.cat;
-  if (activeCat === 'pharmacy') selectedSpecs.clear();
-  shownLimit = PAGE_SIZE; render();
-});
-$('showAll').addEventListener('click', () => {
-  activeCat = null;
-  selectedSpecs.clear();
-  clearAllAreaFilters();
-});
-$('slidePrev').addEventListener('click', () => $('posterTrack').scrollBy({ left: -posterStep(), behavior: 'smooth' }));
-$('slideNext').addEventListener('click', () => $('posterTrack').scrollBy({ left: posterStep(), behavior: 'smooth' }));
-
-/* النقرات العامة */
-document.addEventListener('click', e => {
-  const bd = e.target.closest('[data-badge-id]');
-  if (bd) { e.preventDefault(); e.stopPropagation(); setVerified(bd.dataset.badgeId); return; }
-  const delStory = e.target.closest('[data-del-story]');
-  if (delStory) { e.preventDefault(); e.stopPropagation(); deleteStoryRelease(delStory.dataset.delStory); return; }
-  const delRev = e.target.closest('[data-del-rev]');
-  if (delRev) {
-    e.preventDefault(); e.stopPropagation();
-    const pid = delRev.dataset.placeId, idx = +delRev.dataset.delRev;
-    const p = byId(pid);
-    if (p && p.reviews[idx]) deleteReviewItem(pid, p.reviews[idx].rawAuthor, p.reviews[idx].body);
-    return;
-  }
-  const off = e.target.closest('[data-off]');
-  if (off) { e.preventDefault(); e.stopPropagation(); toast(NO_DATA_MSG); return; }
-  if (e.target.closest('a')) return;
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  const id = b.dataset.id, a = b.dataset.act;
-  if (a === 'share') { e.stopPropagation(); share(id); }
-  else if (a === 'more') { shownLimit += PAGE_SIZE; render(); }
-  else if (a === 'openPage') openPlacePage(id);
-}, true);
-
-/* التقييم */
-$('revLoginBtn').addEventListener('click', () => { closeReviewModal(); navigateApp('account'); });
-$('reviewForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const u = getCurrentUser();
-  if (!u) { closeReviewModal(); navigateApp('account'); return; }
-  if (hasUserReviewedPlace(activeReviewPlaceId, u)) {
-    closeReviewModal();
-    return toast('⚠️ لديك تقييم مسجل بالفعل على هذه الصفحة');
-  }
-  const body = $('revBody').value.trim();
-  if (containsDefamation(body)) return toast('🚫 التعليق يحتوي على كلمات غير لائقة');
-  const dispName = getReviewerDisplayName(u);
-  if (isReservedBrandName(dispName)) return toast('🚫 لا يمكن النشر باسم Cryovion المحجوز للإدارة');
-  const packedAuthor = packAuthor(dispName, u);
-  markLocalReviewed(activeReviewPlaceId, getUserAccountKey(u), body, pickedStars);
-  saveReview({ place_id: activeReviewPlaceId, author: packedAuthor, stars: pickedStars, body });
-  closeReviewModal(); await load();
-  if (currentViewName === 'placePage') renderPlacePageDOM(activeReviewPlaceId);
-  toast('✔ شكراً لك! تم نشر تقييمك بنجاح');
-});
-
-/* إدارة صفحتي: نشر/حذف الحالة اليومية */
-$('managedListBox').addEventListener('click', e => {
-  const b = e.target.closest('[data-qs]'); if (!b) return;
-  if (b.dataset.qs === 'del') return saveDailyStatus(b.dataset.id, '');
-  const t = $('managedListBox').querySelector(`[data-qs-text="${b.dataset.id}"]`).value.trim();
-  if (!t) return toast('اكتب الحالة أولاً');
-  saveDailyStatus(b.dataset.id, t);
-});
-
-/* حالة Cryovion الرسمية */
-$('devPub').addEventListener('click', () => {
-  const t = $('devText').value.trim(); if (!t) return toast('اكتب نص الحالة أولاً');
-  if (!db) return toast('الخدمة غير متاحة حالياً');
-  writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: t, ts: Date.now() }))
-    .then(r => { if (r && r.error) toast('رُفض النشر: للأدمن فقط'); else toast('✔ تم نشر حالة Cryovion'); return load(); }).catch(() => {});
-});
-$('devDel').addEventListener('click', () => {
-  if (!db) return toast('الخدمة غير متاحة حالياً');
-  $('devText').value = '';
-  writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1)).then(() => { toast('تم حذف الحالة'); return load(); }).catch(() => {});
-});
-
-/* نافذة التعديل */
-$('edCat').addEventListener('change', syncEditorCatFields);
-$('svcAdd').addEventListener('click', () => addServiceRow('', ''));
-
-$('edGalleryFiles').addEventListener('change', e => {
-  const files = Array.from(e.target.files); if (!files.length) return;
-  Promise.all(files.map(f => new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.onerror = () => res(null); r.readAsDataURL(f); })))
-    .then(list => {
-      const gallery = list.filter(Boolean); if (!gallery.length) return;
-      $('edPhotoUrl').value = gallery[0];
-      $('edGalleryData').value = JSON.stringify(gallery);
-      $('edGalleryPreview').innerHTML = gallery.map(g => `<img src="${g}" alt="" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--gold);">`).join('');
-      toast(`📷 تم إرفاق ${gallery.length} صور`);
-    });
-});
-$('edOwnerEmail').addEventListener('input', function () { $('edIsVerified').checked = this.value.indexOf('@') > 0; });
-
-$('editorForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  adminUnlocked = isUserMasterAdmin(getCurrentUser());
-  const bioVal = $('edBio').value.trim(), nameVal = $('edName').value.trim();
-  if (containsDefamation(bioVal) || containsDefamation(nameVal)) return toast('🚫 النص يحتوي على عبارات مسيئة.');
-  const id = $('edId').value || ('c-' + crypto.randomUUID().slice(0, 8)), ex = byId(id);
-  const off = []; document.querySelectorAll('.offd').forEach(c => { if (c.checked) off.push(+c.value); });
-
-  const uiCat = $('edCat').value;
-  const actualCat = uiCat === 'optics' ? 'lab' : uiCat;
-  const actualSpecKey = uiCat === 'doctor' ? $('edSpecKey').value : (uiCat === 'pharmacy' ? 'pharmacy' : (uiCat === 'optics' ? 'optics' : 'lab'));
-
-  const services = [];
-  if (uiCat === 'lab' || uiCat === 'optics') {
-    document.querySelectorAll('#svcRows .svc-row').forEach(r => {
-      const n = r.querySelector('.svc-name')?.value.trim() || '';
-      const p = r.querySelector('.svc-price')?.value.trim() || '';
-      if (n || p) services.push({ name: n, price: p });
-    });
-  }
-
-  const pickedAreaKey = $('edAreaKey') ? $('edAreaKey').value : '';
-  const sched = { from: $('edFrom').value, to: $('edTo').value, h24: $('edH24').checked, off };
-  if (services.length) sched.services = services;
-  if (pickedAreaKey) sched.area_key = pickedAreaKey;
-
-  let hours = $('edHours').value.trim();
-  if (!hours) { if (sched.h24) hours = '24 ساعة'; else if (sched.from && sched.to) hours = 'من ' + t12(sched.from) + ' إلى ' + t12(sched.to); }
-  const item = {
-    id, cat: actualCat, spec_key: actualSpecKey, name: nameVal, spec: $('edSpec').value.trim(),
-    bio: bioVal, bio_ts: bioVal ? Date.now() : null, photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'),
-    area_key: pickedAreaKey,
-    addr: $('edAddr').value.trim() || 'غير معروف', fee: uiCat === 'doctor' ? $('edFee').value.trim() : '', map_url: $('edMapUrl').value.trim(),
-    services,
-    is_verified: adminUnlocked ? $('edIsVerified').checked : !!(ex && ex.is_verified),
-    lamp_mode: $('edLampMode').value, sched, hours,
-    phone: $('edPhone').value.trim() || null, whatsapp: $('edWhatsapp').value.trim() || $('edPhone').value.trim() || null,
-    owner_email: adminUnlocked ? $('edOwnerEmail').value.trim().toLowerCase() : (ex ? ex.owner_email : ''),
-    ref_count: adminUnlocked ? (parseInt($('edRefCount').value, 10) || 0) : (ex ? (ex.ref_count || 0) : 0),
-    status: 'approved', updated_date: new Date().toISOString().split('T')[0]
-  };
-  savePlace(item); closeEditorModal(); await load();
-  if (currentViewName === 'placePage') renderPlacePageDOM(id);
-  if (currentViewName === 'admin') renderAdminList();
-  if (currentViewName === 'myManaged') renderManagedAds();
-  toast('✔ تم حفظ ونشر التعديلات وتحديث معاينة البطاقة فوراً!');
-});
-
-Cryovion.on('templateChanged', () => { if (appReady) { render(); if (currentViewName === 'placePage' && currentPlaceId) renderPlacePageDOM(currentPlaceId); } });
-
-/* ============ 16) التشغيل النهائي فائق السرعة ============ */
-if ($('footYear')) $('footYear').textContent = new Date().getFullYear();
-setInterval(() => { if (!document.hidden) recomputeAvailability(); }, 60000);
-history.replaceState({ view: 'home' }, '', '');
-populateEditorAreaSelect();
-hydrateFromCache();
-applyLanguage();
-renderAreaDropdownItems();
-updateAreaPickerButtonUI();
-updateSpecLadderButtonUI();
-renderPostersCarousel();
-startContinuousPosterLoop();
-Cryovion.applyIcons();
-appReady = true;
-Cryovion.emit('ready');
-initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
-</script>
-</body>
-</html>
+        <div style="display:flex; justify-content:space-between; fon
