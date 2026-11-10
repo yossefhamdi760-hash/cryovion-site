@@ -16,14 +16,14 @@
 <link id="favIconLink" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='45%25' r='65%25'%3E%3Cstop offset='0%25' stop-color='%230a2e36'/%3E%3Cstop offset='100%25' stop-color='%23040911'/%3E%3C/radialGradient%3E%3ClinearGradient id='cGrad' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='65%25' stop-color='%23cbd5e1'/%3E%3Cstop offset='100%25' stop-color='%23D9B45A'/%3E%3C/linearGradient%3E%3ClinearGradient id='ring' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232dd4bf'/%3E%3Cstop offset='50%25' stop-color='%230d9488'/%3E%3Cstop offset='100%25' stop-color='%23D9B45A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='url(%23bg)'/%3E%3Ccircle cx='256' cy='256' r='196' fill='none' stroke='url(%23ring)' stroke-width='12' opacity='0.9'/%3E%3Ccircle cx='256' cy='256' r='176' fill='none' stroke='%232dd4bf' stroke-width='3' opacity='0.35'/%3E%3Cpath d='M340 165 C295 120 205 125 165 185 C130 235 135 305 180 350 C225 395 300 390 342 345' fill='none' stroke='url(%23cGrad)' stroke-width='44' stroke-linecap='round'/%3E%3Cpath d='M165 262 L235 262 L252 232 L272 295 L294 210 L314 278 L330 262 L415 262' fill='none' stroke='%232dd4bf' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link id="appleTouchIcon" rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%23041b21'/%3E%3Ccircle cx='256' cy='256' r='196' fill='none' stroke='%232dd4bf' stroke-width='14'/%3E%3Cpath d='M340 165 C295 120 205 125 165 185 C130 235 135 305 180 350 C225 395 300 390 342 345' fill='none' stroke='%23ffffff' stroke-width='44' stroke-linecap='round'/%3E%3Cpath d='M165 262 L235 262 L252 232 L272 295 L294 210 L314 278 L330 262 L415 262' fill='none' stroke='%232dd4bf' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
-<!-- ================= نواة التطوير القابلة للتوسعة (Plugin Core v1.5.0) ================= -->
+<!-- ================= نواة التطوير القابلة للتوسعة (Plugin Core v1.6.0) ================= -->
 <script>
 (function (w) {
   'use strict';
   var C = w.Cryovion = {
-    version: '1.5.0',
+    version: '1.6.0',
     flags: { mascot: true, posterAutoplay: true },
-    config: { cacheVersion: 'v3', maxServices: 7, posterSpeed: 38 },
+    config: { cacheVersion: 'v4', maxServices: 7, posterSpeed: 38 },
     hooks: {}, icons: {}, tpl: {},
 
     /* أحداث: on / off / emit (أي خطأ داخل إضافة يُسجَّل ولا يوقف الموقع) */
@@ -106,6 +106,9 @@ html[dir="ltr"] body { font-family:var(--font-body-ltr); }
 button, input, select, textarea { font-family:inherit; color:inherit; border:none; background:none; }
 button { cursor:pointer; transition:background-color .12s ease, border-color .12s ease, color .12s ease, transform .12s ease, opacity .12s ease; touch-action:manipulation; }
 a { text-decoration:none; color:inherit; touch-action:manipulation; }
+/* إخفاء علامة X الزرقاء الافتراضية للمتصفح داخل حقول البحث لمنع تكرارها */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration { -webkit-appearance:none; appearance:none; display:none; }
 [data-ico] { display:inline-flex; align-items:center; justify-content:center; }
 [data-ico] img { width:1em; height:1em; object-fit:contain; }
 .gold-bg { background:var(--gold-grad); color:var(--on-gold); font-weight:700; }
@@ -138,27 +141,78 @@ html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:tr
   .dock-tooltip { display:none; }
 }
 
-/* ================= 5) النافذة الرئيسية ================= */
-.main-window { max-width:1200px; margin:0 auto 18px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 14px 34px -12px rgba(0,0,0,.7); min-height:86vh; position:relative; overflow:hidden; }
-.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border-soft); background:var(--nav-bg); position:sticky; top:0; z-index:40; }
-.menu-trigger { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:12px; background:rgba(15,28,46,.95); border:1px solid var(--border); color:var(--gold); font-weight:700; font-size:13px; }
+/* ================= 5) النافذة الرئيسية وشريط التنقل العلوي + قائمة المناطق المنسدلة ================= */
+.main-window { max-width:1200px; margin:0 auto 18px; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:0 14px 34px -12px rgba(0,0,0,.7); min-height:86vh; position:relative; overflow:visible; }
+.window-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--border-soft); background:var(--nav-bg); border-radius:26px 26px 0 0; position:sticky; top:0; z-index:250; gap:8px; }
+.menu-trigger { display:inline-flex; align-items:center; gap:8px; padding:8px 13px; border-radius:12px; background:rgba(15,28,46,.95); border:1px solid var(--border); color:var(--gold); font-weight:700; font-size:13px; flex-shrink:0; }
 html.light .menu-trigger { background:var(--card); }
 .menu-trigger:hover { border-color:var(--gold-light); }
 
-/* ================= 6) الواجهة الزمردية وشريط البحث المحكم ================= */
-.jevi-hero-stage { position:relative; padding:24px 16px 22px; text-align:center; border-bottom:1px solid rgba(45,212,191,.25); overflow:hidden;
+/* زر وقائمة اختيار المناطق والقرى (الجيزة) فوق الجميع */
+.area-picker-wrap { position:relative; display:inline-block; }
+.area-trigger-btn {
+  display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:99px;
+  background:rgba(20,184,166,.16); color:#5eead4; border:1px solid rgba(45,212,191,.45);
+  font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;
+}
+.area-trigger-btn.has-selection {
+  background:var(--gold-grad); color:var(--on-gold); border-color:var(--gold);
+  box-shadow:0 0 14px rgba(217,180,90,.35);
+}
+.area-dropdown-panel {
+  position:fixed; top:112px; left:50%; transform:translateX(-50%);
+  width:min(420px, 94vw); max-height:74vh;
+  background:var(--surface); border:1.5px solid var(--gold); border-radius:22px;
+  box-shadow:0 24px 60px rgba(0,0,0,.92); z-index:1100;
+  display:flex; flex-direction:column; overflow:hidden; text-align:start;
+}
+.area-panel-head {
+  padding:12px 15px; background:linear-gradient(135deg,#0f293a 0%,#09131f 100%);
+  border-bottom:1px solid var(--border-soft); display:grid; gap:8px;
+}
+.area-list-scroll {
+  padding:10px 12px; overflow-y:auto; flex:1; display:grid; gap:10px;
+}
+.area-group-title {
+  font-size:11.5px; font-weight:700; color:var(--gold); padding:4px 6px;
+  border-right:3px solid var(--gold); background:rgba(217,180,90,.08); border-radius:4px; margin-bottom:5px;
+}
+.area-chips-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(118px, 1fr)); gap:6px;
+}
+.area-check-item {
+  display:flex; align-items:center; gap:6px; padding:7px 9px; border-radius:11px;
+  background:rgba(255,255,255,.03); border:1px solid var(--border-soft);
+  font-size:12px; font-weight:600; cursor:pointer; user-select:none; transition:all .12s ease;
+}
+.area-check-item:hover { border-color:var(--gold); }
+.area-check-item.checked {
+  background:rgba(16,185,129,.18); border-color:var(--emerald); color:#fff; font-weight:700;
+}
+.area-check-item input { width:15px; height:15px; accent-color:var(--emerald); flex-shrink:0; pointer-events:none; }
+.area-panel-foot {
+  padding:10px 14px; border-top:1px solid var(--border-soft); background:var(--card);
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+
+/* ================= 6) الواجهة الزمردية وشريط البحث (overflow:visible لعدم قص القوائم المنسدلة نهائياً) ================= */
+.jevi-hero-stage {
+  position:relative; z-index:60; padding:24px 16px 22px; text-align:center;
+  border-bottom:1px solid rgba(45,212,191,.25); overflow:visible;
   background:var(--hero-bg),
     repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 48px),
     repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 48px);
-  box-shadow:inset 0 -24px 40px -15px rgba(4,15,25,.9),inset 0 1px 0 rgba(255,255,255,.2); }
-.jevi-spotlight { position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:540px; height:260px; background:radial-gradient(circle,rgba(94,234,212,.3) 0%,rgba(217,180,90,.1) 45%,transparent 72%); pointer-events:none; z-index:0; }
-.jevi-3d-emblem { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:240px; height:240px; border-radius:50%; background:radial-gradient(circle at 35% 30%,rgba(45,212,191,.18),rgba(6,78,59,.08) 60%,transparent 75%); border:1px solid rgba(94,234,212,.14); box-shadow:inset 0 0 40px rgba(45,212,191,.15); pointer-events:none; z-index:0; }
-.jevi-hero-content { position:relative; z-index:2; }
+  box-shadow:inset 0 -24px 40px -15px rgba(4,15,25,.9),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.jevi-hero-bg-clip { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+.jevi-spotlight { position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:540px; height:260px; background:radial-gradient(circle,rgba(94,234,212,.3) 0%,rgba(217,180,90,.1) 45%,transparent 72%); pointer-events:none; }
+.jevi-3d-emblem { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:240px; height:240px; border-radius:50%; background:radial-gradient(circle at 35% 30%,rgba(45,212,191,.18),rgba(6,78,59,.08) 60%,transparent 75%); border:1px solid rgba(94,234,212,.14); box-shadow:inset 0 0 40px rgba(45,212,191,.15); pointer-events:none; }
+.jevi-hero-content { position:relative; z-index:5; }
 .elegant-slogan { font-size:clamp(25px,3.8vw,38px); font-weight:700; letter-spacing:.4px; margin-bottom:10px; display:inline-flex; align-items:center; gap:10px; text-shadow:0 4px 14px rgba(0,0,0,.6); }
 .slogan-white { color:#fff; }
 .slogan-gold { background:linear-gradient(135deg,#FFF6C2 0%,#D9B45A 55%,#B8860B 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .personal-greet-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:99px; font-size:12.5px; font-weight:700; color:var(--gold-light); background:rgba(9,19,31,.72); border:1px solid var(--border); margin-bottom:12px; max-width:95%; }
-.ai-search-container { max-width:760px; width:100%; margin:0 auto; position:relative; z-index:50; }
+.ai-search-container { max-width:760px; width:100%; margin:0 auto; position:relative; z-index:900; }
 .ai-search-box {
   display:flex; align-items:center; gap:8px; width:100%;
   background:rgba(8,22,34,.95); border:1.5px solid rgba(94,234,212,.38);
@@ -184,17 +238,24 @@ html.light .menu-trigger { background:var(--card); }
   display:inline-flex; align-items:center; justify-content:center;
 }
 .search-clear-btn:hover { background:rgba(244,63,94,.22); color:var(--rose); }
-.autocomplete-dropdown { position:absolute; top:calc(100% + 6px); right:0; left:0; background:var(--card); border:1px solid var(--gold); border-radius:16px; box-shadow:0 14px 30px rgba(0,0,0,.8); max-height:290px; overflow-y:auto; text-align:start; z-index:80; padding:6px; }
-.auto-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; border-bottom:1px solid var(--border-soft); }
+/* القائمة المنسدلة للبحث تظهر فوق الريلز وفوق كل العناصر أسفلها */
+.autocomplete-dropdown {
+  position:absolute; top:calc(100% + 8px); right:0; left:0;
+  background:var(--card); border:1.5px solid var(--gold); border-radius:18px;
+  box-shadow:0 22px 50px rgba(0,0,0,.92); max-height:330px; overflow-y:auto;
+  text-align:start; z-index:999; padding:8px;
+}
+.auto-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; cursor:pointer; border-bottom:1px solid var(--border-soft); gap:8px; }
+.auto-item:last-child { border-bottom:none; }
 .auto-item:hover { background:var(--card-hover); }
 
 /* ================= 7) الأقسام والتخصصات ================= */
-.cats-modern-bar { max-width:720px; margin:18px auto 0; display:flex; justify-content:center; align-items:center; gap:14px; }
+.cats-modern-bar { max-width:720px; margin:18px auto 0; display:flex; justify-content:center; align-items:center; gap:14px; position:relative; z-index:2; }
 .cat-orb-pill { display:inline-flex; align-items:center; gap:12px; padding:10px 20px 10px 14px; border-radius:99px; background:rgba(7,20,32,.9); border:1px solid rgba(94,234,212,.28); box-shadow:0 5px 12px -6px rgba(0,0,0,.6); flex:1; max-width:220px; justify-content:center; color:#fff; }
 .cat-orb-pill:hover { border-color:var(--gold); }
 .cat-orb-pill.active { background:linear-gradient(135deg,rgba(217,180,90,.32),rgba(10,30,44,.95)); border:1.5px solid var(--gold); box-shadow:0 0 18px rgba(217,180,90,.25); }
 .orb-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; box-shadow:0 3px 8px rgba(0,0,0,.35); }
-.specs-filter-bar { max-width:1040px; margin:14px auto 0; display:flex; gap:8px; overflow-x:auto; padding:4px 4px 2px; scrollbar-width:none; justify-content:center; flex-wrap:wrap; }
+.specs-filter-bar { max-width:1040px; margin:14px auto 0; display:flex; gap:8px; overflow-x:auto; padding:4px 4px 2px; scrollbar-width:none; justify-content:center; flex-wrap:wrap; position:relative; z-index:2; }
 .specs-filter-bar::-webkit-scrollbar { display:none; }
 .spec-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:99px; font-size:12.5px; font-weight:700; background:rgba(8,22,35,.9); border:1px solid rgba(255,255,255,.14); color:#e2e8f0; white-space:nowrap; }
 .spec-chip:hover { border-color:var(--gold); color:#fff; }
@@ -207,8 +268,8 @@ html.light .menu-trigger { background:var(--card); }
   .specs-filter-bar { justify-content:flex-start; flex-wrap:nowrap; }
 }
 
-/* ================= 8) شريط الحالات (24 ساعة) — أداء مسرّع بالـ GPU ================= */
-.poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; }
+/* ================= 8) شريط الحالات (24 ساعة) — طبقة أقل من القوائم المنسدلة ================= */
+.poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; position:relative; z-index:10; }
 .poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; will-change:scroll-position; }
 .poster-track::-webkit-scrollbar { display:none; }
 .poster-card {
@@ -246,7 +307,7 @@ h1 .vbadge, .noon-showcase h2 .vbadge { width:22px; height:22px; }
 .act-off { background:rgba(148,163,184,.18) !important; color:#94a3b8 !important; border:1px dashed rgba(148,163,184,.45) !important; cursor:not-allowed; }
 
 /* ================= 10) البطاقات (كمبيوتر + مربع علوي أنيق للهاتف) ================= */
-.content-body { padding:14px 20px 45px; max-width:1160px; margin:0 auto; }
+.content-body { padding:14px 20px 45px; max-width:1160px; margin:0 auto; position:relative; z-index:5; }
 .cards-grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(480px,1fr)); }
 .entity-card { background:var(--card); border:1px solid var(--border-soft); border-radius:var(--card-radius); padding:var(--card-pad); position:relative; overflow:hidden; cursor:pointer; transition:border-color .12s ease; content-visibility:auto; contain-intrinsic-size:auto 195px; }
 @media (hover:hover) { .entity-card:hover { border-color:var(--border); } }
@@ -322,9 +383,9 @@ html.light .entity-card.peds-dignified { background:linear-gradient(145deg,#fdf2
 .rv-del:hover { background:rgba(244,63,94,.28); }
 .rv-mine { font-size:10.5px; padding:2px 8px; border-radius:99px; background:rgba(16,185,129,.18); color:var(--emerald); font-weight:700; }
 
-/* ================= 12) القائمة الجانبية والنوافذ ================= */
-.drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:90; }
-.side-drawer { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:86vw; background:var(--surface); border-left:1px solid var(--border); z-index:100; padding:20px; display:flex; flex-direction:column; justify-content:space-between; overflow-y:auto; transform:translateX(100%); transition:transform .2s cubic-bezier(.16,1,.3,1); will-change:transform; }
+/* ================= 12) القائمة الجانبية والنوافذ العلوية ================= */
+.drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:1200; }
+.side-drawer { position:fixed; top:0; right:0; bottom:0; width:320px; max-width:86vw; background:var(--surface); border-left:1px solid var(--border); z-index:1250; padding:20px; display:flex; flex-direction:column; justify-content:space-between; overflow-y:auto; transform:translateX(100%); transition:transform .2s cubic-bezier(.16,1,.3,1); will-change:transform; }
 html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-right:1px solid var(--border); transform:translateX(-100%); }
 .side-drawer.open { transform:translateX(0) !important; }
 .nav-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-radius:14px; font-weight:600; font-size:14px; color:var(--text); margin-bottom:6px; text-align:start; }
@@ -333,12 +394,12 @@ html[dir="ltr"] .side-drawer { right:auto; left:0; border-left:none; border-righ
 .nav-btn:hover { background:rgba(255,255,255,.06); }
 .nav-btn.active { background:rgba(217,180,90,.15); color:var(--gold); border:1px solid var(--border); }
 .nav-btn.active .nav-icon-box { background:var(--gold); color:#050811; border-color:var(--gold); }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:120; display:flex; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:1400; display:flex; align-items:center; justify-content:center; padding:16px; }
 .modal-box { width:100%; max-width:620px; max-height:92vh; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:22px; }
 .input-box { width:100%; background:rgba(255,255,255,.04); border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; font-size:14px; color:var(--text); outline:none; }
 html.light .input-box { background:rgba(0,0,0,.03); }
 .input-box:focus { border-color:var(--gold); }
-.toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:200; padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.6); }
+.toast-box { position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:2000; padding:11px 20px; border-radius:14px; font-weight:700; font-size:13px; max-width:90vw; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.6); }
 .ed-two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .ed-two.ed-addr { grid-template-columns:1.6fr 1fr; }
 .ed-two:has(> .hidden) { grid-template-columns:1fr; }
@@ -349,9 +410,9 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 .site-footer b { color:var(--gold); font-weight:700; }
 @media (max-width:1024px) { .site-footer { padding-bottom:96px; } }
 
-/* ================= 13) المساعد الذكي القابل للسحب (بفقاعة كلمات قصيرة لطيفة) + نافذة محادثة الذكاء الاصطناعي ================= */
+/* ================= 13) المساعد الذكي القابل للسحب + نافذة محادثة الذكاء الاصطناعي ================= */
 .cryo-mascot {
-  position:fixed; bottom:84px; left:16px; z-index:95;
+  position:fixed; bottom:84px; left:16px; z-index:950;
   width:56px; height:56px; cursor:grab; touch-action:none; user-select:none;
   filter:drop-shadow(0 8px 18px rgba(20,184,166,.45));
   transition:transform .18s ease; will-change:left,top,transform;
@@ -361,7 +422,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   position:absolute; bottom:2px; right:2px; width:13px; height:13px; border-radius:50%;
   background:#10b981; border:2px solid #040911; box-shadow:0 0 8px #10b981; pointer-events:none;
 }
-/* فقاعة الكلمات القصيرة تظهر يمين البوت نحو الشاشة المفتوحة بحجم رشيق */
 .cryo-mascot-bubble {
   position:absolute; top:50%; left:calc(100% + 10px); transform:translateY(-50%) translateX(-6px);
   background:var(--card); color:var(--gold-light);
@@ -380,9 +440,8 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 @keyframes cryoFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
 .cryo-mascot-svg { width:100%; height:100%; animation:cryoFloat 3.4s ease-in-out infinite; pointer-events:none; }
 
-/* نافذة محادثة الذكاء الاصطناعي CryoBot AI */
 .cryo-ai-panel {
-  position:fixed; bottom:148px; left:16px; z-index:115;
+  position:fixed; bottom:148px; left:16px; z-index:1150;
   width:360px; max-width:calc(100vw - 32px); height:470px; max-height:calc(100vh - 175px);
   background:var(--surface); border:1.5px solid var(--gold); border-radius:24px;
   box-shadow:0 20px 50px rgba(0,0,0,.85); display:flex; flex-direction:column; overflow:hidden;
@@ -528,19 +587,52 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       <span data-ico="menu"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg></span>
       <span data-i18n="menu_btn">القائمة</span>
     </button>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <button id="topAdminShortcut" onclick="navigateApp('admin')" class="hidden badge-pill gold-bg" style="padding:5px 12px;">🛡️ لوحة الأدمن</button>
-      <button onclick="navigateApp('referrals')" class="badge-pill" style="background:rgba(217,180,90,.14); color:var(--gold); border:1px solid var(--border); padding:5px 12px;" data-i18n="nav_referrals_short">✨ دعوة صديق</button>
+
+    <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap; justify-content:flex-end;">
+      <button id="topAdminShortcut" onclick="navigateApp('admin')" class="hidden badge-pill gold-bg" style="padding:5px 11px;">🛡️ الأدمن</button>
+
+      <!-- زر وقائمة اختيار مناطق وقرى الجيزة (بجانب دعوة صديق وإدارة صفحتي) -->
+      <div class="area-picker-wrap" id="areaPickerWrap">
+        <button type="button" id="areaPickerBtn" class="area-trigger-btn" title="تحديد القرية أو المنطقة في الجيزة">
+          <span>📍</span>
+          <span id="areaPickerLabel">كل الجيزة</span>
+          <span style="font-size:9px; opacity:.8;">▼</span>
+        </button>
+
+        <div id="areaDropdownPanel" class="area-dropdown-panel hidden" onclick="event.stopPropagation()">
+          <div class="area-panel-head">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <b class="font-display" style="font-size:14.5px; color:var(--gold);">📍 اختر منطقتك أو قريتك (محافظة الجيزة)</b>
+                <p style="font-size:11px; color:var(--muted);">يمكنك اختيار قرية واحدة أو عدة قرى معاً أو كل الجيزة</p>
+              </div>
+              <button type="button" id="closeAreaPanelBtn" style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.08); font-size:13px;">✕</button>
+            </div>
+            <input id="areaQuickSearch" type="search" autocomplete="off" placeholder="🔍 ابحث عن قريتك (مثال: الكوم الأحمر، أوسيم، الوراق...)" class="input-box" style="padding:7px 12px; font-size:12.5px;">
+          </div>
+
+          <div id="areaGroupsContainer" class="area-list-scroll"></div>
+
+          <div class="area-panel-foot">
+            <button type="button" id="selectAllGizaBtn" style="padding:7px 12px; border-radius:10px; background:rgba(255,255,255,.07); font-size:12px; font-weight:700; color:var(--gold);">✨ عرض كل الجيزة</button>
+            <button type="button" id="applyAreaFilterBtn" class="gold-bg" style="padding:7px 18px; border-radius:10px; font-size:12.5px;">تطبيق وإغلاق ✔</button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="navigateApp('referrals')" class="badge-pill" style="background:rgba(217,180,90,.14); color:var(--gold); border:1px solid var(--border); padding:5px 11px;" data-i18n="nav_referrals_short">✨ دعوة صديق</button>
       <button onclick="navigateApp('myManaged')" id="topManageShortcut" class="hidden badge-pill" style="background:rgba(16,185,129,.2); color:var(--emerald); border:1px solid var(--emerald); padding:5px 11px;" data-i18n="nav_managed">🎛️ إدارة صفحتي</button>
-      <span id="headerUserBadge" onclick="navigateApp('account')" style="font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; background:rgba(217,180,90,.12); padding:5px 11px; border-radius:10px;" data-i18n="login_short">🔐 دخول</span>
+      <span id="headerUserBadge" onclick="navigateApp('account')" style="font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; background:rgba(217,180,90,.12); padding:5px 10px; border-radius:10px;" data-i18n="login_short">🔐 دخول</span>
     </div>
   </div>
 
   <!-- ===== الرئيسية ===== -->
   <div id="view-home" class="spa-view">
     <header class="jevi-hero-stage">
-      <div class="jevi-spotlight"></div>
-      <div class="jevi-3d-emblem"></div>
+      <div class="jevi-hero-bg-clip">
+        <div class="jevi-spotlight"></div>
+        <div class="jevi-3d-emblem"></div>
+      </div>
       <div class="jevi-hero-content">
         <div id="personalGreetBox" class="personal-greet-pill hidden"></div>
         <div>
@@ -549,7 +641,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
             <span class="slogan-gold" data-i18n="slogan_2">مما تظن</span>
           </h1>
         </div>
-        <!-- شريط البحث المحكم: المكبرة وبجانبها الميكروفون يميناً، وحقل البحث يتمدد بأمان، وزر مسح يساراً -->
+        <!-- شريط البحث المحكم + القائمة المنسدلة التي تطفو فوق شريط الريلز -->
         <div class="ai-search-container">
           <div class="ai-search-box">
             <div class="search-right-cluster">
@@ -585,9 +677,10 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 
     <section class="content-body">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <h2 id="listTitle" class="font-display" style="font-size:20px;" data-i18n="dir_title">الدليل الطبي الموثق (الأعلى تقييماً والنشط أولاً)</h2>
           <span id="totalCountBadge" class="badge-pill" style="background:rgba(217,180,90,.16); color:var(--gold);">0</span>
+          <span id="activeAreaPill" class="badge-pill hidden" style="background:rgba(16,185,129,.18); color:var(--emerald); border:1px solid var(--emerald); cursor:pointer;" onclick="openAreaDropdown()"></span>
         </div>
         <button id="showAll" class="hidden badge-pill" style="background:var(--gold); color:#000; padding:5px 14px;" data-i18n="reset_filter">إلغاء الفلتر وعرض الكل ✕</button>
       </div>
@@ -599,16 +692,16 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <!-- ===== صفحة المكان ===== -->
   <div id="view-placePage" class="spa-view hidden"><div id="placePageContent" class="noon-page"></div></div>
 
-  <!-- ===== إدارة صفحتي ===== -->
+  <!-- ===== إدارة صفحتي (مع معاينة حية ومباشرة لشكل البطاقة كما تظهر للناس) ===== -->
   <div id="view-myManaged" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
-        <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="managed_header">🎛️ إدارة صفحتي وحالة الـ 24 ساعة</h2>
-        <p style="font-size:13px; color:var(--muted);" data-i18n="managed_sub">أضف صورتك، نشّط حالة الفتح، سعر الكشف، وانشر أو احذف حالتك اليومية</p>
+        <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="managed_header">🎛️ إدارة صفحتي ومعاينتها الحية</h2>
+        <p style="font-size:13px; color:var(--muted);" data-i18n="managed_sub">شاهد شكل صفحتك كما يراها الزوار وعدّل صورتك أو مواعيدك أو حالتك اليومية فوراً</p>
       </div>
       <button onclick="goBackSmart()" class="badge-pill" style="background:var(--card); border:1px solid var(--border-soft); padding:8px 14px;" data-i18n="back_btn">رجوع ←</button>
     </div>
-    <div id="managedListBox" style="display:grid; gap:16px;"></div>
+    <div id="managedListBox" style="display:grid; gap:20px;"></div>
   </div>
 
   <!-- ===== دعوة صديق ===== -->
@@ -769,7 +862,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 
       <div id="ext-admin-slot"></div>
 
-      <!-- قسم مراقبة وبحث جميع التعليقات في الموقع (تحسباً لأي تعليق سيء) -->
+      <!-- قسم مراقبة وبحث جميع التعليقات في الموقع -->
       <div class="entity-card" style="border-color:rgba(244,63,94,.35); display:grid; gap:10px; cursor:default;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
@@ -792,7 +885,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
           <h3 style="font-size:16px; color:var(--gold);">📋 جميع الصفحات المنشورة (<span id="adminTotalPlaces">0</span>)</h3>
           <div style="flex:1; min-width:240px; max-width:420px; position:relative;">
-            <input id="adminSearchInput" type="search" autocomplete="off" placeholder="🔍 ابحث في صفحات الإدارة بالاسم، التخصص، الهاتف، أو الإيميل..." class="input-box" style="border-color:var(--gold); padding:8px 14px; font-size:13px;">
+            <input id="adminSearchInput" type="search" autocomplete="off" placeholder="🔍 ابحث في صفحات الإدارة بالاسم، التخصص، المنطقة، الهاتف..." class="input-box" style="border-color:var(--gold); padding:8px 14px; font-size:13px;">
           </div>
         </div>
         <div id="adminAllPlacesList" style="display:grid; gap:10px;"></div>
@@ -835,7 +928,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   </form>
 </div>
 
-<!-- ================= نافذة الإضافة والتعديل ================= -->
+<!-- ================= نافذة الإضافة والتعديل (مع حقل اختيار قرية/منطقة الجيزة) ================= -->
 <div id="editorModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <form id="editorForm" class="modal-box" onclick="event.stopPropagation()" style="display:grid; gap:10px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -897,10 +990,18 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       <input type="hidden" id="edGalleryData">
     </div>
 
-    <div class="ed-two ed-addr">
-      <input id="edAddr" required placeholder="العنوان التفصيلي المؤكد *" class="input-box">
-      <div id="edFeeWrap"><input id="edFee" placeholder="💰 سعر الكشف (مثال: 150 ج.م)" class="input-box"></div>
+    <!-- اختيار المنطقة/القرية في الجيزة + العنوان التفصيلي -->
+    <div class="ed-two">
+      <div>
+        <label style="font-size:11px; color:var(--emerald); font-weight:700;">📍 المنطقة / القرية (الجيزة):</label>
+        <select id="edAreaKey" class="input-box" style="background:var(--card);"></select>
+      </div>
+      <div id="edFeeWrap">
+        <label style="font-size:11px; color:var(--gold); font-weight:700;">💰 سعر الكشف:</label>
+        <input id="edFee" placeholder="مثال: 150 ج.م" class="input-box">
+      </div>
     </div>
+    <input id="edAddr" required placeholder="العنوان التفصيلي المؤكد (مثال: الكوم الأحمر - شارع البوسطة) *" class="input-box">
     <input id="edMapUrl" placeholder="🗺️ رابط الموقع على خرائط جوجل (اختياري)" class="input-box">
 
     <div id="servicesWrap" class="hidden" style="background:rgba(168,85,247,.08); padding:10px; border-radius:12px; border:1px solid rgba(168,85,247,.35); display:grid; gap:8px;">
@@ -1051,8 +1152,8 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <script>
 'use strict';
 /* =====================================================================
-   Cryovion v1.5.0 — الجزء الثاني (القسم الأول: 2A)
-   الإعدادات، الهوية البصرية (DNA + PWA)، الحماية، قاعدة البيانات، والترتيب الذكي
+   Cryovion v1.6.0 — الجزء الثاني (القسم الأول: 2A)
+   الإعدادات، الهوية البصرية (DNA + PWA)، قرى ومناطق الجيزة، قاعدة البيانات، والترتيب الذكي
    ===================================================================== */
 
 /* ============ 1) الإعدادات الأساسية ============ */
@@ -1092,9 +1193,7 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
         <feComposite in="SourceGraphic" in2="blur" operator="over"/>
       </filter>
     </defs>
-    <!-- نبض قلب خفيف في الخلفية العليا كما في بوستر Cryovion -->
     <path d="M0 160 L95 160 L112 125 L130 195 L150 95 L172 180 L188 150 L205 160 L360 160" stroke="#14b8a6" stroke-width="1.6" opacity="0.22" fill="none"/>
-    <!-- الشريط الحلزوني المائل بزاوية القطر -->
     <g transform="rotate(-26 180 400) translate(5, -35)" filter="url(#cryoNeon)">
       <g stroke="url(#cryoRung)" stroke-width="2.2" stroke-linecap="round" opacity="0.72">
         <line x1="102" y1="62" x2="228" y2="62"/><line x1="118" y1="88" x2="212" y2="88"/><line x1="138" y1="112" x2="192" y2="112"/>
@@ -1144,7 +1243,7 @@ const db = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supab
     const manifest = {
       name: 'Cryovion | الدليل الطبي الذكي',
       short_name: 'Cryovion',
-      description: 'صحتك أقرب مما تظن — الدليل الرقمي للأطباء والصيدليات والمعامل',
+      description: 'صحتك أقرب مما تظن — الدليل الرقمي للأطباء والصيدليات والمعامل بمحافظة الجيزة',
       start_url: location.origin + location.pathname,
       display: 'standalone',
       background_color: '#040911',
@@ -1177,7 +1276,70 @@ window.addEventListener('beforeinstallprompt', e => {
   const btn = document.getElementById('installAppBtn'); if (btn) btn.classList.remove('hidden');
 });
 
-/* ============ 2) القواميس والتخصصات الطبية المصححة علمياً ============ */
+/* ============ 1.8) قاعدة بيانات قرى ومراكز وأحياء محافظة الجيزة + الربط الذكي بالعناوين ============ */
+const GIZA_AREAS_GROUPS = [
+  {
+    group: '🌿 مركز أوسيم وقراه',
+    items: [
+      { key: 'kom_ahmar', label: 'الكوم الأحمر', kw: ['الكوم الاحمر','كوم احمر','كوم الاحمر'] },
+      { key: 'osim',      label: 'أوسيم (المدينة)', kw: ['اوسيم','أوسيم'] },
+      { key: 'bashtil',   label: 'بشتيل', kw: ['بشتيل','لعبه'] },
+      { key: 'bartas',    label: 'برطس', kw: ['برطس'] },
+      { key: 'baragil',   label: 'البراجيل', kw: ['البراجيل','براجيل'] },
+      { key: 'saqil',     label: 'سقيل', kw: ['سقيل'] },
+      { key: 'zaydiya',   label: 'الزيدية', kw: ['الزيديه','زيديه'] },
+      { key: 'qaratyin',  label: 'القراطيين', kw: ['القراطيين','قراطيين'] },
+      { key: 'shanbari',  label: 'شنباري', kw: ['شنباري'] },
+      { key: 'kudaya',    label: 'الكداية', kw: ['الكدايه','كدايه'] }
+    ]
+  },
+  {
+    group: '🏙️ قطاع الوراق وإمبابة وشمال الجيزة',
+    items: [
+      { key: 'warraq',       label: 'الوراق', kw: ['الوراق','وراق العرب','وراق الحضر'] },
+      { key: 'tanash',       label: 'طناش وجزيرة محمد', kw: ['طناش','جزيره محمد'] },
+      { key: 'imbaba',       label: 'إمبابة', kw: ['امبابه','إمبابة','القوميه'] },
+      { key: 'munira',       label: 'المنيرة الغربية', kw: ['المنيره','منيره'] },
+      { key: 'ard_el_lewa',  label: 'أرض اللواء', kw: ['ارض اللواء'] }
+    ]
+  },
+  {
+    group: '🌴 مركز كرداسة ومنشأة القناطر',
+    items: [
+      { key: 'kerdasa',        label: 'كرداسة', kw: ['كرداسه'] },
+      { key: 'nahia',          label: 'ناهيا', kw: ['ناهيا'] },
+      { key: 'abu_rawash',     label: 'أبو رواش وبني مجدول', kw: ['ابو رواش','بني مجدول'] },
+      { key: 'kafr_hakim',     label: 'كفر حكيم والمعتمدية', kw: ['كفر حكيم','المعتمديه'] },
+      { key: 'manshiyat_qanater', label: 'منشأة القناطر وقراها', kw: ['منشاه القناطر','نكلا','برقاش','وردان','ابو غالب'] }
+    ]
+  },
+  {
+    group: '🏛️ أحياء مدينة الجيزة وأكتوبر',
+    items: [
+      { key: 'mohandessin', label: 'المهندسين والدقي والعجوزة', kw: ['المهندسين','الدقي','العجوزه'] },
+      { key: 'faisal_haram',label: 'فيصل والهرم والعمرانية', kw: ['فيصل','الهرم','العمرانيه','المريوطيه','الطوابق'] },
+      { key: 'bulaq_dakrour',label: 'بولاق الدكرور', kw: ['بولاق الدكرور','بولاق','صفط اللبن'] },
+      { key: 'giza_center', label: 'ميدان الجيزة والمنيب', kw: ['ميدان الجيزه','المنيب','جنوب الجيزه'] },
+      { key: 'october_zayed',label: '6 أكتوبر والشيخ زايد وحدائق الأهرام', kw: ['اكتوبر','الشيخ زايد','حدائق الاهرام','حدائق اكتوبر'] }
+    ]
+  },
+  {
+    group: '🌾 مراكز جنوب الجيزة',
+    items: [
+      { key: 'hawamdiya_badrashin', label: 'الحوامدية والبدرشين وأبو النمرس', kw: ['الحوامديه','البدرشين','ابو النمرس','شبرامنت','منيل شيحه'] },
+      { key: 'ayyat_saf_atfih',     label: 'العياط والصف وأطفيح', kw: ['العياط','الصف','اطفيح'] }
+    ]
+  }
+];
+
+const GIZA_AREAS_MAP = new Map();
+const GIZA_AREAS_FLAT = [];
+GIZA_AREAS_GROUPS.forEach(g => g.items.forEach(it => {
+  GIZA_AREAS_MAP.set(it.key, it);
+  GIZA_AREAS_FLAT.push(it);
+}));
+
+/*============ 2) القواميس والتخصصات الطبية المصححة علمياً ============ */
 const I18N = {
   ar: {
     menu_btn: 'القائمة', nav_home: 'الدليل الطبي الذكي', nav_managed: 'إدارة صفحتي', nav_referrals: 'دعوة صديق ومكافأة النشر',
@@ -1185,7 +1347,7 @@ const I18N = {
     login_title: 'تسجيل الدخول', login_sub: 'إدارة صفحتك / دعوة صديق', login_short: '🔐 دخول', slogan_1: 'صحتك أقرب', slogan_2: 'مما تظن',
     search_ph: 'ابحث عن طبيب، تخصص (أطفال، باطنة، مخ وأعصاب، عظام)، أو صيدلية...', stories_title: 'حالات وتحديثات اليوم (تُعرض لمدة 24 ساعة)',
     dir_title: 'الدليل الطبي الموثق (الأعلى تقييماً والنشط أولاً)', reset_filter: 'إلغاء الفلتر وعرض الكل ✕', back_btn: 'رجوع ←',
-    managed_header: '🎛️ إدارة صفحتي وحالة الـ 24 ساعة', managed_sub: 'أضف صورتك، نشّط حالة الفتح، سعر الكشف، وانشر أو احذف حالتك اليومية',
+    managed_header: '🎛️ إدارة صفحتي ومعاينتها الحية', managed_sub: 'شاهد شكل صفحتك كما يراها الزوار وعدّل صورتك أو مواعيدك أو حالتك اليومية فوراً',
     ref_header: '✨ دعوة صديق ومكافأة نشر الإعلانات', ref_sub: 'ادعُ أصدقاءك وشارك المنصة لتحصل على إعلان مجاني لنشاطك الطبي أو التجميلي',
     acc_header: '🔐 الحساب وتسجيل الدخول', acc_sub: 'سجل دخولك عبر Google أو Facebook أو بالبريد الإلكتروني مباشرة', logout_btn: 'تسجيل الخروج',
     tab_login: 'تسجيل دخول', tab_register: 'إنشاء حساب جديد', email_submit: 'دخول بالبريد الإلكتروني ✔', or_oauth: '— أو الدخول المباشر السريع —',
@@ -1201,7 +1363,7 @@ const I18N = {
     login_title: 'Sign In', login_sub: 'Manage page / Invite friends', login_short: '🔐 Sign In', slogan_1: 'Your Health is Closer', slogan_2: 'Than You Think',
     search_ph: 'Search doctor, specialty (Pediatrics, Neuro, Ortho, Optics), or pharmacy...', stories_title: 'Daily Updates & Status (Live for 24h)',
     dir_title: 'Verified Medical Directory (Active & Top Rated First)', reset_filter: 'Clear Filter & Show All ✕', back_btn: '← Back',
-    managed_header: '🎛️ Manage My Page & 24h Status', managed_sub: 'Upload photo, toggle open status, set consultation fee & daily story',
+    managed_header: '🎛️ Manage My Page & Live Preview', managed_sub: 'Preview your card live as visitors see it & update your details',
     ref_header: '✨ Invite Friends & Get Free Listing', ref_sub: 'Share Cryovion with friends to unlock a free verified medical listing',
     acc_header: '🔐 Account & Sign In', acc_sub: 'Sign in with Google, Facebook, or Email', logout_btn: 'Sign Out',
     tab_login: 'Sign In', tab_register: 'Create Account', email_submit: 'Sign In with Email ✔', or_oauth: '— Or Quick Social Sign In —',
@@ -1261,16 +1423,28 @@ const DEFAULT_DIRECTORY = [
     addr: 'الكوم الأحمر: شارع البوسطة - أمام صيدلية د/ علياء', phone: '01107204057', whatsapp: '01107204057', fee: 'كشف أطفال وحديثي ولادة',
     map_url: '', is_verified: true, photo_url: '', ref_count: 0, updated_date: '2026-11-08' },
   { id: 'v-ph-1', cat: 'pharmacy', spec_key: 'pharmacy', name: 'صيدلية الأمل', spec: 'صيدلية عامة وتركيبات دوائية',
-    bio: 'صرف الأدوية والمستلزمات الطبية وقياس الضغط والسكر.', bio_ts: nowTs, hours: '24 ساعة', lamp_mode: 'open', addr: 'أمام المستشفى العام مباشرة',
+    bio: 'صرف الأدوية والمستلزمات الطبية وقياس الضغط والسكر.', bio_ts: nowTs, hours: '24 ساعة', lamp_mode: 'open', addr: 'أوسيم - أمام المستشفى العام مباشرة',
     phone: null, whatsapp: null, fee: '', map_url: '', is_verified: false, ref_count: 0, updated_date: '2026-11-08' }
 ];
 
-/* ============ 3) أدوات مساعدة فائقة السرعة + حماية اسم Cryovion ============ */
+/* ============ 3) أدوات مساعدة فائقة السرعة + محلل المناطق الذكي ============ */
 const $ = id => document.getElementById(id);
 const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim().toLowerCase();
 const containsDefamation = txt => { const n = norm(txt); return BAD_NORM.some(w => n.includes(w)); };
+
+/* استنتاج المنطقة/القرية تلقائياً من العنوان أو البيانات الحالية دون الحاجة لتعديل قاعدة البيانات يدوياً */
+function detectPlaceAreaKey(d) {
+  if (d.sched && d.sched.area_key && GIZA_AREAS_MAP.has(d.sched.area_key)) return d.sched.area_key;
+  if (d.area_key && GIZA_AREAS_MAP.has(d.area_key)) return d.area_key;
+  const hay = norm(`${d.addr || ''} ${d.name || ''} ${d.bio || ''}`);
+  for (let i = 0; i < GIZA_AREAS_FLAT.length; i++) {
+    const ar = GIZA_AREAS_FLAT[i];
+    if (ar.kw.some(w => hay.includes(norm(w)))) return ar.key;
+  }
+  return '';
+}
 
 function isReservedBrandName(txt) {
   if (isUserMasterAdmin(getCurrentUser())) return false;
@@ -1401,9 +1575,12 @@ function updateDispSettingsUI() {
   if (prev) prev.textContent = 'سيظهر اسمك في التعليقات هكذا: 👤 ' + (u ? getReviewerDisplayName(u) : initial);
 }
 
-/* ============ 4) الحالة العامة ============ */
+/* ============ 4) الحالة العامة + حالة المناطق المختارة ============ */
 let places = [], placeMap = new Map(), allReviewsFlat = [], refCache = [];
-let activeCat = null, activeSpec = 'all', query = '', adminQuery = '', adminRevQuery = '';
+let activeCat = null, activeSpec = 'all', query = '', adminQuery = '', adminRevQuery = '', areaSearchQuery = '';
+let selectedAreas = new Set((() => {
+  try { return JSON.parse(localStorage.getItem('cryovion_selected_areas') || '[]'); } catch { return []; }
+})());
 let currentLang = localStorage.getItem('cryovion_lang') || 'ar';
 let isRegisterMode = false, selectedRole = 'مستخدم', pickedGender = 'male';
 let savedHomeScrollY = 0, currentViewName = 'home', currentPlaceId = null;
@@ -1413,6 +1590,19 @@ let writeQueue = Promise.resolve(), logoClicks = 0, logoTimer = null;
 let shownLimit = PAGE_SIZE, homeDirty = false, loadSeq = 0, lastUid = undefined;
 let ttsId = null, voices = [], appReady = false;
 
+function saveSelectedAreas() {
+  try { localStorage.setItem('cryovion_selected_areas', JSON.stringify(Array.from(selectedAreas))); } catch {}
+}
+function doesPlaceMatchSelectedAreas(d) {
+  if (!selectedAreas.size) return true;
+  if (d.area_key && selectedAreas.has(d.area_key)) return true;
+  for (const key of selectedAreas) {
+    const ar = GIZA_AREAS_MAP.get(key);
+    if (ar && ar.kw.some(w => d._s.includes(norm(w)))) return true;
+  }
+  return false;
+}
+
 /* ============ 4.5) واجهة التطوير العامة (للإضافات) ============ */
 Cryovion.filters = [];
 Cryovion.addFilter = fn => { Cryovion.filters.push(fn); Cryovion.refresh(); };
@@ -1421,6 +1611,7 @@ Cryovion.reload = () => load();
 Cryovion.onReady = f => { if (appReady) { try { f(); } catch (e) { console.error(e); } } else Cryovion.on('ready', f); };
 Cryovion.api = {
   get places() { return places; }, get reviews() { return allReviewsFlat; },
+  get areas() { return GIZA_AREAS_GROUPS; }, get selectedAreas() { return Array.from(selectedAreas); },
   get user() { return getCurrentUser(); }, get isAdmin() { return adminUnlocked; },
   get lang() { return currentLang; }, get view() { return currentViewName; },
   byId: id => byId(id), toast, esc, norm, navigate: v => navigateApp(v), openPlace: id => openPlacePage(id),
@@ -1502,6 +1693,7 @@ function switchViewDOM(viewName, restoreScroll = false) {
   const target = $('view-' + viewName); if (target) target.classList.remove('hidden');
   document.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === viewName));
   closeSideDrawer();
+  if ($('areaDropdownPanel')) $('areaDropdownPanel').classList.add('hidden');
   $('searchSuggest').classList.add('hidden');
   if (viewName === 'home' && homeDirty) { homeDirty = false; render(); }
   if (viewName === 'myManaged') renderManagedAds();
@@ -1649,7 +1841,7 @@ async function initSupabaseSession() {
   }, 0));
 }
 
-/* ============ 9) طبقة قاعدة البيانات (Supabase) + فهرسة التعليقات للبحث السريع + الحذف ============ */
+/* ============ 9) طبقة قاعدة البيانات (Supabase) + فهرسة التعليقات والمناطق ============ */
 const PLACE_COLS = 'id,cat,spec_key,name,spec,bio,bio_ts,photo_url,gallery,addr,hours,lamp_mode,sched,phone,whatsapp,fee,map_url,is_verified,ref_count,status,created_at,updated_at';
 const PLACE_KEYS = PLACE_COLS.split(',');
 const uploadedCache = {};
@@ -1692,6 +1884,7 @@ async function dbWrite(it) {
   const schedObj = it.sched ? { ...it.sched } : {};
   if (Array.isArray(it.services) && it.services.length) schedObj.services = it.services;
   else delete schedObj.services;
+  if (it.area_key) schedObj.area_key = it.area_key;
 
   const row = {
     id: it.id, cat: it.cat === 'optics' ? 'lab' : it.cat, spec_key: it.spec_key, name: it.name, spec: it.spec || '',
@@ -1827,8 +2020,12 @@ function buildPlaces(rows, revs) {
   places = rows.map(d => {
     const rv = rmap.get(d.id) || [], rated = rv.filter(x => x.stars > 0);
     const services = (d.sched && Array.isArray(d.sched.services)) ? d.sched.services : (Array.isArray(d.services) ? d.services : []);
+    const areaKey = detectPlaceAreaKey(d);
+    const areaMeta = areaKey ? GIZA_AREAS_MAP.get(areaKey) : null;
     const o = {
       ...d,
+      area_key: areaKey,
+      area_label: areaMeta ? areaMeta.label : '',
       services,
       hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف', bio: d.bio || '', gallery: d.gallery || [],
       phone: d.phone || null, whatsapp: d.whatsapp || null, fee: d.fee || '', map_url: d.map_url || '',
@@ -1838,7 +2035,7 @@ function buildPlaces(rows, revs) {
     };
     const svcNames = services.map(s => s.name || '').join(' ');
     const revBodies = rv.map(r => r.body || '').join(' ');
-    o._n = norm(`${o.name} ${o.spec} ${o.addr}`);
+    o._n = norm(`${o.name} ${o.spec} ${o.addr} ${o.area_label}`);
     o._s = o._n + ' ' + norm(o.bio) + ' ' + norm(svcNames) + ' ' + norm(revBodies);
     const a = getAvailabilityStatus(o); o.avail_state = a.state; o.avail_label = a.label; o.avail_color = a.color;
     return o;
@@ -1880,8 +2077,9 @@ async function load() {
   refCache = reqRows.map(x => ({ ...x, desc: x.description, refs: '—' }));
   if (!failed && rows.length) saveCache();
 
-  refreshUserUI(); buildFilters(); render(); renderPostersCarousel();
+  refreshUserUI(); buildFilters(); renderAreaDropdownItems(); updateAreaPickerButtonUI(); render(); renderPostersCarousel();
   if (currentViewName === 'admin') renderAdminList();
+  if (currentViewName === 'myManaged') renderManagedAds();
   if (currentViewName === 'placePage' && currentPlaceId && byId(currentPlaceId)) renderPlacePageDOM(currentPlaceId);
   Cryovion.emit('placesLoaded', places);
 }
@@ -1892,6 +2090,7 @@ function repaintVerified(id) {
   render();
   if (currentViewName === 'placePage' && currentPlaceId === id) renderPlacePageDOM(id);
   if (currentViewName === 'admin') renderAdminList();
+  if (currentViewName === 'myManaged') renderManagedAds();
 }
 async function setVerified(id, val) {
   const p = byId(id); if (!p) return;
@@ -1921,11 +2120,106 @@ async function setVerified(id, val) {
 }
 const toggleVerify = id => setVerified(id);
     /* =====================================================================
-   Cryovion v1.5.0 — الجزء الثاني (القسم الأخير: 2B)
-   البطاقات السريعة، البحث في التعليقات، الكلمات اللطيفة المتناوبة، ومحرك CryoBot AI القابل للتطوير
+   Cryovion v1.6.0 — الجزء الثاني (القسم الأخير: 2B)
+   فلتر قرى الجيزة المتعدد، المعاينة الحية في إدارة صفحتي، البحث في التعليقات، و CryoBot AI
    ===================================================================== */
 
-/* ============ 10) الأزرار: اتصال / واتساب / خريطة ============ */
+/* ============ 10) نظام اختيار قرى ومناطق الجيزة المتعدد ============ */
+function populateEditorAreaSelect() {
+  const sel = $('edAreaKey'); if (!sel) return;
+  let html = '<option value="">🔄 تلقائي من نص العنوان</option>';
+  GIZA_AREAS_GROUPS.forEach(g => {
+    html += `<optgroup label="${esc(g.group)}">` + g.items.map(it => `<option value="${esc(it.key)}">📍 ${esc(it.label)}</option>`).join('') + `</optgroup>`;
+  });
+  sel.innerHTML = html;
+}
+
+function updateAreaPickerButtonUI() {
+  const btn = $('areaPickerBtn'), lbl = $('areaPickerLabel'), pill = $('activeAreaPill');
+  if (!btn || !lbl) return;
+  const count = selectedAreas.size;
+  if (count === 0) {
+    lbl.textContent = currentLang === 'en' ? 'All Giza' : 'كل الجيزة';
+    btn.classList.remove('has-selection');
+    if (pill) pill.classList.add('hidden');
+  } else if (count === 1) {
+    const firstKey = Array.from(selectedAreas)[0];
+    const meta = GIZA_AREAS_MAP.get(firstKey);
+    const name = meta ? meta.label : firstKey;
+    lbl.textContent = name;
+    btn.classList.add('has-selection');
+    if (pill) { pill.textContent = `📍 المنطقة: ${name} (تغيير)`; pill.classList.remove('hidden'); }
+  } else {
+    lbl.textContent = `${count} مناطق بالجيزة`;
+    btn.classList.add('has-selection');
+    if (pill) { pill.textContent = `📍 ${count} مناطق محددة بالجيزة (تغيير)`; pill.classList.remove('hidden'); }
+  }
+}
+
+function renderAreaDropdownItems() {
+  const box = $('areaGroupsContainer'); if (!box) return;
+  const q = norm(areaSearchQuery);
+  const countPerArea = new Map();
+  places.forEach(p => {
+    if (p.area_key) countPerArea.set(p.area_key, (countPerArea.get(p.area_key) || 0) + 1);
+  });
+
+  let html = '';
+  GIZA_AREAS_GROUPS.forEach(g => {
+    const matchedItems = g.items.filter(it => !q || norm(it.label).includes(q) || it.kw.some(w => norm(w).includes(q)));
+    if (!matchedItems.length) return;
+    html += `<div>
+      <div class="area-group-title">${esc(g.group)}</div>
+      <div class="area-chips-grid">
+        ${matchedItems.map(it => {
+          const isChecked = selectedAreas.has(it.key);
+          const cnt = countPerArea.get(it.key) || 0;
+          return `<div class="area-check-item${isChecked ? ' checked' : ''}" data-area-toggle="${esc(it.key)}">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} tabindex="-1">
+            <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(it.label)}</span>
+            ${cnt ? `<span style="font-size:10px; color:var(--gold); font-weight:700;">(${cnt})</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  box.innerHTML = html || '<p style="text-align:center; padding:18px; font-size:12.5px; color:var(--muted);">لا توجد قرية أو منطقة مطابقة لبحثك.</p>';
+}
+
+function openAreaDropdown(forceState) {
+  const panel = $('areaDropdownPanel'); if (!panel) return;
+  const willOpen = typeof forceState === 'boolean' ? forceState : panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', !willOpen);
+  if (willOpen) {
+    $('searchSuggest').classList.add('hidden');
+    renderAreaDropdownItems();
+  }
+}
+
+function toggleAreaKey(key) {
+  if (!key) return;
+  if (selectedAreas.has(key)) selectedAreas.delete(key);
+  else selectedAreas.add(key);
+  saveSelectedAreas();
+  renderAreaDropdownItems();
+  updateAreaPickerButtonUI();
+  shownLimit = PAGE_SIZE;
+  render();
+  renderPostersCarousel();
+}
+
+function clearAllAreaFilters() {
+  selectedAreas.clear();
+  saveSelectedAreas();
+  renderAreaDropdownItems();
+  updateAreaPickerButtonUI();
+  shownLimit = PAGE_SIZE;
+  render();
+  renderPostersCarousel();
+}
+
+/* ============ 10.5) الأزرار: اتصال / واتساب / خريطة ============ */
 function actions(d, mode) {
   const pg = mode === 'page', wa = formatWaNumber(d.whatsapp || d.phone);
   let mu = (d.map_url || '').trim();
@@ -1944,7 +2238,7 @@ function actions(d, mode) {
 function buildFilters() {
   const dict = I18N[currentLang] || I18N.ar;
   $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => {
-    const n = places.reduce((a, d) => a + (d.cat === k ? 1 : 0), 0);
+    const n = places.reduce((a, d) => a + (d.cat === k && doesPlaceMatchSelectedAreas(d) ? 1 : 0), 0);
     return `<button data-cat="${k}" class="cat-orb-pill">${orb(k, 40)}
       <div style="text-align:start;"><span style="font-size:14px; font-weight:700; display:block; line-height:1.2;">${currentLang === 'en' ? c.labelEn : c.label}</span>
       <span style="font-size:11px; color:var(--gold);">${n} ${dict.page_unit}</span></div></button>`;
@@ -1990,6 +2284,7 @@ function renderPostersCarousel() {
   }
   places.forEach(d => {
     if (!d.bio || (d.bio_ts && now - d.bio_ts > DAY_MS)) return;
+    if (!doesPlaceMatchSelectedAreas(d)) return;
     const sp = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro;
     const catMeta = CATS[d.cat] || CATS.doctor;
     const accentColor = sp.color || catMeta.accent || '#10b981';
@@ -2066,6 +2361,7 @@ function card(d) {
   const verifyText = d.is_verified
     ? '<span style="color:#60a5fa; font-size:11.5px; font-weight:700;" title="تمت مراجعة وتأكيد البيانات بنسبة 100%">✔ موثق ورسمي</span>'
     : '<span style="color:var(--muted); font-size:11px;" title="جاري جمع وتدقيق البيانات">⏳ قيد التدقيق</span>';
+  const areaTag = d.area_label ? `<span class="badge-pill" style="background:rgba(20,184,166,.14); color:#5eead4; font-size:10.5px; padding:2px 8px;">📍 ${esc(d.area_label)}</span>` : '';
   const photo = d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" loading="lazy" decoding="async">`
     : `<div style="text-align:center; padding:6px;"><div class="fallback-ico" style="font-size:36px; margin-bottom:4px;">${spMeta.icon}</div><span class="fallback-lbl" style="font-size:10.5px; color:var(--muted); font-weight:700; display:block;">${currentLang === 'en' ? c.labelEn : c.label}</span></div>`;
 
@@ -2078,8 +2374,9 @@ function card(d) {
           <h3 style="font-size:17px; font-weight:700; line-height:1.35;"><span>${esc(d.name)}</span>${badge(d, true)}</h3>
           <span class="top-left-activity"><span class="status-dot ${d.avail_state}"></span><span style="color:${d.avail_color};">${esc(d.avail_label)}</span></span>
         </div>
-        <div style="margin-top:6px; display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+        <div style="margin-top:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color}; border:1px solid ${spMeta.color}44;">${spMeta.icon} ${esc(d.spec)}</span>
+          ${areaTag}
           ${verifyText}
           <span style="font-size:11.5px; color:var(--gold); font-weight:700;">★ ${d.rate || 5} (${d.n})</span>
         </div>
@@ -2102,19 +2399,24 @@ function render() {
   if (currentViewName !== 'home') { homeDirty = true; return; }
   const q = norm(query), dict = I18N[currentLang] || I18N.ar;
   const extra = Cryovion.filters;
-  const res = places.filter(d => (!activeCat || d.cat === activeCat) && (activeSpec === 'all' || d.spec_key === activeSpec) && (!q || d._s.includes(q))
-    && (!extra.length || extra.every(f => { try { return f(d); } catch { return true; } })));
+  const res = places.filter(d =>
+    (!activeCat || d.cat === activeCat) &&
+    (activeSpec === 'all' || d.spec_key === activeSpec) &&
+    doesPlaceMatchSelectedAreas(d) &&
+    (!q || d._s.includes(q)) &&
+    (!extra.length || extra.every(f => { try { return f(d); } catch { return true; } }))
+  );
   const shown = res.slice(0, shownLimit);
   let html = shown.map(card).join('');
   if (res.length > shown.length) html += `<button type="button" data-act="more" class="gold-bg" style="grid-column:1/-1; padding:12px; border-radius:14px; font-size:13.5px;">${dict.more_btn} (${res.length - shown.length})</button>`;
   $('list').innerHTML = html;
   $('totalCountBadge').textContent = res.length;
-  $('empty').textContent = currentLang === 'en' ? 'No matching results found.' : 'لا توجد نتائج مطابقة لهذا الفلتر.';
+  $('empty').textContent = currentLang === 'en' ? 'No matching results found in selected area.' : 'لا توجد نتائج مطابقة لهذا الفلتر أو المنطقة المحددة.';
   $('empty').classList.toggle('hidden', res.length > 0);
   $('listTitle').textContent = activeSpec !== 'all' ? (currentLang === 'en' ? SPECS_META[activeSpec].labelEn : SPECS_META[activeSpec].label)
     : (activeCat ? (currentLang === 'en' ? CATS[activeCat].labelEn : CATS[activeCat].label) : dict.dir_title);
-  $('showAll').classList.toggle('hidden', !activeCat && activeSpec === 'all');
-  paintFilters();
+  $('showAll').classList.toggle('hidden', !activeCat && activeSpec === 'all' && selectedAreas.size === 0);
+  buildFilters();
   Cryovion.emit('rendered', res);
 }
 
@@ -2188,8 +2490,9 @@ function defaultPlacePageHtml(d, x) {
         <table class="noon-table">
           <tr><th>حالة التوثيق</th><td>${verifyPage}</td></tr>
           <tr><th>التصنيف / التخصص</th><td style="color:${spMeta.color};">${esc(d.spec)}</td></tr>
+          ${d.area_label ? `<tr><th>📍 المنطقة / القرية</th><td style="color:#5eead4;">${esc(d.area_label)} — محافظة الجيزة</td></tr>` : ''}
           ${d.cat === 'doctor' ? `<tr><th>💰 سعر الكشف</th><td style="color:var(--gold);">${esc(d.fee || 'يُحدد بالعيادة')}</td></tr>` : ''}
-          <tr><th>📍 العنوان المؤكد</th><td>${esc(d.addr)}</td></tr>
+          <tr><th>📍 العنوان التفصيلي</th><td>${esc(d.addr)}</td></tr>
           <tr><th>🕒 مواعيد الفتح</th><td>${esc(d.hours || 'غير معروف')}</td></tr>
           <tr><th>📞 رقم الهاتف</th><td>${phoneRow}</td></tr>
           <tr><th>📅 آخر تحديث</th><td>${esc(d.updated_date || '2026-11-08')}</td></tr>
@@ -2257,7 +2560,6 @@ function renderPlacePageDOM(id) {
   const custom = runTpl('placePage', d, ctx);
   $('placePageContent').innerHTML = custom !== null ? custom : defaultPlacePageHtml(d, ctx);
 
-  /* تفعيل البحث الفوري داخل تعليقات الصفحة الواحدة */
   const revSearchInp = $('placeRevSearch');
   if (revSearchInp) {
     revSearchInp.addEventListener('input', e => {
@@ -2313,7 +2615,7 @@ function openReviewModal(id) {
 }
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
-/* ============ 13) إدارة صفحتي + دعوة صديق + غرفة الإدارة (مع مراقبة وبحث جميع التعليقات) ============ */
+/* ============ 13) إدارة صفحتي (مع عرض البطاقة الحية كما تظهر للناس مباشرة) + دعوة صديق + غرفة الإدارة ============ */
 function renderManagedAds() {
   const u = getCurrentUser(), box = $('managedListBox');
   if (!u) {
@@ -2328,34 +2630,57 @@ function renderManagedAds() {
   const baseUrl = window.location.href.split('?')[0];
   box.innerHTML = myAds.map(p => {
     const refLink = `${baseUrl}?ref=${p.id}`, count = p.ref_count || 0, pct = Math.min(100, count);
-    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px; cursor:default;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div><span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔ صفحة مفوضة لحسابك</span><h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}${badge(p, false)}</h3></div>
+    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:16px; cursor:default;">
+      <!-- شريط التحكم العلوي لصاحب الصفحة -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
+        <div>
+          <span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔ صفحة مفوضة لحسابك</span>
+          <h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}${badge(p, false)}</h3>
+        </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button onclick="quickToggleLamp('${p.id}')" style="background:rgba(255,255,255,0.06); border:1px solid var(--emerald); color:var(--emerald); padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700;"><span class="status-dot ${p.avail_state}"></span> تبديل حالة الدوام (${esc(p.avail_label)})</button>
-          <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">📷 رفع صورة / تعديل البيانات</button>
+          <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">✏️ تعديل البيانات والصورة</button>
+          <button onclick="openPlacePage('${p.id}')" style="background:rgba(59,130,246,.18); color:#60a5fa; border:1px solid rgba(59,130,246,.4); padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700;">👁️ فتح الصفحة الداخلية</button>
         </div>
       </div>
+
+      <!-- معاينة حية ومباشرة لشكل البطاقة كما تظهر للزوار في الموقع -->
+      <div style="background:rgba(4,9,17,.65); padding:14px; border-radius:18px; border:1.5px dashed var(--gold);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
+          <span style="font-size:12px; font-weight:700; color:var(--gold);">👁️ معاينة حية لبطاقتك كما يراها الزوار الآن في الدليل (اضغط عليها لفتح صفحتك الكاملة):</span>
+          <span style="font-size:11px; color:var(--emerald); font-weight:700;">تتحدث تلقائياً فور حفظ أي تعديل ✔</span>
+        </div>
+        ${card(p)}
+      </div>
+
+      <!-- نشر أو حذف الحالة اليومية (الريلز) -->
+      <div style="background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:8px;">
+        <b style="font-size:13px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية على شريط الـ 24 ساعة</b>
+        <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="مثال: متاح كشف الليلة حتى 9 مساءً...">${esc(p.bio || '')}</textarea>
+        <div style="display:flex; gap:8px;">
+          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة فوراً ✔</button>
+          <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">🗑 حذف الحالة</button>
+        </div>
+      </div>
+
+      <!-- عداد ورابط دعوة صديق -->
       <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:14px; border:1px solid var(--border-soft);">
         <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; margin-bottom:6px;"><span style="color:var(--gold);">✨ عداد دعوة صديق الخاص بصفحتك:</span><span style="color:var(--emerald);">${count} / 100 صديق</span></div>
         <div style="height:9px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:10px;"><div style="width:${pct}%; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald));"></div></div>
         <div style="display:flex; gap:8px;"><input readonly value="${esc(refLink)}" class="input-box" style="font-size:12px; padding:8px 10px;">
         <button onclick="navigator.clipboard.writeText('${esc(refLink)}'); toast('تم نسخ رابط دعوة صديق 📋')" class="gold-bg" style="padding:0 14px; border-radius:10px; font-size:12px; white-space:nowrap;">نسخ الرابط</button></div>
       </div>
-      <div style="background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:8px;">
-        <b style="font-size:13px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية (تظهر 24 ساعة)</b>
-        <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="مثال: متاح كشف الليلة حتى 9 مساءً...">${esc(p.bio || '')}</textarea>
-        <div style="display:flex; gap:8px;">
-          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة ✔</button>
-          <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">🗑 حذف الحالة</button>
-        </div>
-      </div>
     </div>`;
   }).join('');
 }
+
 async function quickToggleLamp(id) {
   const p = byId(id); if (!p) return;
   const order = ['auto', 'open', 'closed', 'unknown'], nx = order[(order.indexOf(p.lamp_mode) + 1) % 4];
+  p.lamp_mode = nx;
+  const a = getAvailabilityStatus(p);
+  p.avail_state = a.state; p.avail_label = a.label; p.avail_color = a.color;
+  renderManagedAds();
   savePlace({ ...p, lamp_mode: nx });
   await load(); renderManagedAds();
   toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ غير معروف' }[nx]);
@@ -2364,7 +2689,7 @@ function saveDailyStatus(id, text) {
   const q = byId(id); if (!q) return;
   if (containsDefamation(text)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
   savePlace({ ...q, bio: text, bio_ts: text ? Date.now() : null });
-  load().then(() => { renderManagedAds(); toast(text ? '✔ تم نشر حالتك' : '🗑 تم حذف الحالة من الشريط'); });
+  load().then(() => { renderManagedAds(); toast(text ? '✔ تم نشر حالتك وتحديث معاينتك' : '🗑 تم حذف الحالة من الشريط'); });
 }
 
 function renderReferralsHub() {
@@ -2407,7 +2732,6 @@ function renderReferralsHub() {
   });
 }
 
-/* عرض ومراقبة وبحث جميع التعليقات في الموقع داخل غرفة الإدارة */
 function renderAdminReviewsMonitor() {
   const box = $('adminAllReviewsList'), countEl = $('adminTotalRevs');
   if (!box || !countEl) return;
@@ -2463,6 +2787,7 @@ function renderAdminList() {
       <div>
         <span style="font-size:11px; color:var(--gold); font-weight:700;">[${(SPECS_META[p.spec_key] || SPECS_META.gastro).label}]</span>
         <strong style="font-size:15px; margin-right:6px;">${esc(p.name)}</strong>${badge(p, true)}
+        ${p.area_label ? `<span style="font-size:11px; color:#5eead4; margin-right:6px;">(📍 ${esc(p.area_label)})</span>` : ''}
         <p style="font-size:12px; color:var(--muted); margin-top:2px;">موثق: <b style="color:${p.is_verified ? '#60a5fa' : 'var(--muted)'};">${p.is_verified ? 'نعم 🔵' : 'لا ⚪'}</b> | المدير: <b style="color:var(--emerald);">${esc(p.owner_email || 'غير محدد')}</b> ${p.phone ? `| 📞 ${esc(p.phone)}` : ''}</p>
       </div>
       <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -2498,7 +2823,7 @@ async function deleteAd(id) {
   await load(); renderAdminList(); toast('تم الحذف');
 }
 
-/* ============ 14) نافذة التعديل + الخدمات ============ */
+/* ============ 14) نافذة التعديل + المنطقة + الخدمات ============ */
 function addServiceRow(nameVal = '', priceVal = '') {
   const box = $('svcRows'); if (!box) return;
   const max = Cryovion.config.maxServices || 7;
@@ -2530,6 +2855,7 @@ function syncEditorCatFields() {
 
 function openEditorModal(id) {
   adminUnlocked = isUserMasterAdmin(getCurrentUser());
+  populateEditorAreaSelect();
   const ex = id ? byId(id) : null, s = (ex && ex.sched) || {};
   $('edId').value = ex ? ex.id : '';
   const uiCat = ex ? (ex.spec_key === 'optics' ? 'optics' : ex.cat) : 'doctor';
@@ -2538,6 +2864,7 @@ function openEditorModal(id) {
   $('edName').value = ex ? ex.name : ''; $('edSpec').value = ex ? ex.spec : '';
   $('edBio').value = ex ? (ex.bio || '') : '';
   $('edPhotoUrl').value = ex ? (ex.photo_url || '') : '';
+  $('edAreaKey').value = ex ? (ex.area_key || '') : '';
   $('edAddr').value = ex ? ex.addr : '';
   $('edFee').value = ex && ex.fee ? ex.fee : '';
   $('edMapUrl').value = ex && ex.map_url ? ex.map_url : '';
@@ -2605,13 +2932,13 @@ function listenVoiceSearch() {
   r.start();
 }
 
-/* ============ 14.5) المساعد الذكي القابل للسحب (بفقاعة كلمات قصيرة لطيفة) + محرك CryoBot AI القابل للتطوير ============ */
+/* ============ 14.5) المساعد الذكي القابل للسحب + محرك CryoBot AI القابل للتطوير ============ */
 const SHORT_BUBBLE_TIPS_MALE = [
   '🩺 هل تبحث عن دكتور؟',
   '💊 هل تبحث عن صيدلية؟',
   '⭐ تقييمك يفيد أهل قريتك!',
   '🟢 النقطة الخضراء = مفتوح الآن',
-  '🎤 جرب البحث الصوتي بالأعلى!',
+  '📍 حدد قريتك من زر المناطق بالأعلى!',
   '🧪 هل تبحث عن معمل أو أشعة؟'
 ];
 const SHORT_BUBBLE_TIPS_FEMALE = [
@@ -2619,12 +2946,11 @@ const SHORT_BUBBLE_TIPS_FEMALE = [
   '💊 هل تبحثين عن صيدلية؟',
   '⭐ تقييمكِ يفيد أهل قريتكِ!',
   '🟢 النقطة الخضراء = مفتوح الآن',
-  '🎤 جربي البحث الصوتي بالأعلى!',
+  '📍 حددي قريتكِ من زر المناطق بالأعلى!',
   '🧪 هل تبحثين عن معمل أو أشعة؟'
 ];
 let bubbleTipIndex = 0, bubbleInterval = null;
 
-/* مصفوفة قواعد قابلة للتطوير مستقبلاً: Cryovion.addBotRule(fn) */
 Cryovion.botRules = [];
 Cryovion.addBotRule = fn => { if (typeof fn === 'function') Cryovion.botRules.push(fn); };
 
@@ -2713,16 +3039,15 @@ function initDraggableMascot() {
   el.addEventListener('pointerup', endDrag);
   el.addEventListener('pointercancel', endDrag);
 
-  /* إظهار العبارات القصيرة المتناوبة بهدوء أثناء تصفح الموقع */
   setTimeout(showShortMascotPhrase, 1500);
   if (bubbleInterval) clearInterval(bubbleInterval);
   bubbleInterval = setInterval(showShortMascotPhrase, 9500);
 }
 
 function getPublicSafePlaces() {
-  return places.map(p => ({
+  return places.filter(doesPlaceMatchSelectedAreas).map(p => ({
     id: p.id, cat: p.cat, spec_key: p.spec_key, name: p.name, spec: p.spec,
-    addr: p.addr, hours: p.hours, avail_state: p.avail_state, avail_label: p.avail_label,
+    addr: p.addr, area_label: p.area_label, hours: p.hours, avail_state: p.avail_state, avail_label: p.avail_label,
     phone: p.phone, whatsapp: p.whatsapp, fee: p.fee, is_verified: !!p.is_verified,
     rate: p.rate || 5, n: p.n || 0, services: p.services || []
   }));
@@ -2748,7 +3073,6 @@ function generateCryoBotReply(userText) {
   const fem = !!(demo && demo.gender === 'female');
   const safeList = getPublicSafePlaces();
 
-  /* فحص القواعد المضافة مستقبلاً عبر Cryovion.addBotRule */
   for (const ruleFn of Cryovion.botRules) {
     try {
       const customReply = ruleFn(q, { userText, fem, safeList, formatMiniCardsHtml });
@@ -2756,44 +3080,38 @@ function generateCryoBotReply(userText) {
     } catch (e) { console.error(e); }
   }
 
-  /* 1) جدار الحماية الصارم (Zero-Leak Security Guard) */
   const secPatterns = ['ايميل','بريد','ادمن','مشرف','باسورد','كلمه السر','كلمه مرور','حسابات','قاعده البيانات','سوبابيز','supabase','admin','email','password','token','key','owner','مين صاحب الموقع','بيانات المستخدمين'];
   if (secPatterns.some(w => q.includes(norm(w)))) {
     return `🔒 <b>حماية الخصوصية في Cryovion:</b><br>أنا مساعد طبي مخصص لخدمتك في البحث عن الأطباء والصيدليات والمعامل فقط. جميع بيانات الحسابات والإدارة مشفرة ومحمية بالكامل ولا يمكنني الاطلاع عليها أو مشاركتها.`;
   }
 
-  /* 2) الترحيب والسلام */
   if (/^(اهلا|مرحبا|السلام عليكم|صباح|مساء|هاي|ازيك|عامل ايه|من انت|مين انت)/.test(q)) {
     return fem
       ? `أهلاً وسهلاً بحضرتكِ! 🌸 أنا <b>CryoBot</b>، المساعد الذكي لمنصة <b>Cryovion</b>.<br>تقدري تسأليني عن أي صيدلية مفتوحة، دكتور في أي تخصص، أو معمل تحاليل وأشعة.`
       : `يا أهلاً وسهلاً بك! ✨ أنا <b>CryoBot</b>، المساعد الذكي لمنصة <b>Cryovion</b>.<br>تقدر تسألني عن أي صيدلية مفتوحة، دكتور في أي تخصص، أو معمل تحاليل وأشعة.`;
   }
 
-  /* 3) السؤال عن كيفية استخدام الموقع أو مميزاته */
   if (q.includes('اشرح') || q.includes('ازاي استخدم') || q.includes('مميزات') || q.includes('يعني ايه') || q.includes('فكره الموقع')) {
     return `💡 <b>مميزات منصة Cryovion باختصار:</b><br>
-    1️⃣ <b>النقطة الخضراء 🟢:</b> معناها العيادة أو الصيدلية فاتحة دلوقتي، والحمراء 🔴 يعني مغلقة أو إجازة.<br>
-    2️⃣ <b>العلامة الزرقاء 🔵:</b> معناها الصفحة موثقة رسمياً وبياناتها مؤكدة.<br>
-    3️⃣ <b>شريط الـ 24 ساعة 📢:</b> يعرض يومياً أحدث الحالات والعروض الطبية.<br>
+    1️⃣ <b>زر المناطق 📍:</b> في أعلى الصفحة لاختيار قريتك أو عدة قرى في الجيزة.<br>
+    2️⃣ <b>النقطة الخضراء 🟢:</b> معناها العيادة أو الصيدلية فاتحة دلوقتي، والحمراء 🔴 يعني مغلقة أو إجازة.<br>
+    3️⃣ <b>العلامة الزرقاء 🔵:</b> معناها الصفحة موثقة رسمياً وبياناتها مؤكدة.<br>
     4️⃣ <b>البحث والقراءة الصوتية 🎤:</b> تقدر تبحث بصوتك أو تستمع لبيانات أي عيادة بالصوت!`;
   }
 
-  /* 4) السؤال عن توثيق أو إضافة عيادة أو صيدلية */
   if (q.includes('توثيق') || q.includes('اوثق') || q.includes('اضيف عياد') || q.includes('اضيف صيدلي') || q.includes('اعلان') || q.includes('تفويض')) {
     return `✔ <b>توثيق وتفويض الصفحات الطبية مجاني 100%!</b><br>
     لو حضرتك طبيب أو صيدلي أو صاحب معمل، تقدر تتواصل مع إدارة المنصة لتسلم إدارة صفحتك بالكامل والحصول على <b>شارة التوثيق الزرقاء 🔵</b>، أو استخدام ميزة <b>"✨ دعوة صديق"</b>!`;
   }
 
-  /* 5) البحث عن صيدليات */
   if (q.includes('صيدلي') || q.includes('دواء') || q.includes('علاج')) {
     const allPh = safeList.filter(p => p.cat === 'pharmacy');
     const openPh = allPh.filter(p => p.avail_state === 'online');
     const listToShow = openPh.length ? openPh : allPh;
-    if (!listToShow.length) return `حالياً لا توجد صيدليات مسجلة مطابقة، جرب عرض كل الأقسام من الصفحة الرئيسية.`;
-    return `💊 ${openPh.length ? `لقيت لك <b>${openPh.length} صيدلية مفتوحة ونشطة دلوقتي 🟢</b>:` : `دي أبرز الصيدليات المسجلة في الدليل:`}` + formatMiniCardsHtml(listToShow);
+    if (!listToShow.length) return `حالياً لا توجد صيدليات مسجلة مطابقة في المنطقة المحددة، جرب اختيار "كل الجيزة" من زر المناطق بالأعلى.`;
+    return `💊 ${openPh.length ? `لقيت لك <b>${openPh.length} صيدلية مفتوحة ونشطة دلوقتي 🟢</b>:` : `دي أبرز الصيدليات المسجلة:`}` + formatMiniCardsHtml(listToShow);
   }
 
-  /* 6) البحث عن معامل تحاليل أو أشعة أو نظارات */
   if (q.includes('معمل') || q.includes('تحليل') || q.includes('تحاليل') || q.includes('اشعه') || q.includes('رنين') || q.includes('نظار') || q.includes('بصريات')) {
     const isOpt = q.includes('نظار') || q.includes('بصريات');
     const labs = safeList.filter(p => isOpt ? p.spec_key === 'optics' : (p.cat === 'lab' && p.spec_key !== 'optics'));
@@ -2802,7 +3120,6 @@ function generateCryoBotReply(userText) {
     return `${isOpt ? '🕶️ <b>محلات البصريات والنظارات الطبية:</b>' : '🧪 <b>معامل التحاليل ومراكز الأشعة المتاحة:</b>'}` + formatMiniCardsHtml(listToShow);
   }
 
-  /* 7) البحث عن تخصص طبي محدد */
   const specKeywords = [
     { key: 'peds', words: ['اطفال','طفل','حديثي الولاده','رضع','صفراء'] },
     { key: 'gastro', words: ['باطنه','معده','قولون','كبد','كلي','سكر','ضغط','هضمي'] },
@@ -2823,25 +3140,22 @@ function generateCryoBotReply(userText) {
     if (sk.words.some(w => q.includes(norm(w)))) {
       const matched = safeList.filter(p => p.spec_key === sk.key);
       const spName = SPECS_META[sk.key]?.label || 'هذا التخصص';
-      if (!matched.length) return `حالياً لم يُسجل طبيب في تخصص <b>${spName}</b>، جرب تصفح الدليل الكامل!`;
+      if (!matched.length) return `حالياً لم يُسجل طبيب في تخصص <b>${spName}</b> ضمن المنطقة المحددة، جرب تصفح الدليل الكامل!`;
       return `🩺 لقيت لك في تخصص <b>${spName}</b> (${matched.length} نتيجة مرتبة حسب النشاط والتقييم):` + formatMiniCardsHtml(matched);
     }
   }
 
-  /* 8) السؤال عن الأماكن المفتوحة الآن بشكل عام */
   if (q.includes('مفتوح') || q.includes('فاتح') || q.includes('شغال دلوقتي')) {
     const openNow = safeList.filter(p => p.avail_state === 'online');
     if (!openNow.length) return `لا توجد منشآت مفعّلة على وضع "مفتوح الآن" في هذه اللحظة، يمكنك تصفح البطاقات والاتصال بها مباشرة.`;
     return `🟢 <b>المنشآت الطبية والصيدليات المفتوحة الآن (${openNow.length}):</b>` + formatMiniCardsHtml(openNow);
   }
 
-  /* 9) بحث مباشر بالاسم أو العنوان */
-  const directMatches = safeList.filter(p => norm(`${p.name} ${p.spec} ${p.addr}`).includes(q));
+  const directMatches = safeList.filter(p => norm(`${p.name} ${p.spec} ${p.addr} ${p.area_label}`).includes(q));
   if (directMatches.length) {
     return `🔍 وجدت لك <b>${directMatches.length} نتيجة</b> مطابقة لسؤالك:` + formatMiniCardsHtml(directMatches);
   }
 
-  /* 10) رد ذكي افتراضي */
   const topOpen = safeList.slice(0, 3);
   return `عشان أجيبلك أدق نتيجة في ثانية، اكتبلي مثلاً: <b>"صيدلية فاتحة"</b>، أو <b>"دكتور أطفال"</b>، أو <b>"دكتور باطنة"</b>.<br><br>ودي أعلى الأماكن نشاطاً وتقييماً حالياً:` + formatMiniCardsHtml(topOpen);
 }
@@ -2855,7 +3169,6 @@ function appendAiMessage(html, who = 'bot') {
   box.scrollTop = box.scrollHeight;
 }
 
-/* فتح نافذة المحادثة مع الرسالة المختصرة النظيفة بدون جملة "في أوسيم والكوم الأحمر أو اختر من الأزرار بالأسفل" */
 function toggleCryoAiPanel(forceOpen) {
   const panel = $('cryoAiPanel'), msgs = $('cryoAiMsgs'), mascot = $('cryoMascot');
   if (!panel) return;
@@ -2892,7 +3205,7 @@ function sendUserQueryToAi(text) {
   }, 200);
 }
 
-/* ============ 15) ربط الأحداث السريعة ============ */
+/* ============ 15) ربط الأحداث السريعة + إغلاق قائمة المناطق عند النقر خارجها ============ */
 let lastNavTap = 0;
 function onNavTap(e) {
   const b = e.target.closest('[data-nav]'); if (!b) return;
@@ -2910,12 +3223,54 @@ $('drawerBackdrop').addEventListener('click', closeSideDrawer);
 $('editorModal').addEventListener('click', e => { if (e.target === $('editorModal')) closeEditorModal(); });
 $('reviewModal').addEventListener('click', e => { if (e.target === $('reviewModal')) closeReviewModal(); });
 $('onboardingModal').addEventListener('click', e => { if (e.target === $('onboardingModal')) $('onboardingModal').classList.add('hidden'); });
-document.addEventListener('click', e => { if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden'); });
+
+/* أحداث قائمة اختيار المناطق (الجيزة) وإغلاقها التلقائي عند الضغط في أي مكان فارغ */
+if ($('areaPickerBtn')) {
+  $('areaPickerBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    openAreaDropdown();
+  });
+}
+if ($('closeAreaPanelBtn')) $('closeAreaPanelBtn').addEventListener('click', () => openAreaDropdown(false));
+if ($('applyAreaFilterBtn')) {
+  $('applyAreaFilterBtn').addEventListener('click', () => {
+    openAreaDropdown(false);
+    toast(selectedAreas.size ? `📍 تم عرض نتائج (${selectedAreas.size}) منطقة مختارة` : '📍 تم عرض كل مناطق الجيزة');
+  });
+}
+if ($('selectAllGizaBtn')) {
+  $('selectAllGizaBtn').addEventListener('click', () => {
+    clearAllAreaFilters();
+    openAreaDropdown(false);
+    toast('📍 تم تفعيل عرض كل مناطق الجيزة');
+  });
+}
+if ($('areaQuickSearch')) {
+  $('areaQuickSearch').addEventListener('input', e => {
+    areaSearchQuery = e.target.value;
+    renderAreaDropdownItems();
+  });
+}
+if ($('areaGroupsContainer')) {
+  $('areaGroupsContainer').addEventListener('click', e => {
+    const item = e.target.closest('[data-area-toggle]');
+    if (!item) return;
+    toggleAreaKey(item.getAttribute('data-area-toggle'));
+  });
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ai-search-container')) $('searchSuggest').classList.add('hidden');
+  if (!e.target.closest('#areaPickerWrap') && $('areaDropdownPanel') && !$('areaDropdownPanel').classList.contains('hidden')) {
+    openAreaDropdown(false);
+  }
+});
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeEditorModal(); closeReviewModal(); closeSideDrawer();
     $('onboardingModal').classList.add('hidden');
     if ($('cryoAiPanel')) $('cryoAiPanel').classList.add('hidden');
+    openAreaDropdown(false);
   }
 });
 
@@ -3091,14 +3446,16 @@ $('logoutBtn').addEventListener('click', async () => {
   load();
 });
 
-/* البحث العام السريع (90ms) + بحث الأدمن في الصفحات + بحث الأدمن في جميع التعليقات */
+/* البحث العام السريع (90ms) + القائمة المنسدلة التي تطفو فوق شريط الريلز */
 const runSearch = debounce(() => {
   const raw = query.trim(), q = norm(raw), box = $('searchSuggest');
   if ($('clearSearchBtn')) $('clearSearchBtn').classList.toggle('hidden', !raw);
   if (!q) box.classList.add('hidden');
   else {
     const matches = [];
-    for (let i = 0; i < places.length && matches.length < 6; i++) if (places[i]._n.includes(q)) matches.push(places[i]);
+    for (let i = 0; i < places.length && matches.length < 7; i++) {
+      if (doesPlaceMatchSelectedAreas(places[i]) && places[i]._n.includes(q)) matches.push(places[i]);
+    }
     box.innerHTML = matches.length ? matches.map(m => {
       const sp = SPECS_META[m.spec_key] || SPECS_META.gastro;
       return `<div class="auto-item" data-suggest-id="${m.id}"><div style="display:flex; align-items:center; gap:10px; min-width:0;">${orb(m.cat, 34)}
@@ -3151,7 +3508,7 @@ $('specsBar').addEventListener('click', e => {
   else if (activeSpec !== 'all') activeCat = 'doctor';
   shownLimit = PAGE_SIZE; render();
 });
-$('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'all'; shownLimit = PAGE_SIZE; render(); });
+$('showAll').addEventListener('click', () => { activeCat = null; activeSpec = 'all'; clearAllAreaFilters(); });
 $('slidePrev').addEventListener('click', () => $('posterTrack').scrollBy({ left: -posterStep(), behavior: 'smooth' }));
 $('slideNext').addEventListener('click', () => $('posterTrack').scrollBy({ left: posterStep(), behavior: 'smooth' }));
 
@@ -3261,14 +3618,17 @@ $('editorForm').addEventListener('submit', async e => {
     });
   }
 
+  const pickedAreaKey = $('edAreaKey') ? $('edAreaKey').value : '';
   const sched = { from: $('edFrom').value, to: $('edTo').value, h24: $('edH24').checked, off };
   if (services.length) sched.services = services;
+  if (pickedAreaKey) sched.area_key = pickedAreaKey;
 
   let hours = $('edHours').value.trim();
   if (!hours) { if (sched.h24) hours = '24 ساعة'; else if (sched.from && sched.to) hours = 'من ' + t12(sched.from) + ' إلى ' + t12(sched.to); }
   const item = {
     id, cat: actualCat, spec_key: actualSpecKey, name: nameVal, spec: $('edSpec').value.trim(),
     bio: bioVal, bio_ts: bioVal ? Date.now() : null, photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'),
+    area_key: pickedAreaKey,
     addr: $('edAddr').value.trim() || 'غير معروف', fee: uiCat === 'doctor' ? $('edFee').value.trim() : '', map_url: $('edMapUrl').value.trim(),
     services,
     is_verified: adminUnlocked ? $('edIsVerified').checked : !!(ex && ex.is_verified),
@@ -3282,7 +3642,7 @@ $('editorForm').addEventListener('submit', async e => {
   if (currentViewName === 'placePage') renderPlacePageDOM(id);
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'myManaged') renderManagedAds();
-  toast('✔ تم حفظ ونشر التعديلات فوراً!');
+  toast('✔ تم حفظ ونشر التعديلات وتحديث معاينة البطاقة فوراً!');
 });
 
 Cryovion.on('templateChanged', () => { if (appReady) { render(); if (currentViewName === 'placePage' && currentPlaceId) renderPlacePageDOM(currentPlaceId); } });
@@ -3291,8 +3651,11 @@ Cryovion.on('templateChanged', () => { if (appReady) { render(); if (currentView
 if ($('footYear')) $('footYear').textContent = new Date().getFullYear();
 setInterval(() => { if (!document.hidden) recomputeAvailability(); }, 60000);
 history.replaceState({ view: 'home' }, '', '');
+populateEditorAreaSelect();
 hydrateFromCache();
 applyLanguage();
+renderAreaDropdownItems();
+updateAreaPickerButtonUI();
 renderPostersCarousel();
 startContinuousPosterLoop();
 initDraggableMascot();
