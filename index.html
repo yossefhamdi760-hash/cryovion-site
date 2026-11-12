@@ -2734,17 +2734,6 @@ function renderManagedAds() {
     return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:16px; cursor:default;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
         <div>
-    
-    return;
-  }
-  const baseUrl = window.location.href.split('?')[0];
-  box.innerHTML = myAds.map(p => {
-    const refLink = `${baseUrl}?ref=${p.id}`; 
-    const count = p.ref_count || 0;
-    const pct = Math.min(100, count);
-    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:16px; cursor:default;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
-        <div>
           <span class="badge-pill" style="background:rgba(16,185,129,0.2); color:var(--emerald);">✔️ صفحة مفوضة لحسابك</span>
           <h3 style="font-size:19px; margin-top:4px;">${esc(p.name)}${badge(p, false)}</h3>
         </div>
@@ -2753,13 +2742,13 @@ function renderManagedAds() {
           <button onclick="openEditorModal('${p.id}')" class="gold-bg" style="padding:8px 16px; border-radius:10px; font-size:12.5px;">✏️ تعديل البيانات والصورة</button>
           <button onclick="openPlacePage('${p.id}')" style="background:rgba(59,130,246,.18); color:#60a5fa; border:1px solid rgba(59,130,246,.4); padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700;">👁 فتح الصفحة الداخلية</button>
         </div>
-      </div>`;
+      </div>
 
       <!-- معاينة حية ومباشرة لشكل البطاقة كما تظهر للزوار في الموقع -->
       <div style="background:rgba(4,9,17,.65); padding:14px; border-radius:18px; border:1.5px dashed var(--gold);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
-          <span style="font-size:12px; font-weight:700; color:var(--gold);">👁️ معاينة حية لبطاقتك كما يراها الزوار الآن في الدليل (اضغط عليها لفتح صفحتك الكاملة):</span>
-          <span style="font-size:11px; color:var(--emerald); font-weight:700;">تتحدث تلقائياً فور حفظ أي تعديل ✔</span>
+          <span style="font-size:12px; font-weight:700; color:var(--gold);">👁 معاينة حية لبطاقتك كما يراها الزوار الآن في الدليل (اضغط عليها لفتح صفحتك الكاملة):</span>
+          <span style="font-size:11px; color:var(--emerald); font-weight:700;">تتحدث تلقائياً فور حفظ أي تعديل ✔️</span>
         </div>
         ${card(p)}
       </div>
@@ -2768,7 +2757,7 @@ function renderManagedAds() {
         <b style="font-size:13px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية على شريط الـ 24 ساعة</b>
         <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="مثال: متاح كشف الليلة حتى 9 مساءً...">${esc(p.bio || '')}</textarea>
         <div style="display:flex; gap:8px;">
-          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة فوراً ✔</button>
+          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة فوراً ✔️</button>
           <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">🗑 حذف الحالة</button>
         </div>
       </div>
