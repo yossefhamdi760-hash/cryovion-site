@@ -3747,5 +3747,29 @@ function toggleReelLike(id, btn) {
   countSpan.textContent = count;
 }
 </script>
+  <script>
+// استماع مباشر لزر رفع الصورة بدون الحاجة لأوامر داخل الـ HTML
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.id === 'devImgFile') {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64Str = event.target.result;
+      
+      // تحديث الحقل المخفي والصورة المعروضة
+      const hiddenInput = document.getElementById('devImgBase64');
+      const previewImg = document.getElementById('devImgPreview');
+      const previewWrap = document.getElementById('devImgPreviewWrap');
+      
+      if (hiddenInput) hiddenInput.value = base64Str;
+      if (previewImg) previewImg.src = base64Str;
+      if (previewWrap) previewWrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+</script>
 </body>
 </html>
