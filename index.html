@@ -3469,5 +3469,41 @@ Cryovion.emit('ready');
 initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
 </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <!-- نافذة تكبير صورة الحالة (Lightbox) -->
+<div id="reelImageLightbox" onclick="this.style.display='none'" style="display:none; position:fixed; inset:0; background:rgba(4,9,17,0.92); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(6px); cursor:zoom-out;">
+  <img id="reelLightboxImg" src="" style="max-width:100%; max-height:90vh; object-fit:contain; border:1px solid var(--gold); box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+</div>
+
+<script>
+// دالة فتح الصورة بحجم كبير
+function openReelImage(url) {
+  if (!url) return;
+  const box = document.getElementById('reelImageLightbox');
+  const img = document.getElementById('reelLightboxImg');
+  img.src = url;
+  box.style.display = 'flex';
+}
+
+// دالة زر الإعجاب (القلب) مع حفظ الإعجاب في جهاز الزائر
+function toggleReelLike(id, btn) {
+  const key = 'cryo_like_' + id;
+  const countSpan = btn.querySelector('.like-count');
+  let count = parseInt(countSpan.textContent) || 0;
+  const liked = localStorage.getItem(key) === '1';
+
+  if (liked) {
+    localStorage.removeItem(key);
+    count = Math.max(0, count - 1);
+    btn.style.background = 'rgba(244, 63, 94, 0.12)';
+    btn.style.color = '#f43f5e';
+  } else {
+    localStorage.setItem(key, '1');
+    count += 1;
+    btn.style.background = '#e11d48';
+    btn.style.color = '#ffffff';
+  }
+  countSpan.textContent = count;
+}
+</script>
 </body>
 </html>
