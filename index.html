@@ -254,7 +254,6 @@ html.light .menu-trigger { background:var(--card); }
 .cat-orb-pill.active { background:linear-gradient(135deg,rgba(217,180,90,.32),rgba(10,30,44,.95)); border:1.5px solid var(--gold); box-shadow:0 0 18px rgba(217,180,90,.25); }
 .orb-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; box-shadow:0 3px 8px rgba(0,0,0,.35); }
 
-/* زر سلم التخصصات الموحد + النافذة المنسدلة التي تعرض نفس أشكال التخصصات لاختيار واحد أو عدة تخصصات */
 .spec-ladder-wrap { max-width:540px; margin:14px auto 0; position:relative; z-index:20; }
 .spec-ladder-trigger {
   width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -319,43 +318,142 @@ body:has(#areaDropdownPanel:not(.hidden)) .right-icon-dock {
   .spec-ladder-grid { grid-template-columns:1fr; }
 }
 
-/* ================= 8) شريط الحالات (24 ساعة) ================= */
+/* ================= 8) شريط الحالات المطور (مطابق للصورة تماماً) ================= */
 .poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; position:relative; z-index:10; }
-.poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; will-change:scroll-position; }
+.poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; will-change:scroll-position; align-items:stretch; }
 .poster-track::-webkit-scrollbar { display:none; }
 
 .poster-card {
-  flex: 0 0 320px; 
-  max-width: 86vw; 
-  border-radius: 18px; 
-  background: #0b1320;
+  flex: 0 0 330px;
+  max-width: 88vw;
+  border-radius: 22px;
+  background: linear-gradient(175deg, #1b2838 0%, #0d1624 55%, #09101b 100%);
   border: 1.5px solid var(--poster-accent, var(--gold));
-  cursor: default; 
-  display: flex; 
-  flex-direction: column; 
-  height: auto; 
-  min-height: 280px; /* ليتناسب مع حجم الصورة والنص */
+  box-shadow: 0 10px 28px -8px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.12);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   position: relative;
-  overflow: hidden; /* هذا السطر هو ما سيلغي الحواف الزائدة حول الصورة بالأعلى */
-  transition: border-color .2s ease;
+  overflow: hidden;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
 .poster-card.live {
-  border-color: var(--poster-accent, var(--live-ring)) !important;
-  box-shadow: 0 0 0 1.5px var(--poster-accent, var(--live-ring)), 0 0 18px -2px var(--poster-accent, rgba(16,185,129,.5));
+  border-color: var(--poster-accent, var(--gold)) !important;
+  box-shadow: 0 0 0 1px var(--poster-accent, var(--gold)), 0 10px 26px -4px rgba(217,180,90,.28);
+}
+.poster-img-box {
+  position: relative;
+  width: 100%;
+  height: 168px;
+  background: #040911;
+  overflow: hidden;
+  border-radius: 2px;
+  cursor: zoom-in;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.poster-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+.poster-zoom-ico {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  background: rgba(7, 13, 22, 0.78);
+  color: var(--gold);
+  border: 1px solid rgba(217,180,90,0.4);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.poster-progress-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.poster-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #10b981, #D9B45A);
+}
+.poster-mini-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  background: rgba(217,180,90,0.14);
+  border: 1.5px solid var(--gold);
+}
+.poster-bio-wrap {
+  position: relative;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 8px 0 8px 18px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.poster-scroll-hint {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-size: 9.5px;
+  color: rgba(148,163,184,0.55);
+  letter-spacing: .5px;
+  pointer-events: none;
+  user-select: none;
 }
 .poster-bio-body {
-  max-height: 64px; 
-  overflow-y: auto; 
-  font-size: 13.5px; 
-  color: #e2e8f0; 
-  line-height: 1.6; 
-  direction: rtl; 
+  max-height: 68px;
+  width: 100%;
+  overflow-y: auto;
+  font-size: 13.5px;
+  color: #f1f5f9;
+  line-height: 1.65;
+  direction: rtl;
+  text-align: right;
   scrollbar-width: thin;
 }
-.poster-bio-body::-webkit-scrollbar { display:none; }
+.poster-bio-body::-webkit-scrollbar { width: 3px; }
+.poster-bio-body::-webkit-scrollbar-thumb { background: rgba(217,180,90,0.4); border-radius: 99px; }
+.poster-like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e11d48;
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 5px 15px;
+  border-radius: 99px;
+  font-size: 13.5px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+  cursor: pointer;
+  transition: transform .12s ease, background .15s ease;
+}
+.poster-like-btn:active { transform: scale(0.93); }
 .poster-del-btn { width:24px; height:24px; border-radius:7px; background:rgba(244,63,94,.22); color:var(--rose); border:1px solid rgba(244,63,94,.4); font-size:12px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;}
 .poster-del-btn:hover { background:var(--rose); color:#fff; }
-  
+
 /* ================= 9) النقطة المضيئة وشارة التوثيق ================= */
 .status-dot { width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
 .status-dot.online { background:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 8px #10b981; }
@@ -798,7 +896,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
   </div>
 
-  <!-- ===== الإعدادات (نظيفة بدون زر البوت المحذوف) ===== -->
+  <!-- ===== الإعدادات ===== -->
   <div id="view-settings" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <h2 class="font-display" style="font-size:22px; color:var(--gold);" data-i18n="settings_header">⚙️ الإعدادات واللغة والمظهر</h2>
@@ -848,9 +946,8 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     </div>
   </div>
 
- <!-- ===== غرفة الإدارة (مركز القيادة المطور) ===== -->
+  <!-- ===== غرفة الإدارة (مركز القيادة المطور) ===== -->
   <div id="view-admin" class="spa-view hidden content-body">
-    <!-- الهيدر العلوي -->
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:14px 16px; margin-bottom:18px; background:linear-gradient(135deg, rgba(217,180,90,0.12), rgba(16,185,129,0.05)); border:1px solid var(--gold); border-radius:16px;">
       <div style="display:flex; align-items:center; gap:12px;">
         <div style="width:42px; height:42px; border-radius:12px; background:rgba(217,180,90,0.2); border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:20px;">🛡️</div>
@@ -890,23 +987,26 @@ html.light .input-box { background:rgba(0,0,0,.03); }
         </div>
       </div>
 
-      <!-- 2. استوديو بث الحالة الرسمية (مع دعم الصور والمعاينة) -->
+      <!-- 2. استوديو بث الحالة الرسمية (رفع صورة مباشر من الجهاز + معاينة فورية) -->
       <div class="entity-card" style="border:1.5px solid var(--gold); background:linear-gradient(160deg, rgba(217,180,90,0.07) 0%, rgba(11,19,32,0.95) 100%); display:grid; gap:10px; cursor:default;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <b style="color:var(--gold); font-size:14.5px;">📣 استوديو بث حالة Cryovion الرسمية (24 ساعة)</b>
           <span id="devCharCount" style="font-size:11px; color:var(--muted);">0 حرف</span>
         </div>
 
-        <!-- حقل رابط الصورة الجديد للأدمن -->
-        <div style="display:flex; gap:8px;">
-          <input id="devImg" type="text" class="input-box" placeholder="🔗 رابط صورة الحالة (اختياري - يظهر أعلى البطاقة بلا حواف)..." style="font-size:12.5px; flex:1;">
-          <button type="button" onclick="previewAdminStatusImg()" style="padding:0 12px; border-radius:10px; background:rgba(255,255,255,0.07); color:var(--gold); border:1px solid var(--border-soft); font-size:12px; white-space:nowrap; cursor:pointer;">👁 معاينة</button>
+        <!-- زر رفع الصورة مباشرة من الهاتف أو الكمبيوتر -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label for="devImgFile" style="cursor:pointer; background:rgba(217,180,90,0.12); border:1.5px dashed var(--gold); border-radius:12px; padding:12px; text-align:center; font-size:13.5px; color:var(--gold); font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>📷 اضغط هنا لاختيار ورفع صورة الحالة من جهازك</span>
+            <input type="file" id="devImgFile" accept="image/*" class="hidden">
+          </label>
+          <input type="hidden" id="devImgBase64" value="">
         </div>
 
         <!-- صندوق معاينة الصورة المصغر قبل النشر -->
-        <div id="devImgPreviewWrap" style="display:none; position:relative; height:130px; background:#040911; border:1px dashed var(--gold); overflow:hidden;">
+        <div id="devImgPreviewWrap" style="display:none; position:relative; height:150px; background:#040911; border:1px solid var(--gold); border-radius:8px; overflow:hidden;">
           <img id="devImgPreview" src="" style="width:100%; height:100%; object-fit:cover; display:block;">
-          <button type="button" onclick="document.getElementById('devImg').value=''; document.getElementById('devImgPreviewWrap').style.display='none';" style="position:absolute; top:6px; left:6px; background:rgba(0,0,0,0.75); color:#fff; border:none; border-radius:6px; padding:3px 8px; font-size:11px; cursor:pointer;">إزالة ✕</button>
+          <button type="button" onclick="clearAdminStatusImg()" style="position:absolute; top:8px; left:8px; background:rgba(244,63,94,0.9); color:#fff; border:none; border-radius:8px; padding:4px 10px; font-size:11.5px; font-weight:700; cursor:pointer;">🗑 إزالة الصورة</button>
         </div>
 
         <!-- حقل النص الأساسي -->
@@ -1041,18 +1141,26 @@ html.light .input-box { background:rgba(0,0,0,.03); }
     <input id="edName" required placeholder="اسم الطبيب / الصيدلية / المنشأة *" class="input-box">
     <input id="edSpec" required placeholder="المسمى التخصصي الواضح تحت الاسم *" class="input-box">
 
-    <div style="background:rgba(217,180,90,.08); padding:10px; border-radius:12px; border:1px solid var(--border);">
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--gold); margin-bottom:4px;">
+    <div style="background:rgba(217,180,90,.08); padding:10px; border-radius:12px; border:1px solid var(--border); display:grid; gap:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--gold);">
         <b>📢 حالتك اليومية على الشريط المتحرك (تُعرض لمدة 24 ساعة):</b>
-        <button type="button" onclick="document.getElementById('edBio').value=''" style="color:var(--rose); font-weight:700; font-size:11px;">🗑 مسح النص</button>
+        <button type="button" onclick="document.getElementById('edBio').value=''; document.getElementById('edBioImg').value=''; document.getElementById('edBioImgPreviewWrap').style.display='none';" style="color:var(--rose); font-weight:700; font-size:11px;">🗑 مسح الحالة والصورة</button>
+      </div>
+      <label for="edBioImgFile" style="cursor:pointer; background:rgba(217,180,90,0.12); border:1px dashed var(--gold); border-radius:10px; padding:8px 12px; text-align:center; font-size:12px; color:var(--gold); font-weight:700; display:block;">
+        📷 إرفاق صورة للحالة اليومية من جهازك (اختياري)
+        <input type="file" id="edBioImgFile" accept="image/*" class="hidden">
+      </label>
+      <input type="hidden" id="edBioImg" value="">
+      <div id="edBioImgPreviewWrap" style="display:none; position:relative; height:110px; background:#040911; border:1px solid var(--gold); border-radius:8px; overflow:hidden;">
+        <img id="edBioImgPreview" src="" style="width:100%; height:100%; object-fit:cover; display:block;">
       </div>
       <textarea id="edBio" rows="2" placeholder="اكتب حالتك اليومية أو عرضاً خاصاً..." class="input-box"></textarea>
     </div>
 
     <div>
-      <label style="font-size:11px; color:var(--gold); font-weight:700;">📷 صور المنشأة (يمكنك رفع أكثر من صورة معاً):</label>
+      <label style="font-size:11px; color:var(--gold); font-weight:700;">📷 صور المنشأة الأساسية (يمكنك رفع أكثر من صورة معاً):</label>
       <div style="display:flex; gap:8px; margin-top:4px; align-items:center;">
-        <input id="edPhotoUrl" placeholder="رابط صورة رئيسية..." class="input-box" style="flex:1;">
+        <input id="edPhotoUrl" placeholder="رابط صورة رئيسية أو ارفع من جهازك..." class="input-box" style="flex:1;">
         <label for="edGalleryFiles" class="gold-bg" style="padding:10px 14px; border-radius:10px; font-size:12px; cursor:pointer; white-space:nowrap;">📁 رفع صور</label>
         <input id="edGalleryFiles" type="file" accept="image/*" multiple class="hidden">
       </div>
@@ -1161,14 +1269,20 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   </form>
 </div>
 
+<!-- ================= نافذة تكبير صورة الحالة (Lightbox) ================= -->
+<div id="reelImageLightbox" onclick="this.style.display='none'" style="display:none; position:fixed; inset:0; background:rgba(4,9,17,0.92); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(6px); cursor:zoom-out;">
+  <img id="reelLightboxImg" src="" style="max-width:100%; max-height:90vh; object-fit:contain; border:1.5px solid var(--gold); box-shadow:0 10px 40px rgba(0,0,0,0.85);">
+</div>
+
 <div id="toast" class="toast-box gold-bg hidden"></div>
 <div id="ext-root"></div>
-<!-- ======================= نهاية الجزء الأول ======================= -->
-  <script>
+<!-- ======================= نهاية الجزء الأول (1/3) ======================= -->
+  <!-- ======================= بداية الجزء الثاني (2/3) ======================= -->
+<script>
 'use strict';
 /* =====================================================================
-   Cryovion v1.7.0 — الجزء الثاني (القسم الأول: 2A)
-   الإعدادات، الهوية البصرية (DNA + PWA)، صيدليات الكوم الأحمر الجديدة، التخصصات المتعددة، وقاعدة البيانات
+   Cryovion v1.7.0 — الجزء الثاني (2/3)
+   الإعدادات، الهوية البصرية، قاعدة البيانات، ضغط الصور الذكي، وعرض شريط الحالات الجديد
    ===================================================================== */
 
 /* ============ 1) الإعدادات الأساسية ============ */
@@ -1352,7 +1466,7 @@ GIZA_AREAS_GROUPS.forEach(g => g.items.forEach(it => {
   GIZA_AREAS_FLAT.push(it);
 }));
 
-/* ============ 2) القواميس والتخصصات الطبية + صيدليات الكوم الأحمر الجديدة من خرائط جوجل ============ */
+/* ============ 2) القواميس والتخصصات الطبية + صيدليات الكوم الأحمر الجديدة ============ */
 const I18N = {
   ar: {
     menu_btn: 'القائمة', nav_home: 'الدليل الطبي الذكي', nav_managed: 'إدارة صفحتي', nav_referrals: 'دعوة صديق ومكافأة النشر',
@@ -1426,7 +1540,6 @@ const RESERVED_BRAND_PATTERNS = ['cryovion','cryo vion','cryo','كرايوفيو
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
 const nowTs = Date.now();
-/* الصيدليات الجديدة المستخرجة من خرائط جوجل لمنطقة الكوم الأحمر */
 const KOM_AHMAR_GOOGLE_PHARMACIES = [
   { id: 'ph-kom-eltawel', cat: 'pharmacy', spec_key: 'pharmacy', name: 'صيدلية مصطفى الطويل - د. ياسر المصري', spec: 'صيدلية عامة وخدمات دوائية (24 ساعة)',
     bio: 'خدمة دوائية على مدار 24 ساعة وصرف الأدوية والمستلزمات الطبية.', bio_ts: null, hours: 'مفتوح 24 ساعة يومياً', lamp_mode: 'open',
@@ -1470,17 +1583,90 @@ const DEFAULT_DIRECTORY = [
   ...KOM_AHMAR_GOOGLE_PHARMACIES
 ];
 
-/* ============ 3) أدوات مساعدة فائقة السرعة + محلل المناطق الذكي ============ */
+/* ============ 3) أدوات مساعدة فائقة السرعة + فك ودمج نص وصورة الحالة اليومية ============ */
 const $ = id => document.getElementById(id);
 const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ESC_MAP[c]);
 const norm = s => String(s || '').replace(/[\u064B-\u065F\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim().toLowerCase();
 const containsDefamation = txt => { const n = norm(txt); return BAD_NORM.some(w => n.includes(w)); };
 
+function unpackStoryPayload(raw) {
+  const s = String(raw || '');
+  if (s.includes('|||')) {
+    const idx = s.indexOf('|||');
+    return { img: s.slice(0, idx).trim(), text: s.slice(idx + 3).trim() };
+  }
+  return { img: '', text: s.trim() };
+}
+function packStoryPayload(text, img) {
+  const t = String(text || '').trim();
+  const i = String(img || '').trim();
+  if (!t && !i) return '';
+  return i ? `${i}|||${t}` : t;
+}
+
+function fileToCompressedDataURL(file, maxW = 820, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve('');
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, maxW / (img.width || maxW));
+          const cv = document.createElement('canvas');
+          cv.width = Math.max(1, Math.round(img.width * scale));
+          cv.height = Math.max(1, Math.round(img.height * scale));
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          resolve(cv.toDataURL('image/jpeg', quality));
+        } catch {
+          resolve(ev.target.result);
+        }
+      };
+      img.onerror = () => resolve(ev.target.result);
+      img.src = ev.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function openReelImage(url) {
+  if (!url) return;
+  const box = $('reelImageLightbox'), img = $('reelLightboxImg');
+  if (!box || !img) return;
+  img.src = url;
+  box.style.display = 'flex';
+}
+
+function getBaseLikeCount(id) {
+  let h = 0; const s = String(id || 'cryo');
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return 9 + (Math.abs(h) % 14);
+}
+function toggleReelLike(id, btn) {
+  const key = 'cryo_like_' + id;
+  const countSpan = btn.querySelector('.like-count');
+  const baseCount = getBaseLikeCount(id);
+  const liked = localStorage.getItem(key) === '1';
+  if (liked) {
+    localStorage.removeItem(key);
+    if (countSpan) countSpan.textContent = baseCount;
+    btn.style.background = 'rgba(225, 29, 72, 0.22)';
+    btn.style.color = '#fda4af';
+  } else {
+    localStorage.setItem(key, '1');
+    if (countSpan) countSpan.textContent = baseCount + 1;
+    btn.style.background = '#e11d48';
+    btn.style.color = '#ffffff';
+  }
+}
+
 function detectPlaceAreaKey(d) {
   if (d.sched && d.sched.area_key && GIZA_AREAS_MAP.has(d.sched.area_key)) return d.sched.area_key;
   if (d.area_key && GIZA_AREAS_MAP.has(d.area_key)) return d.area_key;
-  const hay = norm(`${d.addr || ''} ${d.name || ''} ${d.bio || ''}`);
+  const parsedBio = unpackStoryPayload(d.bio).text;
+  const hay = norm(`${d.addr || ''} ${d.name || ''} ${parsedBio || ''}`);
   for (let i = 0; i < GIZA_AREAS_FLAT.length; i++) {
     const ar = GIZA_AREAS_FLAT[i];
     if (ar.kw.some(w => hay.includes(norm(w)))) return ar.key;
@@ -1650,7 +1836,7 @@ function doesPlaceMatchSelectedSpecs(d) {
   return selectedSpecs.has(d.spec_key);
 }
 
-/* ============ 4.5) واجهة التطوير العامة (للإضافات المستقبلية) ============ */
+/* ============ 4.5) واجهة التطوير العامة ============ */
 Cryovion.filters = [];
 Cryovion.addFilter = fn => { Cryovion.filters.push(fn); Cryovion.refresh(); };
 Cryovion.refresh = () => { if (appReady) { render(); renderPostersCarousel(); } };
@@ -1746,7 +1932,7 @@ function switchViewDOM(viewName, restoreScroll = false) {
   if (viewName === 'home' && homeDirty) { homeDirty = false; render(); }
   if (viewName === 'myManaged') renderManagedAds();
   if (viewName === 'referrals') renderReferralsHub();
-  if (viewName === 'admin') renderAdminList();
+  if (viewName === 'admin') { renderAdminList(); refreshAdminStats(); }
   if (viewName === 'settings') updateDispSettingsUI();
   if (viewName === 'home' && restoreScroll) requestAnimationFrame(() => window.scrollTo({ top: savedHomeScrollY, behavior: 'instant' }));
   else window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1889,7 +2075,7 @@ async function initSupabaseSession() {
   }, 0));
 }
 
-/* ============ 9) طبقة قاعدة البيانات (Supabase) + دمج صيدليات الكوم الأحمر الجديدة تلقائياً ============ */
+/* ============ 9) طبقة قاعدة البيانات (Supabase) + رفع الصور المدمج ============ */
 const PLACE_COLS = 'id,cat,spec_key,name,spec,bio,bio_ts,photo_url,gallery,addr,hours,lamp_mode,sched,phone,whatsapp,fee,map_url,is_verified,ref_count,status,created_at,updated_at';
 const PLACE_KEYS = PLACE_COLS.split(',');
 const uploadedCache = {};
@@ -1910,12 +2096,16 @@ function compressImage(url) {
 async function publishPhoto(src, uid) {
   if (!src || src.indexOf('data:') !== 0) return src;
   if (uploadedCache[src]) return uploadedCache[src];
-  const blob = await compressImage(src);
-  const path = uid + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
-  const r = await db.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: 'image/jpeg' });
-  if (r.error) throw r.error;
-  uploadedCache[src] = db.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
-  return uploadedCache[src];
+  try {
+    const blob = await compressImage(src);
+    const path = (uid || 'anon') + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+    const r = await db.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: 'image/jpeg' });
+    if (r.error) return src;
+    uploadedCache[src] = db.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+    return uploadedCache[src];
+  } catch {
+    return src;
+  }
 }
 async function dbWrite(it) {
   const s = await sess();
@@ -1934,9 +2124,16 @@ async function dbWrite(it) {
   else delete schedObj.services;
   if (it.area_key) schedObj.area_key = it.area_key;
 
+  let finalBio = it.bio || '';
+  const parsedStory = unpackStoryPayload(finalBio);
+  if (parsedStory.img && parsedStory.img.indexOf('data:') === 0) {
+    const uploadedStoryImg = await publishPhoto(parsedStory.img, s.user.id);
+    finalBio = packStoryPayload(parsedStory.text, uploadedStoryImg);
+  }
+
   const row = {
     id: it.id, cat: it.cat === 'optics' ? 'lab' : it.cat, spec_key: it.spec_key, name: it.name, spec: it.spec || '',
-    bio: it.bio || '', bio_ts: it.bio_ts || null, photo_url: await publishPhoto(it.photo_url, s.user.id),
+    bio: finalBio, bio_ts: it.bio_ts || null, photo_url: await publishPhoto(it.photo_url, s.user.id),
     gallery: await Promise.all((it.gallery || []).map(g => publishPhoto(g, s.user.id))),
     addr: it.addr || '', hours: it.hours || 'غير معروف', lamp_mode: it.lamp_mode || 'unknown', sched: schedObj,
     phone: it.phone || null, whatsapp: it.whatsapp || null, fee: it.fee || null, map_url: it.map_url || null
@@ -1966,6 +2163,7 @@ async function deleteStoryRelease(id) {
     localStorage.removeItem('cryovion_dev_status');
     if (db) await db.from('site_status').delete().eq('id', 1).catch(() => {});
     renderPostersCarousel();
+    refreshAdminStats();
     toast('🗑 تم حذف حالة Cryovion من الشريط');
     return;
   }
@@ -1973,9 +2171,9 @@ async function deleteStoryRelease(id) {
   const canDel = adminUnlocked || (u && p.owner_email && norm(u.email) === norm(p.owner_email));
   if (!canDel) return toast('حذف الحالة متاح لصاحب الصفحة أو المشرف فقط');
   if (!confirm(`حذف الحالة اليومية الخاصة بـ "${p.name}" من شريط الـ 24 ساعة؟`)) return;
-  p.bio = ''; p.bio_ts = null;
+  p.bio = ''; p.bio_ts = null; p.reelImg = ''; p.reelText = '';
   renderPostersCarousel();
-  if (currentViewName === 'admin') renderAdminList();
+  if (currentViewName === 'admin') { renderAdminList(); refreshAdminStats(); }
   if (currentViewName === 'myManaged') renderManagedAds();
   savePlace({ ...p, bio: '', bio_ts: null });
   toast('🗑 تم حذف الحالة اليومية من الشريط');
@@ -2032,7 +2230,6 @@ function hydrateFromCache() {
   } catch {}
 }
 function buildPlaces(rows, revs) {
-  /* دمج صيدليات الكوم الأحمر الجديدة المستخرجة من خرائط جوجل إن لم تكن مسجلة بعد */
   const rowMap = new Map((rows || []).map(r => [r.id, r]));
   const existingNames = new Set((rows || []).map(r => norm(r.name)));
   KOM_AHMAR_GOOGLE_PHARMACIES.forEach(ph => {
@@ -2080,12 +2277,17 @@ function buildPlaces(rows, revs) {
     const services = (d.sched && Array.isArray(d.sched.services)) ? d.sched.services : (Array.isArray(d.services) ? d.services : []);
     const areaKey = detectPlaceAreaKey(d);
     const areaMeta = areaKey ? GIZA_AREAS_MAP.get(areaKey) : null;
+    const parsedBio = unpackStoryPayload(d.bio || '');
     const o = {
       ...d,
       area_key: areaKey,
       area_label: areaMeta ? areaMeta.label : '',
       services,
-      hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف', bio: d.bio || '', gallery: d.gallery || [],
+      hours: d.hours || 'غير معروف', addr: d.addr || 'غير معروف',
+      bio: d.bio || '',
+      reelImg: parsedBio.img,
+      reelText: parsedBio.text,
+      gallery: d.gallery || [],
       phone: d.phone || null, whatsapp: d.whatsapp || null, fee: d.fee || '', map_url: d.map_url || '',
       reviews: rv, n: rated.length,
       rate: rated.length ? Math.round(rated.reduce((a, x) => a + x.stars, 0) / rated.length * 10) / 10 : 5,
@@ -2094,7 +2296,7 @@ function buildPlaces(rows, revs) {
     const svcNames = services.map(s => s.name || '').join(' ');
     const revBodies = rv.map(r => r.body || '').join(' ');
     o._n = norm(`${o.name} ${o.spec} ${o.addr} ${o.area_label}`);
-    o._s = o._n + ' ' + norm(o.bio) + ' ' + norm(svcNames) + ' ' + norm(revBodies);
+    o._s = o._n + ' ' + norm(o.reelText) + ' ' + norm(svcNames) + ' ' + norm(revBodies);
     const a = getAvailabilityStatus(o); o.avail_state = a.state; o.avail_label = a.label; o.avail_color = a.color;
     return o;
   });
@@ -2124,7 +2326,6 @@ async function load() {
     else if (!r[2].error) localStorage.removeItem('cryovion_dev_status');
     metaRows = r[3].data || []; reqRows = r[4].data || [];
 
-    /* مزامنة صيدليات الكوم الأحمر الجديدة تلقائياً إلى Supabase عند دخول الأدمن */
     if (!failed && admin && s) {
       const dbIds = new Set(rows.map(x => x.id));
       const dbNames = new Set(rows.map(x => norm(x.name)));
@@ -2141,7 +2342,7 @@ async function load() {
   refCache = reqRows.map(x => ({ ...x, desc: x.description, refs: '—' }));
   if (!failed && rows.length) saveCache();
 
-  refreshUserUI(); buildFilters(); renderAreaDropdownItems(); updateAreaPickerButtonUI(); render(); renderPostersCarousel();
+  refreshUserUI(); buildFilters(); renderAreaDropdownItems(); updateAreaPickerButtonUI(); render(); renderPostersCarousel(); refreshAdminStats();
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'myManaged') renderManagedAds();
   if (currentViewName === 'placePage' && currentPlaceId && byId(currentPlaceId)) renderPlacePageDOM(currentPlaceId);
@@ -2152,6 +2353,8 @@ const verifyBusy = new Set();
 function repaintVerified(id) {
   sortPlacesByPriority();
   render();
+  renderPostersCarousel();
+  refreshAdminStats();
   if (currentViewName === 'placePage' && currentPlaceId === id) renderPlacePageDOM(id);
   if (currentViewName === 'admin') renderAdminList();
   if (currentViewName === 'myManaged') renderManagedAds();
@@ -2183,10 +2386,6 @@ async function setVerified(id, val) {
   } finally { verifyBusy.delete(id); }
 }
 const toggleVerify = id => setVerified(id);
-    /* =====================================================================
-   Cryovion v1.7.0 — الجزء الثاني (القسم الأخير: 2B)
-   سلم التخصصات المتعددة، قرى الجيزة، المعاينة الحية في إدارة صفحتي، والبحث الفوري (بدون البوت)
-   ===================================================================== */
 
 /* ============ 10) نظام اختيار قرى ومناطق الجيزة المتعدد ============ */
 function populateEditorAreaSelect() {
@@ -2284,7 +2483,7 @@ function clearAllAreaFilters() {
   renderPostersCarousel();
 }
 
-/* ============ 10.2) نافذة سلم التخصصات المتعددة (اختيار تخصص واحد أو أكثر أو الكل بسهولة) ============ */
+/* ============ 10.2) نافذة سلم التخصصات المتعددة ============ */
 function updateSpecLadderButtonUI() {
   const btn = $('specLadderBtn'), lbl = $('specLadderLabel'), wrap = $('specLadderWrap');
   if (!btn || !lbl) return;
@@ -2352,13 +2551,13 @@ function actions(d, mode) {
                   : 'padding:5px 11px; border-radius:9px; font-size:11.5px; font-weight:700;';
   const one = (ok, href, blank, css, label) => ok
     ? `<a href="${esc(href)}"${blank ? ' target="_blank" rel="noopener"' : ''} onclick="event.stopPropagation()" style="${base}${css}">${label}</a>`
-    : `<button type="button" data-off="1" class="act-off" style="${base}">${label}</a>`;
+    : `<button type="button" data-off="1" class="act-off" style="${base}">${label}</button>`;
   return one(!!d.phone, 'tel:' + d.phone, false, 'background:var(--emerald); color:#fff;', pg ? '📞 اتصال مباشر' : '📞 اتصل')
     + one(!!wa, 'https://wa.me/' + wa, true, 'background:var(--whatsapp); color:#fff;', pg ? '💬 مراسلة واتساب' : '💬 واتساب')
     + (pg ? one(!!mu, mu, true, 'background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);', '🗺️ الموقع على الخريطة') : '');
 }
 
-/* ============ 11) العرض: الأقسام والتخصصات (بنظام السلم المنسدل) والبطاقات ============ */
+/* ============ 11) العرض: الأقسام والتخصصات وشريط الحالات الجديد المطابق للصورة ============ */
 function buildFilters() {
   const dict = I18N[currentLang] || I18N.ar;
   $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => {
@@ -2415,64 +2614,65 @@ function renderPostersCarousel() {
   const now = Date.now(), dev = getDevStatus(), u = getCurrentUser();
   const items = [];
 
-  // دالة مساعدة لبناء قالب البطاقة الجديد الموحد
-  const buildCardHtml = ({ id, imgUrl, text, ts, titleHtml, badgeHtml, delBtnHtml, accentColor, isClickable }) => {
+  const verifiedSealSvg = `<span style="display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; border-radius:50%; background:linear-gradient(135deg,#38bdf8,#0284c7); color:#fff; flex-shrink:0; box-shadow:0 0 8px rgba(56,189,248,0.45);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`;
+
+  const buildCardHtml = ({ id, imgUrl, text, ts, iconHtml, nameText, isVerified, delBtnHtml, accentColor, isClickable }) => {
     const elapsed = ts ? Math.max(0, now - ts) : 0;
     const remMs = Math.max(0, DAY_MS - elapsed);
     const remHours = Math.max(1, Math.ceil(remMs / 3600000));
-    const pct = Math.max(5, Math.min(100, Math.round((remMs / DAY_MS) * 100)));
+    const pct = Math.max(8, Math.min(100, Math.round((remMs / DAY_MS) * 100)));
 
     const likeKey = 'cryo_like_' + id;
     const isLiked = localStorage.getItem(likeKey) === '1';
-    const likeCount = isLiked ? 1 : 0;
-    const heartBg = isLiked ? '#e11d48' : 'rgba(244, 63, 94, 0.14)';
-    const heartColor = isLiked ? '#ffffff' : '#f43f5e';
+    const baseLikes = getBaseLikeCount(id);
+    const likeCount = isLiked ? (baseLikes + 1) : baseLikes;
+    const heartBg = isLiked ? '#e11d48' : 'rgba(225, 29, 72, 0.88)';
+    const heartColor = '#ffffff';
 
     const imgSection = imgUrl ? `
-      <div onclick="event.stopPropagation(); openReelImage('${esc(imgUrl)}')" style="position:relative; width:100%; height:145px; cursor:zoom-in; overflow:hidden; background:#040911; flex-shrink:0;">
-        <img src="${esc(imgUrl)}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; border-radius:0; display:block;">
-        <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.65); color:#fff; padding:5px; border-radius:6px; display:flex; align-items:center; justify-content:center; pointer-events:none;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      <div class="poster-img-box" onclick="event.stopPropagation(); openReelImage('${esc(imgUrl)}')">
+        <img src="${esc(imgUrl)}" alt="" loading="lazy" decoding="async">
+        <div class="poster-zoom-ico">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
         </div>
       </div>` : '';
 
     const clickAttr = isClickable ? `data-act="openPage" data-id="${esc(id)}"` : '';
     const cursorStyle = isClickable ? 'cursor:pointer;' : 'cursor:default;';
 
-    return `<div ${clickAttr} class="poster-card" style="--poster-accent:${accentColor}; padding:0; ${cursorStyle}">
+    return `<div ${clickAttr} class="poster-card" style="--poster-accent:${accentColor}; ${cursorStyle}">
       ${imgSection}
-      <div style="padding:12px 14px; display:flex; flex-direction:column; gap:10px; flex:1; justify-content:space-between;">
-        
-        <!-- شريط الوقت وبجانبه عدد الساعات فقط -->
-        <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
-          <span style="font-size:11.5px; color:${accentColor}; font-weight:700; white-space:nowrap;">${remHours} ساعة</span>
-          <div style="flex:1; height:5px; background:rgba(255,255,255,0.1); border-radius:99px; overflow:hidden;">
-            <div style="width:${pct}%; height:100%; background:${accentColor};"></div>
-          </div>
+
+      <!-- شريط الوقت المتبقي كما في الصورة -->
+      <div style="display:flex; flex-direction:column; gap:5px; direction:rtl;">
+        <div class="poster-progress-bar">
+          <div class="poster-progress-fill" style="width:${pct}%;"></div>
         </div>
-
-        <!-- الاسم + التوثيق / الشارة + زر الحذف -->
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; direction:rtl;">
-          <div style="display:flex; align-items:center; gap:7px; min-width:0;">
-            ${titleHtml}
-          </div>
-          <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
-            ${badgeHtml}
-            ${delBtnHtml}
-          </div>
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-size:11.5px; color:#cbd5e1; font-weight:600;">متبقي ${remHours} ساعة</span>
+          ${delBtnHtml}
         </div>
+      </div>
 
-        <!-- صندوق النص القابل للتمرير -->
-        ${text ? `<div class="poster-bio-body" onclick="event.stopPropagation()" style="max-height:64px; overflow-y:auto; font-size:13.5px; color:#e2e8f0; line-height:1.6; direction:rtl;">${esc(text)}</div>` : ''}
+      <!-- صف الأيقونة الدائرية الذهبية + الاسم + شارة التوثيق -->
+      <div style="display:flex; align-items:center; justify-content:flex-start; gap:8px; direction:rtl;">
+        ${iconHtml}
+        <b style="font-size:15.5px; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(nameText)}</b>
+        ${isVerified ? verifiedSealSvg : ''}
+      </div>
 
-        <!-- زر القلب أسفل اليسار فقط -->
-        <div style="display:flex; justify-content:flex-end; direction:rtl; padding-top:2px;">
-          <button type="button" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)" style="display:inline-flex; align-items:center; gap:6px; background:${heartBg}; color:${heartColor}; border:1px solid rgba(244,63,94,0.35); padding:4px 12px; border-radius:99px; font-size:13px; font-weight:700; cursor:pointer;">
-            <span class="like-count">${likeCount}</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          </button>
-        </div>
+      <!-- مساحة النص القابلة للتمرير الداخلي -->
+      <div class="poster-bio-wrap" onclick="event.stopPropagation()">
+        <span class="poster-scroll-hint">التمرير الداخلي</span>
+        <div class="poster-bio-body">${esc(text || 'تحديث جديد متاح الآن')}</div>
+      </div>
 
+      <!-- زر القلب والاعجابات في الأسفل يساراً -->
+      <div style="display:flex; justify-content:flex-end; align-items:center; direction:rtl; padding-top:2px;">
+        <button type="button" class="poster-like-btn" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)" style="background:${heartBg}; color:${heartColor};">
+          <span class="like-count">${likeCount}</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
       </div>
     </div>`;
   };
@@ -2480,21 +2680,17 @@ function renderPostersCarousel() {
   // 1. حالة Cryovion الرسمية
   if (dev && now - dev.ts <= DAY_MS) {
     const devDelBtn = adminUnlocked ? `<button type="button" class="poster-del-btn" data-del-story="__dev__" title="حذف حالة Cryovion">✕</button>` : '';
-    const rawDev = dev.text || '';
-    const parts = rawDev.includes('|||') ? rawDev.split('|||') : ['', rawDev];
-    const devImg = parts[0].trim();
-    const devTxt = parts[1].trim();
-
-    const titleHtml = `<span class="brand-mark" style="width:26px; height:26px; flex-shrink:0;"><svg viewBox="0 0 100 100" fill="none"><path d="M68 28 C55 16 32 18 22 34 C12 49 14 70 28 82 C42 94 64 90 70 76" stroke="#fff" stroke-width="11" stroke-linecap="round"/><path d="M22 52 L44 52 L50 40 L56 64 L63 32 L70 57 L75 52 L92 52" stroke="#2dd4bf" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="brand-text font-display" style="font-size:17px;">Cryovion</span>`;
-    const badgeHtml = `<span class="badge-pill gold-bg" style="font-size:10px; padding:2px 8px;">✔️ تحديث رسمي</span>`;
+    const parsedDev = unpackStoryPayload(dev.text || '');
+    const iconHtml = `<span class="brand-mark" style="width:34px; height:34px; flex-shrink:0; border-color:var(--gold);"><svg viewBox="0 0 100 100" fill="none"><path d="M68 28 C55 16 32 18 22 34 C12 49 14 70 28 82 C42 94 64 90 70 76" stroke="#fff" stroke-width="11" stroke-linecap="round"/><path d="M22 52 L44 52 L50 40 L56 64 L63 32 L70 57 L75 52 L92 52" stroke="#2dd4bf" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
     items.push(buildCardHtml({
       id: '__dev__',
-      imgUrl: devImg,
-      text: devTxt,
+      imgUrl: parsedDev.img,
+      text: parsedDev.text,
       ts: dev.ts,
-      titleHtml,
-      badgeHtml,
+      iconHtml,
+      nameText: 'Cryovion',
+      isVerified: true,
       delBtnHtml: devDelBtn,
       accentColor: 'var(--gold)',
       isClickable: false
@@ -2507,30 +2703,25 @@ function renderPostersCarousel() {
     if (!doesPlaceMatchSelectedAreas(d)) return;
 
     const sp = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro;
-    const catMeta = CATS[d.cat] || CATS.doctor;
-    const accentColor = sp.color || catMeta.accent || '#10b981';
     const canDelStory = adminUnlocked || (u && d.owner_email && norm(u.email) === norm(d.owner_email));
     const delBtnHtml = canDelStory ? `<button type="button" class="poster-del-btn" data-del-story="${esc(d.id)}" title="حذف هذا الريليز">✕</button>` : '';
 
-    const rawBio = d.bio || '';
-    const parts = rawBio.includes('|||') ? rawBio.split('|||') : ['', rawBio];
-    const placeImg = parts[0].trim();
-    const placeTxt = parts[1].trim();
+    const parsedBio = unpackStoryPayload(d.bio || '');
+    const storyImg = parsedBio.img || d.photo_url || '';
+    const storyTxt = parsedBio.text;
 
-    const thumb = d.photo_url ? `<img src="${esc(d.photo_url)}" class="poster-mini-thumb" alt="" loading="lazy" decoding="async">` : `<span class="poster-mini-thumb t-${d.cat}">${sp.icon}</span>`;
-    const verifiedTick = d.is_verified ? `<span style="color:#38bdf8; font-size:13px; flex-shrink:0;">✔️</span>` : '';
-    const titleHtml = `${thumb}<span style="font-size:14px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(d.name)}</span>${verifiedTick}`;
-    const badgeHtml = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:${d.avail_color};"><span class="status-dot ${d.avail_state}"></span><span>${esc(d.avail_label)}</span></span>`;
+    const iconHtml = `<span class="poster-mini-thumb">${sp.icon}</span>`;
 
     items.push(buildCardHtml({
       id: d.id,
-      imgUrl: placeImg,
-      text: placeTxt,
+      imgUrl: storyImg,
+      text: storyTxt,
       ts: d.bio_ts || now,
-      titleHtml,
-      badgeHtml,
+      iconHtml,
+      nameText: d.name,
+      isVerified: !!d.is_verified,
       delBtnHtml,
-      accentColor,
+      accentColor: 'var(--gold)',
       isClickable: true
     }));
   });
@@ -2540,7 +2731,8 @@ function renderPostersCarousel() {
   track.innerHTML = items.length >= 2 ? (baseHtml + baseHtml) : baseHtml;
   setupPosterLiveObserver();
 }
-
+<!-- ======================= نهاية الجزء الثاني (2/3) ======================= -->
+  <!-- ======================= بداية الجزء الثالث والأخير (3/3) ======================= -->
 function startContinuousPosterLoop() {
   const track = $('posterTrack'); if (!track) return;
   ['pointerenter', 'touchstart'].forEach(ev => track.addEventListener(ev, () => { posterPaused = true; }, { passive: true }));
@@ -2574,7 +2766,7 @@ function startContinuousPosterLoop() {
   }
   if (!posterRaf) posterRaf = requestAnimationFrame(tick);
 }
-const posterStep = () => document.documentElement.dir === 'rtl' ? -354 : 354;
+const posterStep = () => document.documentElement.dir === 'rtl' ? -344 : 344;
 
 function cardCtx(d) {
   const c = CATS[d.cat] || CATS.doctor;
@@ -2687,7 +2879,8 @@ function mountTTS(id) {
     if (!hasTTS) return toast('المتصفح لا يدعم القراءة الصوتية');
     if (speechSynthesis.speaking) { speechSynthesis.cancel(); ttsId = null; paintTTS(false); return; }
     const p = byId(id); if (!p) return;
-    const u = new SpeechSynthesisUtterance('مرحباً بك في ' + p.name + '. ' + (p.spec ? 'التخصص: ' + p.spec + '. ' : '') + (p.bio ? p.bio + '. ' : '') + (p.hours ? 'مواعيد العمل: ' + p.hours + '. ' : ''));
+    const cleanBio = unpackStoryPayload(p.bio).text;
+    const u = new SpeechSynthesisUtterance('مرحباً بك في ' + p.name + '. ' + (p.spec ? 'التخصص: ' + p.spec + '. ' : '') + (cleanBio ? cleanBio + '. ' : '') + (p.hours ? 'مواعيد العمل: ' + p.hours + '. ' : ''));
     u.lang = 'ar-SA'; u.rate = 0.9;
     const v = bestVoice(); if (v) { u.voice = v; u.lang = v.lang; }
     u.onstart = () => { ttsId = id; paintTTS(true); };
@@ -2701,6 +2894,7 @@ function mountTTS(id) {
 function defaultPlacePageHtml(d, x) {
   const { c, spMeta, canManage, reviewsHtml, galleryHtml, servicesHtml, verifyPage, phoneRow } = x;
   const showRevSearch = d.reviews && d.reviews.length >= 2;
+  const cleanBio = unpackStoryPayload(d.bio).text;
   return `
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border-soft);">
       <div style="font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px;">
@@ -2716,7 +2910,7 @@ function defaultPlacePageHtml(d, x) {
         ${d.photo_url ? `<img src="${esc(d.photo_url)}" alt="${esc(d.name)}" decoding="async" style="width:100%; height:230px; object-fit:cover; border-radius:16px; margin-bottom:10px;">` : `<div style="font-size:58px; margin-bottom:10px;">${spMeta.icon}</div>`}
         <span class="badge-pill" style="background:${spMeta.bg}; color:${spMeta.color};">${spMeta.icon} ${esc(d.spec)}</span>
         <h2 class="font-display" style="font-size:22px; margin-top:8px; color:#fff;">${esc(d.name)}${badge(d, true)}</h2>
-        <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">"${esc(d.bio || 'صحتك أقرب مما تظن')}"</p>
+        <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">"${esc(cleanBio || 'صحتك أقرب مما تظن')}"</p>
       </div>
       <div>
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
@@ -2856,7 +3050,7 @@ function openReviewModal(id) {
 }
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
-/* ============ 13) إدارة صفحتي (مع عرض البطاقة الحية كما تظهر للناس مباشرة) + دعوة صديق + غرفة الإدارة ============ */
+/* ============ 13) إدارة صفحتي (مع رفع صورة مباشر للحالة اليومية) + دعوة صديق + غرفة الإدارة ============ */
 function renderManagedAds() {
   const u = getCurrentUser(), box = $('managedListBox');
   if (!u) {
@@ -2889,9 +3083,9 @@ function renderManagedAds() {
     const refLink = `${baseUrl}?ref=${p.id}`;
     const count = p.ref_count || 0;
     const pct = Math.min(100, count);
-    
-    // استخراج رابط الصورة من الكود (إذا كان مخزناً داخل p.reelImg)
-    const reelImgUrl = p.reelImg || '';
+    const parsedStory = unpackStoryPayload(p.bio || '');
+    const reelImgUrl = parsedStory.img || '';
+    const reelCleanText = parsedStory.text || '';
 
     return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:16px; cursor:default;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
@@ -2915,17 +3109,25 @@ function renderManagedAds() {
         ${card(p)}
       </div>
 
-      <div style="background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:8px;">
-        <b style="font-size:13px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية (تظهر لمدة 24 ساعة)</b>
+      <!-- استوديو نشر الحالة اليومية لصاحب الصفحة مع رفع صورة مباشر من الجهاز -->
+      <div style="background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:9px;">
+        <b style="font-size:13.5px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية (تظهر لمدة 24 ساعة في الشريط العلوي)</b>
         
-        <!-- حقل رابط الصورة الجديد -->
-        <input class="input-box" type="text" data-qs-img="${p.id}" placeholder="🔗 رابط الصورة (اختياري، مثلاً من imgur)..." value="${esc(reelImgUrl)}" style="font-size:12.5px;">
+        <label style="cursor:pointer; background:rgba(217,180,90,0.12); border:1.5px dashed var(--gold); border-radius:11px; padding:10px; text-align:center; font-size:13px; color:var(--gold); font-weight:700; display:block;">
+          📷 اضغط هنا لاختيار صورة للحالة من جهازك (اختياري)
+          <input type="file" accept="image/*" data-qs-file="${p.id}" class="hidden">
+        </label>
+        <input type="hidden" data-qs-img="${p.id}" value="${esc(reelImgUrl)}">
+
+        <div data-qs-prev-wrap="${p.id}" style="display:${reelImgUrl ? 'block' : 'none'}; position:relative; height:140px; background:#040911; border:1px solid var(--gold); border-radius:8px; overflow:hidden;">
+          <img data-qs-prev-img="${p.id}" src="${esc(reelImgUrl)}" style="width:100%; height:100%; object-fit:cover; display:block;">
+          <button type="button" data-qs="clear-img" data-id="${p.id}" style="position:absolute; top:6px; left:6px; background:rgba(244,63,94,0.9); color:#fff; border:none; border-radius:6px; padding:4px 9px; font-size:11px; font-weight:700; cursor:pointer;">إزالة الصورة ✕</button>
+        </div>
+
+        <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="اكتب تحديثاً أو عرضاً أو مواعيد اليوم للمستخدمين هنا...">${esc(reelCleanText)}</textarea>
         
-        <!-- حقل النص كما هو -->
-        <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="اكتب تحديثاً أو إعلاناً للمستخدمين هنا...">${esc(p.bio || '')}</textarea>
-        
-        <div style="display:flex; gap:8px; margin-top:4px;">
-          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة ✔️</button>
+        <div style="display:flex; gap:8px; margin-top:2px;">
+          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">🚀 نشر الحالة فوراً ✔️</button>
           <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">🗑 حذف</button>
         </div>
       </div>
@@ -2951,25 +3153,22 @@ async function quickToggleLamp(id) {
   await load(); renderManagedAds();
   toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ غير معروف' }[nx]);
 }
+
 function saveDailyStatus(id, text, imgUrl = '') {
-  const q = byId(id); 
+  const q = byId(id);
   if (!q) return;
   if (containsDefamation(text)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
-  
-  // دمج الصورة مع النص إذا تم إرفاق صورة
-  const payloadText = imgUrl ? (imgUrl + '|||' + text) : text;
-  
-  // نتحقق إذا كان هناك نص أو صورة لتحديد حالة النشر وتحديث الوقت
-  const hasContent = text || imgUrl;
-  
+  const payloadText = packStoryPayload(text, imgUrl);
+  const hasContent = !!(text || imgUrl);
   savePlace({ ...q, bio: payloadText, bio_ts: hasContent ? Date.now() : null });
-  
-  load().then(() => { 
-    renderManagedAds(); 
-    toast(hasContent ? '✔️ تم نشر حالتك وتحديث معاينتك' : '🗑 تم حذف الحالة من الشريط'); 
+  load().then(() => {
+    renderManagedAds();
+    renderPostersCarousel();
+    refreshAdminStats();
+    toast(hasContent ? '✔️ تم نشر حالتك المصورة وتحديث الشريط' : '🗑 تم حذف الحالة من الشريط');
   });
 }
-    
+
 function renderReferralsHub() {
   const u = getCurrentUser(), box = $('referralsDashboardBox'), baseUrl = window.location.href.split('?')[0];
   if (!u) {
@@ -2981,7 +3180,7 @@ function renderReferralsHub() {
   const myAds = places.filter(p => norm(p.owner_email) === norm(u.email));
   const totalRefs = (uMap[myCode] || 0) + myAds.reduce((a, i) => a + (i.ref_count || 0), 0), pct = Math.min(100, totalRefs);
   const myRefUrl = myAds.length ? `${baseUrl}?ref=${myAds[0].id}` : `${baseUrl}?ref=${myCode}`;
-box.innerHTML = `
+  box.innerHTML = `
     <div class="entity-card" style="border-color:var(--gold); display:grid; gap:14px; cursor:default;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div><span class="badge-pill" style="background:rgba(217,180,90,0.2); color:var(--gold);">✨ دعوة صديق</span><h3 style="font-size:19px; margin-top:4px;">مرحباً ${esc(u.name)}</h3></div>
@@ -3027,6 +3226,19 @@ function renderAdminReviewsMonitor() {
 
 function renderAdminList() {
   renderAdminReviewsMonitor();
+  refreshAdminStats();
+
+  const dev = getDevStatus();
+  if (dev && dev.text && $('devText')) {
+    const parsedDev = unpackStoryPayload(dev.text);
+    if (!$('devText').value) $('devText').value = parsedDev.text;
+    if (parsedDev.img && $('devImgBase64') && !$('devImgBase64').value) {
+      $('devImgBase64').value = parsedDev.img;
+      if ($('devImgPreview')) $('devImgPreview').src = parsedDev.img;
+      if ($('devImgPreviewWrap')) $('devImgPreviewWrap').style.display = 'block';
+    }
+  }
+
   const reqs = getRefRequests();
   $('adminRefReqCount').textContent = reqs.length;
   $('adminRefRequestsList').innerHTML = reqs.length ? reqs.map(r => `
@@ -3125,7 +3337,13 @@ function openEditorModal(id) {
   $('edCat').value = uiCat;
   $('edSpecKey').value = (ex && ex.cat === 'doctor') ? (ex.spec_key || 'gastro') : 'gastro';
   $('edName').value = ex ? ex.name : ''; $('edSpec').value = ex ? ex.spec : '';
-  $('edBio').value = ex ? (ex.bio || '') : '';
+
+  const parsedStory = unpackStoryPayload(ex ? (ex.bio || '') : '');
+  $('edBio').value = parsedStory.text;
+  if ($('edBioImg')) $('edBioImg').value = parsedStory.img;
+  if ($('edBioImgPreview')) $('edBioImgPreview').src = parsedStory.img || '';
+  if ($('edBioImgPreviewWrap')) $('edBioImgPreviewWrap').style.display = parsedStory.img ? 'block' : 'none';
+
   $('edPhotoUrl').value = ex ? (ex.photo_url || '') : '';
   $('edAreaKey').value = ex ? (ex.area_key || '') : '';
   $('edAddr').value = ex ? ex.addr : '';
@@ -3195,7 +3413,7 @@ function listenVoiceSearch() {
   r.start();
 }
 
-/* ============ 15) ربط الأحداث السريعة + إغلاق القوائم المنسدلة (المناطق والتخصصات) عند النقر خارجها ============ */
+/* ============ 15) ربط الأحداث السريعة + رفع الصور المباشر + إغلاق القوائم ============ */
 let lastNavTap = 0;
 function onNavTap(e) {
   const b = e.target.closest('[data-nav]'); if (!b) return;
@@ -3292,6 +3510,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeEditorModal(); closeReviewModal(); closeSideDrawer();
     $('onboardingModal').classList.add('hidden');
+    if ($('reelImageLightbox')) $('reelImageLightbox').style.display = 'none';
     openAreaDropdown(false);
     openSpecDropdown(false);
   }
@@ -3542,77 +3761,118 @@ $('reviewForm').addEventListener('submit', async e => {
   toast('✔ شكراً لك! تم نشر تقييمك بنجاح');
 });
 
-/* إدارة صفحتي: نشر/حذف الحالة اليومية */
+/* إدارة صفحتي: رفع صورة الحالة من الجهاز + نشر/حذف الحالة اليومية */
+$('managedListBox').addEventListener('change', async e => {
+  const fileInp = e.target.closest('[data-qs-file]');
+  if (!fileInp || !fileInp.files || !fileInp.files[0]) return;
+  const id = fileInp.getAttribute('data-qs-file');
+  const dataUrl = await fileToCompressedDataURL(fileInp.files[0], 820, 0.8);
+  const hiddenImg = $('managedListBox').querySelector(`[data-qs-img="${id}"]`);
+  const prevWrap = $('managedListBox').querySelector(`[data-qs-prev-wrap="${id}"]`);
+  const prevImg = $('managedListBox').querySelector(`[data-qs-prev-img="${id}"]`);
+  if (hiddenImg) hiddenImg.value = dataUrl;
+  if (prevImg) prevImg.src = dataUrl;
+  if (prevWrap) prevWrap.style.display = 'block';
+  toast('📷 تم تجهيز صورة الحالة، اضغط "نشر الحالة" لاعتمادها');
+});
+
 $('managedListBox').addEventListener('click', e => {
   const b = e.target.closest('[data-qs]'); if (!b) return;
-  
-  // جلب حقل الصورة وحقل النص
-  const imgInput = $('managedListBox').querySelector(`[data-qs-img="${b.dataset.id}"]`);
-  const txtInput = $('managedListBox').querySelector(`[data-qs-text="${b.dataset.id}"]`);
-  
+  const id = b.dataset.id;
+  const imgInput = $('managedListBox').querySelector(`[data-qs-img="${id}"]`);
+  const txtInput = $('managedListBox').querySelector(`[data-qs-text="${id}"]`);
+  const prevWrap = $('managedListBox').querySelector(`[data-qs-prev-wrap="${id}"]`);
+
+  if (b.dataset.qs === 'clear-img') {
+    if (imgInput) imgInput.value = '';
+    if (prevWrap) prevWrap.style.display = 'none';
+    return;
+  }
   if (b.dataset.qs === 'del') {
     if (imgInput) imgInput.value = '';
     if (txtInput) txtInput.value = '';
-    // نرسل تفريغاً للنص والصورة معاً
-    return saveDailyStatus(b.dataset.id, '', ''); 
+    if (prevWrap) prevWrap.style.display = 'none';
+    return saveDailyStatus(id, '', '');
   }
-  
   const t = txtInput ? txtInput.value.trim() : '';
   const img = imgInput ? imgInput.value.trim() : '';
-  
-  if (!t && !img) return toast('اكتب الحالة أو ضع رابط الصورة أولاً');
-  
-  // نمرر النص والصورة (كمتغير ثالث) لدالة الحفظ
-  saveDailyStatus(b.dataset.id, t, img); 
+  if (!t && !img) return toast('اكتب الحالة أو اختر صورة من جهازك أولاً');
+  saveDailyStatus(id, t, img);
 });
 
-/* حالة Cryovion الرسمية (مع دعم الصور بدون كسر قاعدة البيانات) */
-$('devPub').addEventListener('click', () => {
+/* غرفة الإدارة: رفع صورة حالة Cryovion الرسمية من الجهاز + نشر/حذف */
+if ($('devImgFile')) {
+  $('devImgFile').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const dataUrl = await fileToCompressedDataURL(file, 820, 0.82);
+    if ($('devImgBase64')) $('devImgBase64').value = dataUrl;
+    if ($('devImgPreview')) $('devImgPreview').src = dataUrl;
+    if ($('devImgPreviewWrap')) $('devImgPreviewWrap').style.display = 'block';
+    toast('📷 تم إرفاق الصورة من جهازك بنجاح');
+  });
+}
+
+function clearAdminStatusImg() {
+  if ($('devImgBase64')) $('devImgBase64').value = '';
+  if ($('devImgFile')) $('devImgFile').value = '';
+  if ($('devImgPreview')) $('devImgPreview').src = '';
+  if ($('devImgPreviewWrap')) $('devImgPreviewWrap').style.display = 'none';
+}
+
+$('devPub').addEventListener('click', async () => {
   const t = $('devText').value.trim();
-  const img = $('devImg') ? $('devImg').value.trim() : '';
-  if (!t && !img) return toast('اكتب نص الحالة أو ضع رابط الصورة أولاً');
+  let img = $('devImgBase64') ? $('devImgBase64').value.trim() : '';
+  if (!t && !img) return toast('اكتب نص الحالة أو ارفع صورة من جهازك أولاً');
   if (!db) return toast('الخدمة غير متاحة حالياً');
-  
-  const payloadText = img ? (img + '|||' + t) : t;
-  
-  writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: payloadText, ts: Date.now() }))
-    .then(r => { 
-      if (r && r.error) toast('رُفض النشر: للأدمن فقط'); 
-      else { toast('✔️ تم نشر حالة Cryovion بنجاح'); refreshAdminStats(); }
-      return load(); 
+
+  try {
+    const s = await sess();
+    if (img && img.indexOf('data:') === 0 && s && s.user) {
+      img = await publishPhoto(img, s.user.id);
+    }
+  } catch {}
+
+  const payloadText = packStoryPayload(t, img);
+  const now = Date.now();
+  localStorage.setItem('cryovion_dev_status', JSON.stringify({ text: payloadText, ts: now }));
+  renderPostersCarousel();
+
+  writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: payloadText, ts: now }))
+    .then(r => {
+      if (r && r.error) toast('رُفض النشر: للأدمن فقط');
+      else { toast('✔️ تم نشر حالة Cryovion المصورة بنجاح'); refreshAdminStats(); }
+      return load();
     }).catch(() => {});
 });
 
 $('devDel').addEventListener('click', () => {
   if (!db) return toast('الخدمة غير متاحة حالياً');
   $('devText').value = '';
-  if ($('devImg')) $('devImg').value = '';
-  if ($('devImgPreviewWrap')) $('devImgPreviewWrap').style.display = 'none';
-  writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1))
-    .then(() => { toast('تم حذف الحالة الرسمية'); refreshAdminStats(); return load(); }).catch(() => {});
-});
+  if ($('devCharCount')) $('devCharCount').textContent = '0 حرف';
+  clearAdminStatusImg();
+  localStorage.removeItem('cryovion_dev_status');
+  renderPostersCarousel();
 
-/* دوال مركز القيادة (الإحصائيات + معاينة الصورة + النسخ الاحتياطي) */
-function previewAdminStatusImg() {
-  const url = $('devImg') ? $('devImg').value.trim() : '';
-  const wrap = $('devImgPreviewWrap'), img = $('devImgPreview');
-  if (!url) { wrap.style.display = 'none'; return toast('ضع رابط الصورة أولاً للمعاينة'); }
-  img.src = url;
-  wrap.style.display = 'block';
-}
+  writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1))
+    .then(() => { toast('🗑 تم حذف الحالة الرسمية'); refreshAdminStats(); return load(); }).catch(() => {});
+});
 
 function refreshAdminStats() {
   if (typeof places === 'undefined' || !Array.isArray(places)) return;
   const totalEl = $('admStatTotal'), verEl = $('admStatVerified'), delEl = $('admStatDelegated'), reelEl = $('admStatActiveReels');
   if (totalEl) totalEl.textContent = places.length;
-  if (verEl) verEl.textContent = places.filter(p => p.verified).length;
+  if (verEl) verEl.textContent = places.filter(p => p.is_verified).length;
   if (delEl) delEl.textContent = places.filter(p => p.owner_email && p.owner_email.trim() !== '').length;
   if (reelEl) {
-    const activePlaces = places.filter(p => p.bio && p.bio.trim() !== '').length;
-    reelEl.textContent = activePlaces + (typeof devStatus !== 'undefined' && devStatus && devStatus.text ? 1 : 0);
+    const now = Date.now();
+    const activePlaces = places.filter(p => p.bio && p.bio.trim() !== '' && (!p.bio_ts || now - p.bio_ts <= DAY_MS)).length;
+    const dev = getDevStatus();
+    const hasDev = !!(dev && dev.text && (now - dev.ts <= DAY_MS));
+    reelEl.textContent = activePlaces + (hasDev ? 1 : 0);
   }
 }
-setInterval(refreshAdminStats, 3000);
+setInterval(refreshAdminStats, 4000);
 
 function exportCryovionBackup() {
   if (typeof places === 'undefined') return toast('لا توجد بيانات لتصديرها');
@@ -3626,13 +3886,25 @@ function exportCryovionBackup() {
   toast('📥 تم تحميل النسخة الاحتياطية بنجاح');
 }
 
-/* نافذة التعديل */
+/* نافذة التعديل + رفع صورة الحالة اليومية داخل نافذة التعديل */
 $('edCat').addEventListener('change', syncEditorCatFields);
 $('svcAdd').addEventListener('click', () => addServiceRow('', ''));
 
+if ($('edBioImgFile')) {
+  $('edBioImgFile').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const dataUrl = await fileToCompressedDataURL(file, 820, 0.8);
+    if ($('edBioImg')) $('edBioImg').value = dataUrl;
+    if ($('edBioImgPreview')) $('edBioImgPreview').src = dataUrl;
+    if ($('edBioImgPreviewWrap')) $('edBioImgPreviewWrap').style.display = 'block';
+    toast('📷 تم إرفاق صورة للحالة اليومية');
+  });
+}
+
 $('edGalleryFiles').addEventListener('change', e => {
   const files = Array.from(e.target.files); if (!files.length) return;
-  Promise.all(files.map(f => new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.onerror = () => res(null); r.readAsDataURL(f); })))
+  Promise.all(files.map(f => fileToCompressedDataURL(f, 900, 0.82)))
     .then(list => {
       const gallery = list.filter(Boolean); if (!gallery.length) return;
       $('edPhotoUrl').value = gallery[0];
@@ -3646,8 +3918,10 @@ $('edOwnerEmail').addEventListener('input', function () { $('edIsVerified').chec
 $('editorForm').addEventListener('submit', async e => {
   e.preventDefault();
   adminUnlocked = isUserMasterAdmin(getCurrentUser());
-  const bioVal = $('edBio').value.trim(), nameVal = $('edName').value.trim();
-  if (containsDefamation(bioVal) || containsDefamation(nameVal)) return toast('🚫 النص يحتوي على عبارات مسيئة.');
+  const bioTxtVal = $('edBio').value.trim();
+  const bioImgVal = $('edBioImg') ? $('edBioImg').value.trim() : '';
+  const nameVal = $('edName').value.trim();
+  if (containsDefamation(bioTxtVal) || containsDefamation(nameVal)) return toast('🚫 النص يحتوي على عبارات مسيئة.');
   const id = $('edId').value || ('c-' + crypto.randomUUID().slice(0, 8)), ex = byId(id);
   const off = []; document.querySelectorAll('.offd').forEach(c => { if (c.checked) off.push(+c.value); });
 
@@ -3671,9 +3945,11 @@ $('editorForm').addEventListener('submit', async e => {
 
   let hours = $('edHours').value.trim();
   if (!hours) { if (sched.h24) hours = '24 ساعة'; else if (sched.from && sched.to) hours = 'من ' + t12(sched.from) + ' إلى ' + t12(sched.to); }
+
+  const packedBio = packStoryPayload(bioTxtVal, bioImgVal);
   const item = {
     id, cat: actualCat, spec_key: actualSpecKey, name: nameVal, spec: $('edSpec').value.trim(),
-    bio: bioVal, bio_ts: bioVal ? Date.now() : null, photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'),
+    bio: packedBio, bio_ts: packedBio ? Date.now() : null, photo_url: $('edPhotoUrl').value.trim(), gallery: JSON.parse($('edGalleryData').value || '[]'),
     area_key: pickedAreaKey,
     addr: $('edAddr').value.trim() || 'غير معروف', fee: uiCat === 'doctor' ? $('edFee').value.trim() : '', map_url: $('edMapUrl').value.trim(),
     services,
@@ -3710,66 +3986,7 @@ appReady = true;
 Cryovion.emit('ready');
 initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
 </script>
-  <script defer src="/_vercel/insights/script.js"></script>
-  <!-- نافذة تكبير صورة الحالة (Lightbox) -->
-<div id="reelImageLightbox" onclick="this.style.display='none'" style="display:none; position:fixed; inset:0; background:rgba(4,9,17,0.92); z-index:99999; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(6px); cursor:zoom-out;">
-  <img id="reelLightboxImg" src="" style="max-width:100%; max-height:90vh; object-fit:contain; border:1px solid var(--gold); box-shadow:0 10px 40px rgba(0,0,0,0.8);">
-</div>
-
-<script>
-// دالة فتح الصورة بحجم كبير
-function openReelImage(url) {
-  if (!url) return;
-  const box = document.getElementById('reelImageLightbox');
-  const img = document.getElementById('reelLightboxImg');
-  img.src = url;
-  box.style.display = 'flex';
-}
-
-// دالة زر الإعجاب (القلب) مع حفظ الإعجاب في جهاز الزائر
-function toggleReelLike(id, btn) {
-  const key = 'cryo_like_' + id;
-  const countSpan = btn.querySelector('.like-count');
-  let count = parseInt(countSpan.textContent) || 0;
-  const liked = localStorage.getItem(key) === '1';
-
-  if (liked) {
-    localStorage.removeItem(key);
-    count = Math.max(0, count - 1);
-    btn.style.background = 'rgba(244, 63, 94, 0.12)';
-    btn.style.color = '#f43f5e';
-  } else {
-    localStorage.setItem(key, '1');
-    count += 1;
-    btn.style.background = '#e11d48';
-    btn.style.color = '#ffffff';
-  }
-  countSpan.textContent = count;
-}
-</script>
-  <script>
-// استماع مباشر لزر رفع الصورة بدون الحاجة لأوامر داخل الـ HTML
-document.addEventListener('change', function(e) {
-  if (e.target && e.target.id === 'devImgFile') {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const base64Str = event.target.result;
-      
-      // تحديث الحقل المخفي والصورة المعروضة
-      const hiddenInput = document.getElementById('devImgBase64');
-      const previewImg = document.getElementById('devImgPreview');
-      const previewWrap = document.getElementById('devImgPreviewWrap');
-      
-      if (hiddenInput) hiddenInput.value = base64Str;
-      if (previewImg) previewImg.src = base64Str;
-      if (previewWrap) previewWrap.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
-});
-</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
+<!-- ======================= نهاية الجزء الثالث والأخير (3/3) ======================= -->
