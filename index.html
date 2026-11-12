@@ -2414,33 +2414,125 @@ function renderPostersCarousel() {
   const track = $('posterTrack'); if (!track) return;
   const now = Date.now(), dev = getDevStatus(), u = getCurrentUser();
   const items = [];
+
+  // دالة مساعدة لبناء قالب البطاقة الجديد الموحد
+  const buildCardHtml = ({ id, imgUrl, text, ts, titleHtml, badgeHtml, delBtnHtml, accentColor, isClickable }) => {
+    const elapsed = ts ? Math.max(0, now - ts) : 0;
+    const remMs = Math.max(0, DAY_MS - elapsed);
+    const remHours = Math.max(1, Math.ceil(remMs / 3600000));
+    const pct = Math.max(5, Math.min(100, Math.round((remMs / DAY_MS) * 100)));
+
+    const likeKey = 'cryo_like_' + id;
+    const isLiked = localStorage.getItem(likeKey) === '1';
+    const likeCount = isLiked ? 1 : 0;
+    const heartBg = isLiked ? '#e11d48' : 'rgba(244, 63, 94, 0.14)';
+    const heartColor = isLiked ? '#ffffff' : '#f43f5e';
+
+    const imgSection = imgUrl ? `
+      <div onclick="event.stopPropagation(); openReelImage('${esc(imgUrl)}')" style="position:relative; width:100%; height:145px; cursor:zoom-in; overflow:hidden; background:#040911; flex-shrink:0;">
+        <img src="${esc(imgUrl)}" alt="" loading="lazy" decoding="async" style="width:100%; height:100%; object-fit:cover; border-radius:0; display:block;">
+        <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.65); color:#fff; padding:5px; border-radius:6px; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </div>
+      </div>` : '';
+
+    const clickAttr = isClickable ? `data-act="openPage" data-id="${esc(id)}"` : '';
+    const cursorStyle = isClickable ? 'cursor:pointer;' : 'cursor:default;';
+
+    return `<div ${clickAttr} class="poster-card" style="--poster-accent:${accentColor}; padding:0; ${cursorStyle}">
+      ${imgSection}
+      <div style="padding:12px 14px; display:flex; flex-direction:column; gap:10px; flex:1; justify-content:space-between;">
+        
+        <!-- شريط الوقت وبجانبه عدد الساعات فقط -->
+        <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
+          <span style="font-size:11.5px; color:${accentColor}; font-weight:700; white-space:nowrap;">${remHours} ساعة</span>
+          <div style="flex:1; height:5px; background:rgba(255,255,255,0.1); border-radius:99px; overflow:hidden;">
+            <div style="width:${pct}%; height:100%; background:${accentColor};"></div>
+          </div>
+        </div>
+
+        <!-- الاسم + التوثيق / الشارة + زر الحذف -->
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; direction:rtl;">
+          <div style="display:flex; align-items:center; gap:7px; min-width:0;">
+            ${titleHtml}
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+            ${badgeHtml}
+            ${delBtnHtml}
+          </div>
+        </div>
+
+        <!-- صندوق النص القابل للتمرير -->
+        ${text ? `<div class="poster-bio-body" onclick="event.stopPropagation()" style="max-height:64px; overflow-y:auto; font-size:13.5px; color:#e2e8f0; line-height:1.6; direction:rtl;">${esc(text)}</div>` : ''}
+
+        <!-- زر القلب أسفل اليسار فقط -->
+        <div style="display:flex; justify-content:flex-end; direction:rtl; padding-top:2px;">
+          <button type="button" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)" style="display:inline-flex; align-items:center; gap:6px; background:${heartBg}; color:${heartColor}; border:1px solid rgba(244,63,94,0.35); padding:4px 12px; border-radius:99px; font-size:13px; font-weight:700; cursor:pointer;">
+            <span class="like-count">${likeCount}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>`;
+  };
+
+  // 1. حالة Cryovion الرسمية
   if (dev && now - dev.ts <= DAY_MS) {
     const devDelBtn = adminUnlocked ? `<button type="button" class="poster-del-btn" data-del-story="__dev__" title="حذف حالة Cryovion">✕</button>` : '';
-    items.push(`<div class="poster-card" style="--poster-accent:var(--gold); cursor:default;"><div class="poster-top-quarter">
-      <div style="display:flex; align-items:center; gap:7px;"><span class="brand-mark" style="width:28px; height:28px;"><svg viewBox="0 0 100 100" fill="none"><path d="M68 28 C55 16 32 18 22 34 C12 49 14 70 28 82 C42 94 64 90 70 76" stroke="#fff" stroke-width="11" stroke-linecap="round"/><path d="M22 52 L44 52 L50 40 L56 64 L63 32 L70 57 L75 52 L92 52" stroke="#2dd4bf" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="brand-text font-display" style="font-size:18px;">Cryovion</span></div>
-      <div style="display:flex; align-items:center; gap:6px;"><span class="badge-pill gold-bg" style="font-size:10px; padding:2px 9px;">✔ تحديث رسمي</span>${devDelBtn}</div></div>
-      <div class="poster-bio-body">${esc(dev.text)}</div></div>`);
+    const rawDev = dev.text || '';
+    const parts = rawDev.includes('|||') ? rawDev.split('|||') : ['', rawDev];
+    const devImg = parts[0].trim();
+    const devTxt = parts[1].trim();
+
+    const titleHtml = `<span class="brand-mark" style="width:26px; height:26px; flex-shrink:0;"><svg viewBox="0 0 100 100" fill="none"><path d="M68 28 C55 16 32 18 22 34 C12 49 14 70 28 82 C42 94 64 90 70 76" stroke="#fff" stroke-width="11" stroke-linecap="round"/><path d="M22 52 L44 52 L50 40 L56 64 L63 32 L70 57 L75 52 L92 52" stroke="#2dd4bf" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="brand-text font-display" style="font-size:17px;">Cryovion</span>`;
+    const badgeHtml = `<span class="badge-pill gold-bg" style="font-size:10px; padding:2px 8px;">✔️ تحديث رسمي</span>`;
+
+    items.push(buildCardHtml({
+      id: '__dev__',
+      imgUrl: devImg,
+      text: devTxt,
+      ts: dev.ts,
+      titleHtml,
+      badgeHtml,
+      delBtnHtml: devDelBtn,
+      accentColor: 'var(--gold)',
+      isClickable: false
+    }));
   }
+
+  // 2. حالات الصيدليات والعيادات والمعامل
   places.forEach(d => {
     if (!d.bio || (d.bio_ts && now - d.bio_ts > DAY_MS)) return;
     if (!doesPlaceMatchSelectedAreas(d)) return;
+
     const sp = SPECS_META[d.spec_key] || SPECS_META[d.cat] || SPECS_META.gastro;
     const catMeta = CATS[d.cat] || CATS.doctor;
     const accentColor = sp.color || catMeta.accent || '#10b981';
-    const wa = formatWaNumber(d.whatsapp || d.phone);
     const canDelStory = adminUnlocked || (u && d.owner_email && norm(u.email) === norm(d.owner_email));
     const delBtnHtml = canDelStory ? `<button type="button" class="poster-del-btn" data-del-story="${esc(d.id)}" title="حذف هذا الريليز">✕</button>` : '';
+
+    const rawBio = d.bio || '';
+    const parts = rawBio.includes('|||') ? rawBio.split('|||') : ['', rawBio];
+    const placeImg = parts[0].trim();
+    const placeTxt = parts[1].trim();
+
     const thumb = d.photo_url ? `<img src="${esc(d.photo_url)}" class="poster-mini-thumb" alt="" loading="lazy" decoding="async">` : `<span class="poster-mini-thumb t-${d.cat}">${sp.icon}</span>`;
-    const foot = d.phone ? `<div style="display:flex; align-items:center; justify-content:space-between; gap:6px; padding-top:6px;">
-      <div style="display:flex; gap:6px;"><a href="tel:${esc(d.phone)}" style="background:var(--emerald); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">📞 ${esc(d.phone)}</a>${wa ? `<a href="https://wa.me/${wa}" target="_blank" rel="noopener" style="background:var(--whatsapp); color:#fff; padding:4px 10px; border-radius:8px; font-size:11.5px; font-weight:700;">💬</a>` : ''}</div>
-      <span style="font-size:10.5px; color:${accentColor}; font-weight:700;">${sp.icon} ${esc(d.spec)}</span></div>` : '';
-    items.push(`<div data-act="openPage" data-id="${d.id}" class="poster-card" style="--poster-accent:${accentColor};"><div class="poster-top-quarter">
-      <div style="display:flex; align-items:center; gap:7px; min-width:0;">${thumb}<span style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(d.name)}</span></div>
-      <div style="display:inline-flex; align-items:center; gap:6px; flex-shrink:0;">
-        <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:${d.avail_color};"><span class="status-dot ${d.avail_state}"></span><span>${esc(d.avail_label)}</span></span>
-        ${delBtnHtml}
-      </div></div>
-      <div class="poster-bio-body">${esc(d.bio)}</div>${foot}</div>`);
+    const verifiedTick = d.is_verified ? `<span style="color:#38bdf8; font-size:13px; flex-shrink:0;">✔️</span>` : '';
+    const titleHtml = `${thumb}<span style="font-size:14px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(d.name)}</span>${verifiedTick}`;
+    const badgeHtml = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:${d.avail_color};"><span class="status-dot ${d.avail_state}"></span><span>${esc(d.avail_label)}</span></span>`;
+
+    items.push(buildCardHtml({
+      id: d.id,
+      imgUrl: placeImg,
+      text: placeTxt,
+      ts: d.bio_ts || now,
+      titleHtml,
+      badgeHtml,
+      delBtnHtml,
+      accentColor,
+      isClickable: true
+    }));
   });
 
   const baseHtml = items.join('');
