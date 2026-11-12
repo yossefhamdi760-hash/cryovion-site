@@ -2724,6 +2724,16 @@ function renderManagedAds() {
         </a>
       </div>
     </div>`;
+    return;
+  }
+  const baseUrl = window.location.href.split('?')[0];
+  box.innerHTML = myAds.map(p => {
+    const refLink = `${baseUrl}?ref=${p.id}`; 
+    const count = p.ref_count || 0;
+    const pct = Math.min(100, count);
+    return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:16px; cursor:default;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
+        <div>
     
     return;
   }
