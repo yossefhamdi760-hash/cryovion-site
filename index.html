@@ -3462,19 +3462,65 @@ $('managedListBox').addEventListener('click', e => {
   saveDailyStatus(b.dataset.id, t, img); 
 });
 
-/* حالة Cryovion الرسمية */
+/* حالة Cryovion الرسمية (مع دعم الصور بدون كسر قاعدة البيانات) */
 $('devPub').addEventListener('click', () => {
-  const t = $('devText').value.trim(); 
-  if (!t) return toast('اكتب نص الحالة أولاً');
+  const t = $('devText').value.trim();
+  const img = $('devImg') ? $('devImg').value.trim() : '';
+  if (!t && !img) return toast('اكتب نص الحالة أو ضع رابط الصورة أولاً');
   if (!db) return toast('الخدمة غير متاحة حالياً');
-  writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: t, ts: Date.now() }))
-    .then(r => { if (r && r.error) toast('رُفض النشر: للأدمن فقط'); else toast('✔️ تم نشر حالة Cryovion'); return load(); }).catch(() => {});
+  
+  const payloadText = img ? (img + '|||' + t) : t;
+  
+  writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: payloadText, ts: Date.now() }))
+    .then(r => { 
+      if (r && r.error) toast('رُفض النشر: للأدمن فقط'); 
+      else { toast('✔️ تم نشر حالة Cryovion بنجاح'); refreshAdminStats(); }
+      return load(); 
+    }).catch(() => {});
 });
+
 $('devDel').addEventListener('click', () => {
   if (!db) return toast('الخدمة غير متاحة حالياً');
   $('devText').value = '';
-  writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1)).then(() => { toast('تم حذف الحالة'); return load(); }).catch(() => {});
+  if ($('devImg')) $('devImg').value = '';
+  if ($('devImgPreviewWrap')) $('devImgPreviewWrap').style.display = 'none';
+  writeQueue = writeQueue.then(() => db.from('site_status').delete().eq('id', 1))
+    .then(() => { toast('تم حذف الحالة الرسمية'); refreshAdminStats(); return load(); }).catch(() => {});
 });
+
+/* دوال مركز القيادة (الإحصائيات + معاينة الصورة + النسخ الاحتياطي) */
+function previewAdminStatusImg() {
+  const url = $('devImg') ? $('devImg').value.trim() : '';
+  const wrap = $('devImgPreviewWrap'), img = $('devImgPreview');
+  if (!url) { wrap.style.display = 'none'; return toast('ضع رابط الصورة أولاً للمعاينة'); }
+  img.src = url;
+  wrap.style.display = 'block';
+}
+
+function refreshAdminStats() {
+  if (typeof places === 'undefined' || !Array.isArray(places)) return;
+  const totalEl = $('admStatTotal'), verEl = $('admStatVerified'), delEl = $('admStatDelegated'), reelEl = $('admStatActiveReels');
+  if (totalEl) totalEl.textContent = places.length;
+  if (verEl) verEl.textContent = places.filter(p => p.verified).length;
+  if (delEl) delEl.textContent = places.filter(p => p.owner_email && p.owner_email.trim() !== '').length;
+  if (reelEl) {
+    const activePlaces = places.filter(p => p.bio && p.bio.trim() !== '').length;
+    reelEl.textContent = activePlaces + (typeof devStatus !== 'undefined' && devStatus && devStatus.text ? 1 : 0);
+  }
+}
+setInterval(refreshAdminStats, 3000);
+
+function exportCryovionBackup() {
+  if (typeof places === 'undefined') return toast('لا توجد بيانات لتصديرها');
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(places, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", "cryovion_backup_" + new Date().toISOString().slice(0,10) + ".json");
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+  toast('📥 تم تحميل النسخة الاحتياطية بنجاح');
+}
 
 /* نافذة التعديل */
 $('edCat').addEventListener('change', syncEditorCatFields);
