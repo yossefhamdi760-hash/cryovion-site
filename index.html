@@ -2740,9 +2740,13 @@ function renderManagedAds() {
   }
   const baseUrl = window.location.href.split('?')[0];
   box.innerHTML = myAds.map(p => {
-    const refLink = `${baseUrl}?ref=${p.id}`; 
+    const refLink = `${baseUrl}?ref=${p.id}`;
     const count = p.ref_count || 0;
     const pct = Math.min(100, count);
+    
+    // استخراج رابط الصورة من الكود (إذا كان مخزناً داخل p.reelImg)
+    const reelImgUrl = p.reelImg || '';
+
     return `<div class="entity-card" style="border-color:var(--gold); display:grid; gap:16px; cursor:default;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--border-soft);">
         <div>
@@ -2766,11 +2770,17 @@ function renderManagedAds() {
       </div>
 
       <div style="background:rgba(217,180,90,0.08); border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:8px;">
-        <b style="font-size:13px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية على شريط الـ 24 ساعة</b>
-        <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="مثال: متاح كشف الليلة حتى 9 مساءً...">${esc(p.bio || '')}</textarea>
-        <div style="display:flex; gap:8px;">
-          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة فوراً ✔️</button>
-          <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">🗑 حذف الحالة</button>
+        <b style="font-size:13px; color:var(--gold);">📢 انشر أو احذف حالتك اليومية (تظهر لمدة 24 ساعة)</b>
+        
+        <!-- حقل رابط الصورة الجديد -->
+        <input class="input-box" type="text" data-qs-img="${p.id}" placeholder="🔗 رابط الصورة (اختياري، مثلاً من imgur)..." value="${esc(reelImgUrl)}" style="font-size:12.5px;">
+        
+        <!-- حقل النص كما هو -->
+        <textarea class="input-box" rows="2" data-qs-text="${p.id}" placeholder="اكتب تحديثاً أو إعلاناً للمستخدمين هنا...">${esc(p.bio || '')}</textarea>
+        
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button type="button" data-qs="pub" data-id="${p.id}" class="gold-bg" style="flex:1; padding:10px; border-radius:10px; font-size:13px;">نشر الحالة ✔️</button>
+          <button type="button" data-qs="del" data-id="${p.id}" style="padding:10px 14px; border-radius:10px; background:rgba(244,63,94,0.18); color:var(--rose); font-weight:700; font-size:12px;">🗑 حذف</button>
         </div>
       </div>
 
