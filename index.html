@@ -323,27 +323,39 @@ body:has(#areaDropdownPanel:not(.hidden)) .right-icon-dock {
 .poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; position:relative; z-index:10; }
 .poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; will-change:scroll-position; }
 .poster-track::-webkit-scrollbar { display:none; }
-.poster-card {
-  flex:0 0 340px; max-width:86vw; border-radius:20px; padding:12px 15px;
-  background:linear-gradient(155deg,#132238 0%,#0b1322 100%);
-  border:1.5px solid var(--poster-accent, var(--border));
-  box-shadow:inset 0 2px 0 0 var(--poster-accent, var(--gold));
-  cursor:pointer; display:flex; flex-direction:column; height:158px; position:relative;
-  contain:layout style paint;
-  transition:border-color .2s ease, box-shadow .2s ease;
-}
-.poster-card:hover { border-color:var(--poster-accent, var(--gold)); }
-.poster-card.live {
-  border-color:var(--poster-accent, var(--live-ring)) !important;
-  box-shadow:0 0 0 1.5px var(--poster-accent, var(--live-ring)), 0 0 18px -2px var(--poster-accent, rgba(16,185,129,.5));
-}
-.poster-top-quarter { height:28%; min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid rgba(255,255,255,.1); padding-bottom:7px; }
-.poster-mini-thumb { width:28px; height:28px; border-radius:8px; object-fit:cover; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; border:1px solid var(--poster-accent, var(--gold)); }
-.poster-bio-body { flex:1; padding-top:8px; font-size:12.5px; color:#e2e8f0; line-height:1.55; overflow-y:auto; scrollbar-width:none; }
-.poster-bio-body::-webkit-scrollbar { display:none; }
-.poster-del-btn { width:22px; height:22px; border-radius:7px; background:rgba(244,63,94,.22); color:var(--rose); border:1px solid rgba(244,63,94,.4); font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
-.poster-del-btn:hover { background:var(--rose); color:#fff; }
 
+.poster-card {
+  flex: 0 0 320px; 
+  max-width: 86vw; 
+  border-radius: 18px; 
+  background: #0b1320;
+  border: 1.5px solid var(--poster-accent, var(--gold));
+  cursor: default; 
+  display: flex; 
+  flex-direction: column; 
+  height: auto; 
+  min-height: 280px; /* ليتناسب مع حجم الصورة والنص */
+  position: relative;
+  overflow: hidden; /* هذا السطر هو ما سيلغي الحواف الزائدة حول الصورة بالأعلى */
+  transition: border-color .2s ease;
+}
+.poster-card.live {
+  border-color: var(--poster-accent, var(--live-ring)) !important;
+  box-shadow: 0 0 0 1.5px var(--poster-accent, var(--live-ring)), 0 0 18px -2px var(--poster-accent, rgba(16,185,129,.5));
+}
+.poster-bio-body {
+  max-height: 64px; 
+  overflow-y: auto; 
+  font-size: 13.5px; 
+  color: #e2e8f0; 
+  line-height: 1.6; 
+  direction: rtl; 
+  scrollbar-width: thin;
+}
+.poster-bio-body::-webkit-scrollbar { display:none; }
+.poster-del-btn { width:24px; height:24px; border-radius:7px; background:rgba(244,63,94,.22); color:var(--rose); border:1px solid rgba(244,63,94,.4); font-size:12px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;}
+.poster-del-btn:hover { background:var(--rose); color:#fff; }
+  
 /* ================= 9) النقطة المضيئة وشارة التوثيق ================= */
 .status-dot { width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
 .status-dot.online { background:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 8px #10b981; }
