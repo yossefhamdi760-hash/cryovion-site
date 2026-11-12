@@ -2951,13 +2951,25 @@ async function quickToggleLamp(id) {
   await load(); renderManagedAds();
   toast({ auto: '⏱️ تلقائي حسب المواعيد', open: '🟢 مفتوح الآن', closed: '🔴 مغلق الآن', unknown: '⚪ غير معروف' }[nx]);
 }
-function saveDailyStatus(id, text) {
-  const q = byId(id); if (!q) return;
+function saveDailyStatus(id, text, imgUrl = '') {
+  const q = byId(id); 
+  if (!q) return;
   if (containsDefamation(text)) return toast('🚫 النص يحتوي على كلمات غير مسموح بها');
-  savePlace({ ...q, bio: text, bio_ts: text ? Date.now() : null });
-  load().then(() => { renderManagedAds(); toast(text ? '✔ تم نشر حالتك وتحديث معاينتك' : '🗑 تم حذف الحالة من الشريط'); });
+  
+  // دمج الصورة مع النص إذا تم إرفاق صورة
+  const payloadText = imgUrl ? (imgUrl + '|||' + text) : text;
+  
+  // نتحقق إذا كان هناك نص أو صورة لتحديد حالة النشر وتحديث الوقت
+  const hasContent = text || imgUrl;
+  
+  savePlace({ ...q, bio: payloadText, bio_ts: hasContent ? Date.now() : null });
+  
+  load().then(() => { 
+    renderManagedAds(); 
+    toast(hasContent ? '✔️ تم نشر حالتك وتحديث معاينتك' : '🗑 تم حذف الحالة من الشريط'); 
+  });
 }
-
+    
 function renderReferralsHub() {
   const u = getCurrentUser(), box = $('referralsDashboardBox'), baseUrl = window.location.href.split('?')[0];
   if (!u) {
