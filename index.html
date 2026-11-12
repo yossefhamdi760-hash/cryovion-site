@@ -3387,18 +3387,34 @@ $('reviewForm').addEventListener('submit', async e => {
 /* إدارة صفحتي: نشر/حذف الحالة اليومية */
 $('managedListBox').addEventListener('click', e => {
   const b = e.target.closest('[data-qs]'); if (!b) return;
-  if (b.dataset.qs === 'del') return saveDailyStatus(b.dataset.id, '');
-  const t = $('managedListBox').querySelector(`[data-qs-text="${b.dataset.id}"]`).value.trim();
-  if (!t) return toast('اكتب الحالة أولاً');
-  saveDailyStatus(b.dataset.id, t);
+  
+  // جلب حقل الصورة وحقل النص
+  const imgInput = $('managedListBox').querySelector(`[data-qs-img="${b.dataset.id}"]`);
+  const txtInput = $('managedListBox').querySelector(`[data-qs-text="${b.dataset.id}"]`);
+  
+  if (b.dataset.qs === 'del') {
+    if (imgInput) imgInput.value = '';
+    if (txtInput) txtInput.value = '';
+    // نرسل تفريغاً للنص والصورة معاً
+    return saveDailyStatus(b.dataset.id, '', ''); 
+  }
+  
+  const t = txtInput ? txtInput.value.trim() : '';
+  const img = imgInput ? imgInput.value.trim() : '';
+  
+  if (!t && !img) return toast('اكتب الحالة أو ضع رابط الصورة أولاً');
+  
+  // نمرر النص والصورة (كمتغير ثالث) لدالة الحفظ
+  saveDailyStatus(b.dataset.id, t, img); 
 });
 
 /* حالة Cryovion الرسمية */
 $('devPub').addEventListener('click', () => {
-  const t = $('devText').value.trim(); if (!t) return toast('اكتب نص الحالة أولاً');
+  const t = $('devText').value.trim(); 
+  if (!t) return toast('اكتب نص الحالة أولاً');
   if (!db) return toast('الخدمة غير متاحة حالياً');
   writeQueue = writeQueue.then(() => db.from('site_status').upsert({ id: 1, text: t, ts: Date.now() }))
-    .then(r => { if (r && r.error) toast('رُفض النشر: للأدمن فقط'); else toast('✔ تم نشر حالة Cryovion'); return load(); }).catch(() => {});
+    .then(r => { if (r && r.error) toast('رُفض النشر: للأدمن فقط'); else toast('✔️ تم نشر حالة Cryovion'); return load(); }).catch(() => {});
 });
 $('devDel').addEventListener('click', () => {
   if (!db) return toast('الخدمة غير متاحة حالياً');
