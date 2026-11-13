@@ -1452,8 +1452,9 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       </div>
     </div>
 
-    <div class="cry-about-footer">
-      Cryovion — نحو وصول أسهل إلى الخدمات الطبية.
+   <div class="cry-about-footer" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <span>Cryovion — نحو وصول أسهل إلى الخدمات الطبية.</span>
+      <button type="button" onclick="navigator.clipboard.writeText(location.origin + location.pathname + '?about=1'); toast('📋 تم نسخ الرابط المباشر للمقالة')" class="gold-bg" style="padding:6px 14px; border-radius:10px; font-size:12px;">🔗 نسخ رابط المقالة</button>
     </div>
   </div>
 </div>
@@ -3633,6 +3634,13 @@ function closeCryAbout() {
   if (!overlay) return;
   overlay.classList.remove('active');
   document.body.style.overflow = '';
+  if (window.location.search.includes('about=1') || window.location.hash === '#about') {
+    history.replaceState({ view: currentViewName }, '', window.location.pathname);
+  }
+}
+
+if (new URLSearchParams(window.location.search).get('about') === '1' || window.location.hash === '#about') {
+  setTimeout(openCryAbout, 150);
 }
 
 async function share(id) {
