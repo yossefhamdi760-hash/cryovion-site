@@ -1640,9 +1640,7 @@ function openReelImage(url) {
 }
 
 function getBaseLikeCount(id) {
-  let h = 0; const s = String(id || 'cryo');
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-  return 9 + (Math.abs(h) % 14);
+  return 0; // يبدأ العداد من الصفر تماماً للجميع
 }
 function toggleReelLike(id, btn) {
   const key = 'cryo_like_' + id;
