@@ -1640,24 +1640,40 @@ function openReelImage(url) {
 }
 
 function getBaseLikeCount(id) {
-  return 0; // يبدأ العداد من الصفر تماماً للجميع
+  return 0; // يبدأ العداد من الصفر تماماً
 }
-function toggleReelLike(id, btn) {
-  const key = 'cryo_like_' + id;
+
+async function toggleReelLike(id, btn) {
+  const u = getCurrentUser();
+  if (!u || !u.email) {
+    toast('سجل دخولك بحسابك لتتمكن من تسجيل إعجابك');
+    navigateApp('account');
+    return;
+  }
+  
+  // مفتاح فريد مخصص لكل حساب مستخدم على حدة
+  const userKey = norm(u.email);
+  const storageKey = `cryo_like_${id}_${userKey}`;
   const countSpan = btn.querySelector('.like-count');
-  const baseCount = getBaseLikeCount(id);
-  const liked = localStorage.getItem(key) === '1';
-  if (liked) {
-    localStorage.removeItem(key);
-    if (countSpan) countSpan.textContent = baseCount;
-    btn.style.background = 'rgba(225, 29, 72, 0.22)';
-    btn.style.color = '#fda4af';
+  let currentCount = parseInt(countSpan.textContent) || 0;
+  
+  const isLiked = localStorage.getItem(storageKey) === '1';
+
+  if (isLiked) {
+    localStorage.removeItem(storageKey);
+    currentCount = Math.max(0, currentCount - 1);
+    btn.style.background = 'rgba(225, 29, 72, 0.14)';
+    btn.style.color = '#f43f5e';
+    toast('تم إزالة إعجابك');
   } else {
-    localStorage.setItem(key, '1');
-    if (countSpan) countSpan.textContent = baseCount + 1;
+    localStorage.setItem(storageKey, '1');
+    currentCount += 1;
     btn.style.background = '#e11d48';
     btn.style.color = '#ffffff';
+    toast('❤️ تم تسجيل إعجابك بنجاح');
   }
+  
+  if (countSpan) countSpan.textContent = currentCount;
 }
 
 function detectPlaceAreaKey(d) {
