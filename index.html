@@ -136,7 +136,8 @@ html[dir="ltr"] .right-icon-dock { right:auto; left:12px; }
 html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:translateX(-6px); }
 .dock-item:hover .dock-tooltip { opacity:1; transform:translateX(0); }
 @media (max-width:1024px) {
-  .right-icon-dock { top:auto; bottom:14px; right:50%; left:auto !important; transform:translateX(50%); flex-direction:row; padding:6px 12px; border-radius:99px; }
+  .right-icon-dock { top:auto; bottom:14px; right:50%; left:auto !important; transform:translateX(50%); flex-direction:row; padding:6px 10px; border-radius:99px; gap:6px; }
+  .dock-item { width:38px; height:38px; }
   .dock-tooltip { display:none; }
 }
 
@@ -147,7 +148,6 @@ html[dir="ltr"] .dock-tooltip { right:auto; left:calc(100% + 10px); transform:tr
 html.light .menu-trigger { background:var(--card); }
 .menu-trigger:hover { border-color:var(--gold-light); }
 
-/* زر وقائمة اختيار المناطق والقرى (الجيزة) فوق الجميع */
 .area-picker-wrap { position:relative; display:inline-block; }
 .area-trigger-btn {
   display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:99px;
@@ -318,7 +318,7 @@ body:has(#areaDropdownPanel:not(.hidden)) .right-icon-dock {
   .spec-ladder-grid { grid-template-columns:1fr; }
 }
 
-/* ================= 8) شريط الحالات المطور (مطابق للصورة تماماً) ================= */
+/* ================= 8) شريط الحالات المطور + زر الإعجاب التفاعلي ================= */
 .poster-section { padding:16px 20px 6px; max-width:1160px; margin:0 auto; position:relative; z-index:10; }
 .poster-track { display:flex; gap:14px; overflow-x:auto; padding:8px 4px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; will-change:scroll-position; align-items:stretch; }
 .poster-track::-webkit-scrollbar { display:none; }
@@ -435,22 +435,63 @@ body:has(#areaDropdownPanel:not(.hidden)) .right-icon-dock {
 }
 .poster-bio-body::-webkit-scrollbar { width: 3px; }
 .poster-bio-body::-webkit-scrollbar-thumb { background: rgba(217,180,90,0.4); border-radius: 99px; }
+
+/* زر الإعجاب: أيقونة باهتة قبل التفاعل + رقم واضح جداً، ويتحول للأحمر النابض عند الضغط */
 .poster-like-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: #e11d48;
-  color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.18);
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   padding: 5px 15px;
   border-radius: 99px;
   font-size: 13.5px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
   cursor: pointer;
-  transition: transform .12s ease, background .15s ease;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
-.poster-like-btn:active { transform: scale(0.93); }
+.poster-like-btn .like-count {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+.poster-like-btn .like-heart-ico {
+  color: rgba(244, 63, 94, 0.42);
+  transition: color 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.poster-like-btn:hover {
+  border-color: rgba(244, 63, 94, 0.45);
+  background: rgba(244, 63, 94, 0.12);
+}
+.poster-like-btn.liked {
+  background: #e11d48;
+  border-color: #fb7185;
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45);
+}
+.poster-like-btn.liked .like-count,
+.poster-like-btn.liked .like-heart-ico {
+  color: #ffffff;
+}
+.poster-like-btn.heart-pop {
+  animation: cryoBtnPop 0.36s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.poster-like-btn.heart-pop .like-heart-ico {
+  animation: cryoHeartBeat 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes cryoBtnPop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.16); }
+  75%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+@keyframes cryoHeartBeat {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.42) rotate(-8deg); }
+  75%  { transform: scale(0.9) rotate(4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
 .poster-del-btn { width:24px; height:24px; border-radius:7px; background:rgba(244,63,94,.22); color:var(--rose); border:1px solid rgba(244,63,94,.4); font-size:12px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;}
 .poster-del-btn:hover { background:var(--rose); color:#fff; }
 
@@ -570,6 +611,65 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 .site-footer { max-width:1200px; margin:0 auto; text-align:center; padding:6px 16px 28px; font-size:12px; color:var(--muted); line-height:1.8; }
 .site-footer b { color:var(--gold); font-weight:700; }
 @media (max-width:1024px) { .site-footer { padding-bottom:96px; } }
+
+/* ================= 13) نافذة حكاية Cryovion المدمجة في شريط التنقل ================= */
+.cry-about-overlay {
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(4,9,17,.84); backdrop-filter:blur(6px);
+  padding:16px; overflow-y:auto; align-items:center; justify-content:center;
+}
+.cry-about-overlay.active { display:flex; }
+.cry-about-modal {
+  position:relative; width:100%; max-width:720px; max-height:88vh; overflow-y:auto;
+  background:var(--surface); border:1.5px solid var(--gold); border-radius:24px;
+  box-shadow:0 24px 70px rgba(0,0,0,.85); animation:cryAboutEnter .28s ease;
+  direction:rtl; text-align:right;
+}
+@keyframes cryAboutEnter {
+  from { opacity:0; transform:translateY(18px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.cry-about-header {
+  padding:28px 24px 22px;
+  background:linear-gradient(135deg, rgba(20,184,166,.22), rgba(217,180,90,.12) 60%, rgba(9,19,31,.95));
+  border-bottom:1px solid var(--border); text-align:center;
+}
+.cry-about-logo {
+  width:56px; height:56px; margin:0 auto 12px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#0e3a44,#04131a);
+  border:2px solid var(--gold); box-shadow:0 0 18px rgba(45,212,191,.35);
+  display:flex; align-items:center; justify-content:center;
+}
+.cry-about-header h2 { margin:0 0 6px; color:var(--gold); font-size:24px; font-weight:700; }
+.cry-about-header p { margin:0; color:var(--muted); font-size:13.5px; }
+.cry-about-close {
+  position:absolute; top:14px; left:14px; width:34px; height:34px; border-radius:50%;
+  background:rgba(255,255,255,.08); border:1px solid var(--border-soft);
+  color:var(--text); font-size:20px; display:flex; align-items:center; justify-content:center;
+}
+.cry-about-close:hover { background:rgba(244,63,94,.22); color:var(--rose); }
+.cry-about-content { padding:22px 26px 28px; color:var(--text); line-height:1.9; font-size:14.5px; }
+.cry-about-content h3 { margin:22px 0 8px; color:var(--gold); font-size:17.5px; font-weight:700; }
+.cry-about-content h3:first-child { margin-top:0; }
+.cry-about-content p { margin:0 0 12px; color:var(--text); opacity:.92; }
+.cry-about-list { list-style:none; padding:0; margin:10px 0 18px; }
+.cry-about-list li { position:relative; padding:8px 26px 8px 0; border-bottom:1px solid var(--border-soft); font-size:14px; }
+.cry-about-list li::before { content:"✓"; position:absolute; right:0; top:8px; color:var(--emerald); font-weight:900; }
+.cry-about-note {
+  margin-top:20px; padding:15px; background:rgba(16,185,129,.1);
+  border-right:4px solid var(--emerald); border-radius:10px;
+  color:var(--text); font-size:13.5px;
+}
+.cry-about-footer {
+  padding:14px 20px; text-align:center; border-top:1px solid var(--border-soft);
+  color:var(--gold); font-size:12.5px; font-weight:700;
+}
+@media(max-width:600px) {
+  .cry-about-modal { max-height:90vh; border-radius:18px; }
+  .cry-about-header { padding:24px 16px 18px; }
+  .cry-about-header h2 { font-size:20px; }
+  .cry-about-content { padding:18px 16px 24px; font-size:13.8px; }
+}
 </style>
 
 <!-- ملف التصميم الإضافي -->
@@ -597,7 +697,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   </div>
 </div>
 
-<!-- ================= شريط التنقل السريع الأيمن ================= -->
+<!-- ================= شريط التنقل السريع الأيمن (مدمج به أيقونة حكاية Cryovion) ================= -->
 <nav class="right-icon-dock" aria-label="Quick Navigation">
   <button data-nav="home" class="dock-item active">
     <span data-ico="dock-home"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
@@ -614,6 +714,10 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <button data-nav="account" class="dock-item">
     <span data-ico="dock-account"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
     <span class="dock-tooltip" data-i18n="nav_account">حسابي والدخول</span>
+  </button>
+  <button type="button" onclick="openCryAbout()" class="dock-item" title="عن Cryovion وحكاية المنصة">
+    <span data-ico="dock-about"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 11v5"/><path stroke-linecap="round" d="M12 8h.01"/></svg></span>
+    <span class="dock-tooltip">عن Cryovion</span>
   </button>
   <button data-nav="settings" class="dock-item">
     <span data-ico="dock-settings"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
@@ -655,6 +759,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
       </button>
       <button data-nav="referrals" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-referrals">✨</span><span data-i18n="nav_referrals">دعوة صديق ومكافأة النشر</span></span></button>
       <button data-nav="account" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-account">🔐</span><span data-i18n="nav_account">تسجيل الدخول والحساب</span></span></button>
+      <button type="button" onclick="closeSideDrawer(); openCryAbout();" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-about">💡</span><span>عن Cryovion وحكاية المنصة</span></span></button>
       <button data-nav="settings" class="nav-btn"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-settings">⚙️</span><span data-i18n="nav_settings">الإعدادات واللغة</span></span></button>
       <button id="drawerAdminBtn" data-nav="admin" class="nav-btn hidden" style="border:1px solid var(--gold); background:rgba(217,180,90,.12);"><span class="nav-btn-left"><span class="nav-icon-box" data-ico="nav-admin">🛡️</span><span>غرفة تحكم المشرف (Admin)</span></span></button>
     </nav>
@@ -810,7 +915,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <!-- ===== صفحة المكان ===== -->
   <div id="view-placePage" class="spa-view hidden"><div id="placePageContent" class="noon-page"></div></div>
 
-  <!-- ===== إدارة صفحتي (مع معاينة حية ومباشرة لشكل البطاقة كما تظهر للناس) ===== -->
+  <!-- ===== إدارة صفحتي ===== -->
   <div id="view-myManaged" class="spa-view hidden content-body">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:16px; border-bottom:1px solid var(--border-soft);">
       <div>
@@ -994,7 +1099,6 @@ html.light .input-box { background:rgba(0,0,0,.03); }
           <span id="devCharCount" style="font-size:11px; color:var(--muted);">0 حرف</span>
         </div>
 
-        <!-- زر رفع الصورة مباشرة من الهاتف أو الكمبيوتر -->
         <div style="display:flex; flex-direction:column; gap:8px;">
           <label for="devImgFile" style="cursor:pointer; background:rgba(217,180,90,0.12); border:1.5px dashed var(--gold); border-radius:12px; padding:12px; text-align:center; font-size:13.5px; color:var(--gold); font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;">
             <span>📷 اضغط هنا لاختيار ورفع صورة الحالة من جهازك</span>
@@ -1003,13 +1107,11 @@ html.light .input-box { background:rgba(0,0,0,.03); }
           <input type="hidden" id="devImgBase64" value="">
         </div>
 
-        <!-- صندوق معاينة الصورة المصغر قبل النشر -->
         <div id="devImgPreviewWrap" style="display:none; position:relative; height:150px; background:#040911; border:1px solid var(--gold); border-radius:8px; overflow:hidden;">
           <img id="devImgPreview" src="" style="width:100%; height:100%; object-fit:cover; display:block;">
           <button type="button" onclick="clearAdminStatusImg()" style="position:absolute; top:8px; left:8px; background:rgba(244,63,94,0.9); color:#fff; border:none; border-radius:8px; padding:4px 10px; font-size:11.5px; font-weight:700; cursor:pointer;">🗑 إزالة الصورة</button>
         </div>
 
-        <!-- حقل النص الأساسي -->
         <textarea id="devText" rows="2" oninput="document.getElementById('devCharCount').textContent = this.value.length + ' حرف'" class="input-box" placeholder="اكتب تحديثاً جديداً، ميزة، أو إعلاناً عاماً للمستخدمين..."></textarea>
 
         <div style="display:flex; gap:8px;">
@@ -1274,6 +1376,88 @@ html.light .input-box { background:rgba(0,0,0,.03); }
   <img id="reelLightboxImg" src="" style="max-width:100%; max-height:90vh; object-fit:contain; border:1.5px solid var(--gold); box-shadow:0 10px 40px rgba(0,0,0,0.85);">
 </div>
 
+<!-- ================= نافذة حكاية Cryovion ومميزات المنصة ================= -->
+<div class="cry-about-overlay" id="cryAboutOverlay" onclick="if(event.target === this) closeCryAbout()">
+  <div class="cry-about-modal">
+    <button type="button" class="cry-about-close" onclick="closeCryAbout()">×</button>
+
+    <div class="cry-about-header">
+      <div class="cry-about-logo">
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+          <path d="M68 28 C55 16 32 18 22 34 C12 49 14 70 28 82 C42 94 64 90 70 76" stroke="#fff" stroke-width="11" stroke-linecap="round"/>
+          <path d="M22 52 L44 52 L50 40 L56 64 L63 32 L70 57 L75 52 L92 52" stroke="#2dd4bf" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="font-display">حكاية Cryovion</h2>
+      <p>فكرة بسيطة، وهدفها تسهيل الوصول إلى الخدمات الطبية.</p>
+    </div>
+
+    <div class="cry-about-content">
+      <h3>من أنا؟ ولماذا بدأت هذه الفكرة؟</h3>
+      <p>
+        أنا شاب قررت أن أستثمر وقتي وجهدي في تطوير منصة <b>Cryovion</b>، انطلاقًا من فكرة بسيطة:
+        لماذا لا يكون الوصول إلى الخدمات الطبية في منطقتنا أسهل وأكثر تنظيمًا؟
+      </p>
+      <p>
+        في كثير من الأحيان، يحتاج الشخص إلى البحث عن طبيب أو صيدلية أو معمل تحاليل، وقد يضطر إلى السؤال هنا وهناك للحصول على المعلومات الأساسية، مثل العنوان ورقم الهاتف ومواعيد العمل.
+      </p>
+      <p>
+        من هنا جاءت فكرة <b>Cryovion</b>؛ منصة تجمع هذه المعلومات في مكان واحد، وتساعد الأشخاص على العثور على ما يحتاجون إليه بطريقة واضحة وسهلة.
+      </p>
+
+      <h3>ما الذي تقدمه Cryovion؟</h3>
+      <p>
+        صُممت المنصة لتكون دليلًا للخدمات والمنشآت الطبية، وتضم مجموعة من الأقسام والخدمات، منها:
+      </p>
+      <ul class="cry-about-list">
+        <li>البحث عن الأطباء حسب التخصص والمنطقة.</li>
+        <li>الوصول إلى العيادات والمنشآت الطبية.</li>
+        <li>العثور على الصيدليات ومواعيد عملها وحالة الفتح الآن.</li>
+        <li>البحث عن معامل التحاليل ومراكز الأشعة.</li>
+        <li>الوصول إلى مراكز البصريات والخدمات المرتبطة بها.</li>
+        <li>عرض أرقام التواصل ووسائل الاتصال المتاحة بضغطة زر.</li>
+        <li>معرفة مواقع المنشآت عبر الخرائط.</li>
+        <li>الاطلاع على التقييمات والتعليقات الحقيقية.</li>
+        <li>معرفة أسعار الكشف ومواعيد العمل عند توفرها.</li>
+        <li>إمكانية إدارة أصحاب المنشآت لصفحاتهم وتحديث بياناتهم وحالاتهم اليومية.</li>
+      </ul>
+
+      <h3>منصة يشارك في إدارتها أصحاب المنشآت</h3>
+      <p>
+        لا تعتمد <b>Cryovion</b> على عرض المعلومات فقط؛ بل تتيح لأصحاب المنشآت الطبية إدارة صفحاتهم وتحديث بياناتهم بأنفسهم من خلال حساباتهم، بما يساعد على إبقاء المعلومات أكثر ارتباطًا بالواقع.
+      </p>
+      <p>
+        فكل منشأة تستطيع عرض معلوماتها ووسائل التواصل ومواعيد العمل والخدمات التي تقدمها، وفقًا للإمكانات المتاحة داخل المنصة.
+      </p>
+
+      <h3>تجربة استخدام بسيطة للجميع</h3>
+      <p>
+        كان من المهم بالنسبة لي ألا تكون المنصة مجرد مجموعة صفحات مليئة بالمعلومات، بل أن تكون سهلة الاستخدام ومريحة للزائر.
+      </p>
+      <p>
+        لذلك تتضمن <b>Cryovion</b> واجهة عربية وإنجليزية، وإمكانية التبديل بين الوضع الليلي والنهاري، والبحث الصوتي، وخيارات تساعد على تحسين تجربة التصفح.
+      </p>
+
+      <h3>ما الذي أطمح إليه؟</h3>
+      <p>
+        لا أتعامل مع <b>Cryovion</b> باعتبارها مجرد موقع إلكتروني، بل مشروع أطمح إلى تطويره وتحسينه باستمرار، حتى يصبح دليلًا محليًا مفيدًا يعتمد عليه الناس في العثور على الخدمات الطبية والمعلومات المتعلقة بها.
+      </p>
+      <p>
+        ما زال أمام المشروع الكثير من العمل والتطوير، وكل تحسين فيه هو خطوة نحو جعل الوصول إلى الخدمات الطبية أكثر سهولة وتنظيمًا.
+      </p>
+
+      <div class="cry-about-note">
+        <strong style="color:var(--emerald);">تنويه مهم:</strong>
+        Cryovion منصة للتعريف بالمنشآت والخدمات الطبية وتسهيل الوصول إلى معلوماتها، وليست بديلًا عن الاستشارة الطبية أو التشخيص أو العلاج.
+      </div>
+    </div>
+
+    <div class="cry-about-footer">
+      Cryovion — نحو وصول أسهل إلى الخدمات الطبية.
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast-box gold-bg hidden"></div>
 <div id="ext-root"></div>
 <!-- ======================= نهاية الجزء الأول (1/3) ======================= -->
@@ -1282,7 +1466,7 @@ html.light .input-box { background:rgba(0,0,0,.03); }
 'use strict';
 /* =====================================================================
    Cryovion v1.7.0 — الجزء الثاني (2/3)
-   الإعدادات، الهوية البصرية، قاعدة البيانات، ضغط الصور الذكي، وعرض شريط الحالات الجديد
+   الإعدادات، الهوية البصرية، قاعدة البيانات، ونظام الإعجابات التفاعلي
    ===================================================================== */
 
 /* ============ 1) الإعدادات الأساسية ============ */
@@ -1639,7 +1823,7 @@ function openReelImage(url) {
   box.style.display = 'flex';
 }
 
-// الإعجابات محفوظة مركزياً في Supabase، وليست في localStorage الخاص بكل جهاز.
+/* نظام الإعجابات السحابي التفاعلي (أيقونة باهتة قبل التفاعل + رقم أبيض واضح، وتتحول للأحمر النابض عند الضغط) */
 const reelLikeCounts = new Map();
 const reelLikedByMe = new Set();
 let reelLikesLoading = false;
@@ -1650,8 +1834,7 @@ function paintReelLikeButtons() {
     const span = btn.querySelector('.like-count');
     if (span) span.textContent = String(reelLikeCounts.get(id) || 0);
     const liked = reelLikedByMe.has(id);
-    btn.style.background = liked ? '#e11d48' : 'rgba(225, 29, 72, 0.88)';
-    btn.style.color = '#ffffff';
+    btn.classList.toggle('liked', liked);
     btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
   });
 }
@@ -1674,7 +1857,6 @@ async function loadReelLikes() {
     paintReelLikeButtons();
   } catch (err) {
     console.error('[Cryovion reel likes]', err);
-    toast('تعذر تحميل أعداد الإعجابات من قاعدة البيانات');
   } finally {
     reelLikesLoading = false;
   }
@@ -1691,22 +1873,41 @@ async function toggleReelLike(id, btn) {
   }
   if (btn.dataset.busy === '1') return;
   btn.dataset.busy = '1';
-  btn.disabled = true;
+
+  // تشغيل الحركة التفاعلية الفورية عند الضغط
+  btn.classList.remove('heart-pop');
+  void btn.offsetWidth;
+  btn.classList.add('heart-pop');
+
+  const key = String(id);
+  const wasLiked = reelLikedByMe.has(key);
+  const prevCount = reelLikeCounts.get(key) || 0;
+
+  // تحديث فوري على الشاشة للاستجابة اللحظية
+  if (wasLiked) {
+    reelLikedByMe.delete(key);
+    reelLikeCounts.set(key, Math.max(0, prevCount - 1));
+  } else {
+    reelLikedByMe.add(key);
+    reelLikeCounts.set(key, prevCount + 1);
+  }
+  paintReelLikeButtons();
+
   try {
     const uid = session.user.id;
-    const key = String(id);
-    const liked = reelLikedByMe.has(key);
-    const result = liked
+    const result = wasLiked
       ? await db.from('reel_likes').delete().eq('story_id', key).eq('user_id', uid)
       : await db.from('reel_likes').insert({ story_id: key, user_id: uid });
     if (result.error) throw result.error;
     await loadReelLikes();
-    toast(liked ? 'تم إزالة إعجابك' : 'تم تسجيل إعجابك بنجاح');
   } catch (err) {
     console.error('[Cryovion toggle like]', err);
-    toast('تعذر حفظ الإعجاب. تحقق من إعدادات جدول reel_likes.');
+    // التراجع عند حدوث خطأ في الاتصال
+    if (wasLiked) reelLikedByMe.add(key); else reelLikedByMe.delete(key);
+    reelLikeCounts.set(key, prevCount);
+    paintReelLikeButtons();
+    toast('تعذر حفظ الإعجاب، تأكد من اتصال الإنترنت');
   } finally {
-    btn.disabled = false;
     delete btn.dataset.busy;
   }
 }
@@ -2606,7 +2807,7 @@ function actions(d, mode) {
     + (pg ? one(!!mu, mu, true, 'background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);', '🗺️ الموقع على الخريطة') : '');
 }
 
-/* ============ 11) العرض: الأقسام والتخصصات وشريط الحالات الجديد المطابق للصورة ============ */
+/* ============ 11) العرض: الأقسام والتخصصات وشريط الحالات الجديد ============ */
 function buildFilters() {
   const dict = I18N[currentLang] || I18N.ar;
   $('cats').innerHTML = Object.entries(CATS).map(([k, c]) => {
@@ -2673,8 +2874,6 @@ function renderPostersCarousel() {
 
     const isLiked = reelLikedByMe.has(String(id));
     const likeCount = reelLikeCounts.get(String(id)) || 0;
-    const heartBg = isLiked ? '#e11d48' : 'rgba(225, 29, 72, 0.88)';
-    const heartColor = '#ffffff';
 
     const imgSection = imgUrl ? `
       <div class="poster-img-box" onclick="event.stopPropagation(); openReelImage('${esc(imgUrl)}')">
@@ -2690,7 +2889,7 @@ function renderPostersCarousel() {
     return `<div ${clickAttr} class="poster-card" style="--poster-accent:${accentColor}; ${cursorStyle}">
       ${imgSection}
 
-      <!-- شريط الوقت المتبقي كما في الصورة -->
+      <!-- شريط الوقت المتبقي -->
       <div style="display:flex; flex-direction:column; gap:5px; direction:rtl;">
         <div class="poster-progress-bar">
           <div class="poster-progress-fill" style="width:${pct}%;"></div>
@@ -2714,11 +2913,11 @@ function renderPostersCarousel() {
         <div class="poster-bio-body">${esc(text || 'تحديث جديد متاح الآن')}</div>
       </div>
 
-      <!-- زر القلب والاعجابات في الأسفل يساراً -->
+      <!-- زر القلب الباهت قبل التفاعل + رقم الإعجابات الأبيض الواضح -->
       <div style="display:flex; justify-content:flex-end; align-items:center; direction:rtl; padding-top:2px;">
-        <button type="button" class="poster-like-btn" data-like-id="${esc(id)}" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)" style="background:${heartBg}; color:${heartColor};">
+        <button type="button" class="poster-like-btn${isLiked ? ' liked' : ''}" data-like-id="${esc(id)}" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)">
           <span class="like-count">${likeCount}</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <svg class="like-heart-ico" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
       </div>
     </div>`;
@@ -3098,7 +3297,7 @@ function openReviewModal(id) {
 }
 function closeReviewModal() { $('reviewModal').classList.add('hidden'); }
 
-/* ============ 13) إدارة صفحتي (مع رفع صورة مباشر للحالة اليومية) + دعوة صديق + غرفة الإدارة ============ */
+/* ============ 13) إدارة صفحتي + دعوة صديق + غرفة الإدارة ============ */
 function renderManagedAds() {
   const u = getCurrentUser(), box = $('managedListBox');
   if (!u) {
@@ -3109,7 +3308,6 @@ function renderManagedAds() {
   if (!myAds.length) {
     box.innerHTML = `<div class="entity-card" style="text-align:center; padding:26px; color:var(--muted);">
       <p style="margin-bottom:16px;">لا توجد صفحة مرتبطة ببريدك (<b style="color:var(--gold);">${esc(u.email)}</b>) حالياً.</p>
-      
       <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 12px; padding: 20px; margin-top: 10px;">
         <p style="font-size: 15.5px; line-height: 1.7; margin-bottom: 16px; color: #fff;">
           إن كنت صيدلي، دكتور، أو صاحب معمل وتود إنشاء صفحة مجاناً أو معرفة المزيد من التفاصيل، تواصل معنا مباشرة:
@@ -3424,6 +3622,19 @@ function openEditorModal(id) {
 }
 function closeEditorModal() { $('editorModal').classList.add('hidden'); }
 
+function openCryAbout() {
+  const overlay = $('cryAboutOverlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeCryAbout() {
+  const overlay = $('cryAboutOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
 async function share(id) {
   const d = byId(id); if (!d) return;
   const shareUrl = `${window.location.href.split('?')[0]}?ref=${d.id}`;
@@ -3556,7 +3767,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    closeEditorModal(); closeReviewModal(); closeSideDrawer();
+    closeEditorModal(); closeReviewModal(); closeSideDrawer(); closeCryAbout();
     $('onboardingModal').classList.add('hidden');
     if ($('reelImageLightbox')) $('reelImageLightbox').style.display = 'none';
     openAreaDropdown(false);
@@ -4035,404 +4246,6 @@ Cryovion.emit('ready');
 initSupabaseSession().then(() => load()).then(() => checkIncomingReferral());
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
-  <!-- =========================================
-     CRYOVION - ABOUT THE PLATFORM
-========================================= -->
-
-<style>
-/* زر عن المنصة */
-.cry-about-trigger {
-    position: fixed;
-    bottom: 24px;
-    left: 22px;
-    z-index: 9990;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 11px 17px;
-    border: 1px solid rgba(16,185,129,.2);
-    border-radius: 30px;
-    background: #ffffff;
-    color: #087f5b;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 5px 22px rgba(0,0,0,.09);
-    transition: .25s ease;
-}
-
-.cry-about-trigger:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 9px 25px rgba(0,0,0,.13);
-}
-
-.cry-about-trigger svg {
-    width: 19px;
-    height: 19px;
-}
-
-/* الخلفية */
-.cry-about-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-    background: rgba(10, 25, 22, .55);
-    backdrop-filter: blur(5px);
-    padding: 20px;
-    overflow-y: auto;
-    align-items: center;
-    justify-content: center;
-}
-
-.cry-about-overlay.active {
-    display: flex;
-}
-
-/* النافذة */
-.cry-about-modal {
-    position: relative;
-    width: 100%;
-    max-width: 720px;
-    max-height: 88vh;
-    overflow-y: auto;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 20px 70px rgba(0,0,0,.2);
-    animation: cryAboutEnter .3s ease;
-    direction: rtl;
-    font-family: inherit;
-}
-
-@keyframes cryAboutEnter {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* رأس النافذة */
-.cry-about-header {
-    padding: 32px 30px;
-    background: linear-gradient(135deg, #e9faf3, #f4fbf8);
-    border-bottom: 1px solid #e5f1eb;
-    text-align: center;
-}
-
-.cry-about-logo {
-    width: 58px;
-    height: 58px;
-    margin: 0 auto 14px;
-    border-radius: 17px;
-    background: #0c9870;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cry-about-logo svg {
-    width: 30px;
-    height: 30px;
-}
-
-.cry-about-header h2 {
-    margin: 0 0 8px;
-    color: #155b45;
-    font-size: 25px;
-    font-weight: 800;
-}
-
-.cry-about-header p {
-    margin: 0;
-    color: #638174;
-    font-size: 14px;
-}
-
-/* زر الإغلاق */
-.cry-about-close {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 35px;
-    height: 35px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255,255,255,.8);
-    color: #46665a;
-    font-size: 23px;
-    cursor: pointer;
-}
-
-/* محتوى المقالة */
-.cry-about-content {
-    padding: 28px 32px 35px;
-    color: #354b43;
-    line-height: 1.95;
-    font-size: 15px;
-}
-
-.cry-about-content h3 {
-    margin: 25px 0 10px;
-    color: #087f5b;
-    font-size: 18px;
-    font-weight: 800;
-}
-
-.cry-about-content h3:first-child {
-    margin-top: 0;
-}
-
-.cry-about-content p {
-    margin: 0 0 14px;
-}
-
-.cry-about-content strong {
-    color: #176b50;
-}
-
-.cry-about-list {
-    list-style: none;
-    padding: 0;
-    margin: 12px 0 20px;
-}
-
-.cry-about-list li {
-    position: relative;
-    padding: 9px 28px 9px 0;
-    border-bottom: 1px solid #edf2ef;
-}
-
-.cry-about-list li::before {
-    content: "✓";
-    position: absolute;
-    right: 0;
-    top: 9px;
-    color: #0c9870;
-    font-weight: 900;
-}
-
-.cry-about-note {
-    margin-top: 25px;
-    padding: 17px;
-    background: #f0faf5;
-    border-right: 4px solid #0c9870;
-    border-radius: 8px;
-    color: #426657;
-    font-size: 14px;
-}
-
-.cry-about-footer {
-    padding: 18px 25px;
-    text-align: center;
-    border-top: 1px solid #edf2ef;
-    color: #82948c;
-    font-size: 12px;
-}
-
-/* الهاتف */
-@media(max-width:600px) {
-    .cry-about-trigger {
-        bottom: 15px;
-        left: 12px;
-        padding: 10px 13px;
-        font-size: 12px;
-    }
-
-    .cry-about-modal {
-        max-height: 92vh;
-        border-radius: 16px;
-    }
-
-    .cry-about-header {
-        padding: 27px 18px;
-    }
-
-    .cry-about-header h2 {
-        font-size: 21px;
-    }
-
-    .cry-about-content {
-        padding: 23px 19px;
-        font-size: 14px;
-    }
-}
-</style>
-
-
-<!-- أيقونة عن المنصة -->
-<button class="cry-about-trigger" onclick="openCryAbout()">
-    <svg viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="1.8"
-         stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 11v5"/>
-        <path d="M12 8h.01"/>
-    </svg>
-    عن Cryovion
-</button>
-
-
-<!-- نافذة المقالة -->
-<div class="cry-about-overlay" id="cryAboutOverlay"
-     onclick="if(event.target === this) closeCryAbout()">
-
-    <div class="cry-about-modal">
-
-        <button class="cry-about-close"
-                onclick="closeCryAbout()">×</button>
-
-        <div class="cry-about-header">
-
-            <div class="cry-about-logo">
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.7"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3v18M3 12h18"/>
-                    <path d="m5.6 5.6 12.8 12.8M18.4 5.6 5.6 18.4"/>
-                </svg>
-            </div>
-
-            <h2>حكاية Cryovion</h2>
-            <p>فكرة بسيطة، وهدفها تسهيل الوصول إلى الخدمات الطبية.</p>
-
-        </div>
-
-
-        <div class="cry-about-content">
-
-            <h3>من أنا؟ ولماذا بدأت هذه الفكرة؟</h3>
-
-            <p>
-                أنا شاب قررت أن أستثمر وقتي وجهدي في تطوير منصة
-                Cryovion، انطلاقًا من فكرة بسيطة:
-                لماذا لا يكون الوصول إلى الخدمات الطبية في منطقتنا
-                أسهل وأكثر تنظيمًا؟
-            </p>
-
-            <p>
-                في كثير من الأحيان، يحتاج الشخص إلى البحث عن طبيب
-                أو صيدلية أو معمل تحاليل، وقد يضطر إلى السؤال هنا
-                وهناك للحصول على المعلومات الأساسية، مثل العنوان
-                ورقم الهاتف ومواعيد العمل.
-            </p>
-
-            <p>
-                من هنا جاءت فكرة Cryovion؛ منصة تجمع هذه المعلومات
-                في مكان واحد، وتساعد الأشخاص على العثور على ما
-                يحتاجون إليه بطريقة واضحة وسهلة.
-            </p>
-
-
-            <h3>ما الذي تقدمه Cryovion؟</h3>
-
-            <p>
-                صُممت المنصة لتكون دليلًا للخدمات والمنشآت الطبية،
-                وتضم مجموعة من الأقسام والخدمات، منها:
-            </p>
-
-            <ul class="cry-about-list">
-                <li>البحث عن الأطباء حسب التخصص والمنطقة.</li>
-                <li>الوصول إلى العيادات والمنشآت الطبية.</li>
-                <li>العثور على الصيدليات ومواعيد عملها.</li>
-                <li>البحث عن معامل التحاليل ومراكز الأشعة.</li>
-                <li>الوصول إلى مراكز البصريات والخدمات المرتبطة بها.</li>
-                <li>عرض أرقام التواصل ووسائل الاتصال المتاحة.</li>
-                <li>معرفة مواقع المنشآت عبر الخرائط.</li>
-                <li>الاطلاع على التقييمات والتعليقات.</li>
-                <li>معرفة أسعار الكشف ومواعيد العمل عند توفرها.</li>
-                <li>إمكانية إدارة أصحاب المنشآت لصفحاتهم وتحديث بياناتهم.</li>
-            </ul>
-
-
-            <h3>منصة يشارك في إدارتها أصحاب المنشآت</h3>
-
-            <p>
-                لا تعتمد Cryovion على عرض المعلومات فقط؛ بل تتيح
-                لأصحاب المنشآت الطبية إدارة صفحاتهم وتحديث بياناتهم
-                بأنفسهم من خلال حساباتهم، بما يساعد على إبقاء
-                المعلومات أكثر ارتباطًا بالواقع.
-            </p>
-
-            <p>
-                فكل منشأة تستطيع عرض معلوماتها ووسائل التواصل
-                ومواعيد العمل والخدمات التي تقدمها، وفقًا
-                للإمكانات المتاحة داخل المنصة.
-            </p>
-
-
-            <h3>تجربة استخدام بسيطة للجميع</h3>
-
-            <p>
-                كان من المهم بالنسبة لي ألا تكون المنصة مجرد
-                مجموعة صفحات مليئة بالمعلومات، بل أن تكون سهلة
-                الاستخدام ومريحة للزائر.
-            </p>
-
-            <p>
-                لذلك تتضمن Cryovion واجهة عربية وإنجليزية،
-                وإمكانية التبديل بين الوضع الليلي والنهاري،
-                وخيارات تساعد على تحسين تجربة التصفح.
-            </p>
-
-
-            <h3>ما الذي أطمح إليه؟</h3>
-
-            <p>
-                لا أتعامل مع Cryovion باعتبارها مجرد موقع إلكتروني،
-                بل مشروع أطمح إلى تطويره وتحسينه باستمرار،
-                حتى يصبح دليلًا محليًا مفيدًا يعتمد عليه الناس
-                في العثور على الخدمات الطبية والمعلومات المتعلقة بها.
-            </p>
-
-            <p>
-                ما زال أمام المشروع الكثير من العمل والتطوير،
-                وكل تحسين فيه هو خطوة نحو جعل الوصول إلى الخدمات
-                الطبية أكثر سهولة وتنظيمًا.
-            </p>
-
-
-            <div class="cry-about-note">
-                <strong>تنويه مهم:</strong>
-                Cryovion منصة للتعريف بالمنشآت والخدمات الطبية
-                وتسهيل الوصول إلى معلوماتها، وليست بديلًا عن
-                الاستشارة الطبية أو التشخيص أو العلاج.
-            </div>
-
-        </div>
-
-        <div class="cry-about-footer">
-            Cryovion — نحو وصول أسهل إلى الخدمات الطبية.
-        </div>
-
-    </div>
-</div>
-
-
-<script>
-function openCryAbout() {
-    const overlay = document.getElementById('cryAboutOverlay');
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeCryAbout() {
-    const overlay = document.getElementById('cryAboutOverlay');
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeCryAbout();
-    }
-});
-</script>
 </body>
 </html>
 <!-- ======================= نهاية الجزء الثالث والأخير (3/3) ======================= -->
