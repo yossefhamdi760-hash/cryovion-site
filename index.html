@@ -1639,41 +1639,76 @@ function openReelImage(url) {
   box.style.display = 'flex';
 }
 
-function getBaseLikeCount(id) {
-  return 0; // يبدأ العداد من الصفر تماماً
+// الإعجابات محفوظة مركزياً في Supabase، وليست في localStorage الخاص بكل جهاز.
+const reelLikeCounts = new Map();
+const reelLikedByMe = new Set();
+let reelLikesLoading = false;
+
+function paintReelLikeButtons() {
+  document.querySelectorAll('.poster-like-btn[data-like-id]').forEach(btn => {
+    const id = btn.dataset.likeId;
+    const span = btn.querySelector('.like-count');
+    if (span) span.textContent = String(reelLikeCounts.get(id) || 0);
+    const liked = reelLikedByMe.has(id);
+    btn.style.background = liked ? '#e11d48' : 'rgba(225, 29, 72, 0.88)';
+    btn.style.color = '#ffffff';
+    btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+  });
+}
+
+async function loadReelLikes() {
+  if (!db || reelLikesLoading) return;
+  reelLikesLoading = true;
+  try {
+    const sessionResult = await db.auth.getSession();
+    const uid = sessionResult.data?.session?.user?.id || null;
+    const result = await db.from('reel_likes').select('story_id,user_id');
+    if (result.error) throw result.error;
+    reelLikeCounts.clear();
+    reelLikedByMe.clear();
+    (result.data || []).forEach(row => {
+      const id = String(row.story_id);
+      reelLikeCounts.set(id, (reelLikeCounts.get(id) || 0) + 1);
+      if (uid && row.user_id === uid) reelLikedByMe.add(id);
+    });
+    paintReelLikeButtons();
+  } catch (err) {
+    console.error('[Cryovion reel likes]', err);
+    toast('تعذر تحميل أعداد الإعجابات من قاعدة البيانات');
+  } finally {
+    reelLikesLoading = false;
+  }
 }
 
 async function toggleReelLike(id, btn) {
-  const u = getCurrentUser();
-  if (!u || !u.email) {
-    toast('سجل دخولك بحسابك لتتمكن من تسجيل إعجابك');
+  if (!db) return toast('قاعدة البيانات غير متاحة حالياً');
+  const sessionResult = await db.auth.getSession();
+  const session = sessionResult.data?.session;
+  if (!session?.user?.id) {
+    toast('سجّل دخولك بحسابك لتتمكن من تسجيل إعجابك');
     navigateApp('account');
     return;
   }
-  
-  // مفتاح فريد مخصص لكل حساب مستخدم على حدة
-  const userKey = norm(u.email);
-  const storageKey = `cryo_like_${id}_${userKey}`;
-  const countSpan = btn.querySelector('.like-count');
-  let currentCount = parseInt(countSpan.textContent) || 0;
-  
-  const isLiked = localStorage.getItem(storageKey) === '1';
-
-  if (isLiked) {
-    localStorage.removeItem(storageKey);
-    currentCount = Math.max(0, currentCount - 1);
-    btn.style.background = 'rgba(225, 29, 72, 0.14)';
-    btn.style.color = '#f43f5e';
-    toast('تم إزالة إعجابك');
-  } else {
-    localStorage.setItem(storageKey, '1');
-    currentCount += 1;
-    btn.style.background = '#e11d48';
-    btn.style.color = '#ffffff';
-    toast('❤️ تم تسجيل إعجابك بنجاح');
+  if (btn.dataset.busy === '1') return;
+  btn.dataset.busy = '1';
+  btn.disabled = true;
+  try {
+    const uid = session.user.id;
+    const key = String(id);
+    const liked = reelLikedByMe.has(key);
+    const result = liked
+      ? await db.from('reel_likes').delete().eq('story_id', key).eq('user_id', uid)
+      : await db.from('reel_likes').insert({ story_id: key, user_id: uid });
+    if (result.error) throw result.error;
+    await loadReelLikes();
+    toast(liked ? 'تم إزالة إعجابك' : 'تم تسجيل إعجابك بنجاح');
+  } catch (err) {
+    console.error('[Cryovion toggle like]', err);
+    toast('تعذر حفظ الإعجاب. تحقق من إعدادات جدول reel_likes.');
+  } finally {
+    btn.disabled = false;
+    delete btn.dataset.busy;
   }
-  
-  if (countSpan) countSpan.textContent = currentCount;
 }
 
 function detectPlaceAreaKey(d) {
@@ -2636,10 +2671,8 @@ function renderPostersCarousel() {
     const remHours = Math.max(1, Math.ceil(remMs / 3600000));
     const pct = Math.max(8, Math.min(100, Math.round((remMs / DAY_MS) * 100)));
 
-    const likeKey = 'cryo_like_' + id;
-    const isLiked = localStorage.getItem(likeKey) === '1';
-    const baseLikes = getBaseLikeCount(id);
-    const likeCount = isLiked ? (baseLikes + 1) : baseLikes;
+    const isLiked = reelLikedByMe.has(String(id));
+    const likeCount = reelLikeCounts.get(String(id)) || 0;
     const heartBg = isLiked ? '#e11d48' : 'rgba(225, 29, 72, 0.88)';
     const heartColor = '#ffffff';
 
@@ -2683,7 +2716,7 @@ function renderPostersCarousel() {
 
       <!-- زر القلب والاعجابات في الأسفل يساراً -->
       <div style="display:flex; justify-content:flex-end; align-items:center; direction:rtl; padding-top:2px;">
-        <button type="button" class="poster-like-btn" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)" style="background:${heartBg}; color:${heartColor};">
+        <button type="button" class="poster-like-btn" data-like-id="${esc(id)}" onclick="event.stopPropagation(); toggleReelLike('${esc(id)}', this)" style="background:${heartBg}; color:${heartColor};">
           <span class="like-count">${likeCount}</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
@@ -2744,6 +2777,7 @@ function renderPostersCarousel() {
   track.dataset.looped = items.length >= 2 ? '1' : '0';
   track.innerHTML = items.length >= 2 ? (baseHtml + baseHtml) : baseHtml;
   setupPosterLiveObserver();
+  loadReelLikes();
 }
 <!-- ======================= نهاية الجزء الثاني (2/3) ======================= -->
   <!-- ======================= بداية الجزء الثالث والأخير (3/3) ======================= -->
